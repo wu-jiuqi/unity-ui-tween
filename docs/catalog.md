@@ -1,6 +1,6 @@
 # 46 项 UI 动效图鉴
 
-版本 0.2.0。编号、名称和默认参数以 `Resources/motion-catalog.json` 为单一数据源；展馆、模板预设与本文使用同一清单。每项对应 `Prefabs/<ID>.prefab` 和 `Presets/<ID>.asset`，实际播放统一使用 `MotionPlayer`。
+版本 0.2.1。编号、名称和默认参数以 `Resources/motion-catalog.json` 为单一数据源；展馆、模板预设与本文使用同一清单。每项对应 `Prefabs/<ID>.prefab` 和 `Presets/<ID>.asset`，实际播放统一使用 `MotionPlayer`。
 
 ## 如何区分相似效果
 

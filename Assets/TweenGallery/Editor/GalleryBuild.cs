@@ -11,7 +11,7 @@ namespace TweenGallery.Editor
 {
     public static class GalleryBuild
     {
-        public const string Version = "0.2.0";
+        public const string Version = "0.2.1";
         const string Root = "Assets/TweenGallery";
 
         [MenuItem("Tools/UI Motion Gallery/Prepare scene and templates")]
@@ -44,11 +44,15 @@ namespace TweenGallery.Editor
                 preset.effectId = effect.id;
                 preset.settings = MotionSettings.FromDefinition(effect);
                 EditorUtility.SetDirty(preset);
+                // Existing base prefabs are part of the public API: preserve their
+                // serialized child fileIDs so downstream overrides remain valid.
+                string prefabPath = Root + "/Prefabs/" + effect.id + ".prefab";
+                if (!effect.id.StartsWith("F", StringComparison.Ordinal) && AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null) continue;
                 var player = DemoFactory.Create(effect.id, preview.transform, new Vector2(600, 420));
                 var prefabRoot = player.transform;
                 while (prefabRoot.parent != preview.transform && prefabRoot.parent != null) prefabRoot = prefabRoot.parent;
                 PersistArt(prefabRoot.gameObject, effect.id);
-                PrefabUtility.SaveAsPrefabAsset(prefabRoot.gameObject, Root + "/Prefabs/" + effect.id + ".prefab");
+                PrefabUtility.SaveAsPrefabAsset(prefabRoot.gameObject, prefabPath);
                 UnityEngine.Object.DestroyImmediate(prefabRoot.gameObject);
             }
             UnityEngine.Object.DestroyImmediate(preview);

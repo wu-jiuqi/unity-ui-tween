@@ -1,6 +1,6 @@
 # Unity UI Motion Gallery
 
-一套以 **Unity UGUI + DOTween 免费版** 实现的 46 项 UI 动效：可运行 Windows 展馆、46 个预设与示例预制体、通用 Runtime、Codex Skill 和中文文档。版本 **0.2.0**。
+一套以 **Unity UGUI + DOTween 免费版** 实现的 46 项 UI 动效：可运行 Windows 展馆、46 个预设与示例预制体、通用 Runtime、Codex Skill 和中文文档。版本 **0.2.1**。
 
 展馆使用鲜艳、高饱和度的休闲游戏 UI，并以同一份 MotionPlayer 播放实际交付的模板。A01–F06 固定编号覆盖出现消失、交互反馈、页面转场、奖励数值、循环和编排。
 
@@ -37,5 +37,5 @@ Unity **6000.0.26f1**、UGUI **2.0.0**、DOTween 免费版 **1.3.045**、Built-i
 
 打开 Gallery.unity 可在编辑器运行。需要重新生成展馆场景和模板时，在此独立工程使用菜单 **Tools → UI Motion Gallery → Prepare scene and templates**；Windows 构建使用 **Build Windows and export templates**。Prepare 会重建当前展馆场景，先保存手动改动。
 
-v0.1.0 已发布，v0.2.0 的构建及发布状态以实际记录为准。当前交付与阻碍记录见 PROGRESS.md。
+v0.1.0 已发布，v0.2.1 的构建及发布状态以实际记录为准。当前交付与阻碍记录见 PROGRESS.md。
 

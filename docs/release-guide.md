@@ -1,13 +1,13 @@
 # Release 使用与发布指南
 
-版本 0.2.0。发布资产按用途分开：
+版本 0.2.1。发布资产按用途分开：
 
 | 资产 | 用途 |
 |---|---|
-| UnityTweenGallery-0.2.0-Windows-x64.zip | 解压后运行 UIMotionGallery.exe 查看展馆 |
-| UnityTweenGallery-0.2.0-Source.zip | 完整 Unity 源工程 |
-| UnityUITween-Templates-0.2.0.unitypackage | TweenGallery 模板与资源；目标项目需已有 DOTween 免费版 |
-| unity-ui-tween-0.2.0.zip | Codex Skill、图鉴和模板资产 |
+| UnityTweenGallery-0.2.1-Windows-x64.zip | 解压后运行 UIMotionGallery.exe 查看展馆 |
+| UnityTweenGallery-0.2.1-Source.zip | 完整 Unity 源工程 |
+| UnityUITween-Templates-0.2.1.unitypackage | TweenGallery 模板与资源；目标项目需已有 DOTween 免费版 |
+| unity-ui-tween-0.2.1.zip | Codex Skill、图鉴和模板资产 |
 
 实际可用资产以本次 Release 或本地 dist 目录为准，不把未生成的包列为已交付。
 
