@@ -39,10 +39,10 @@ foreach ($name in @('Assets','Packages','ProjectSettings','docs','scripts','Skil
     Copy-Item -LiteralPath (Join-Path $project $name) -Destination $source -Recurse
 }
 Compress-Archive -LiteralPath $source -DestinationPath (Join-Path $dist "UnityTweenGallery-$version-Source.zip") -Force
-$hashes = Get-ChildItem -LiteralPath $dist -File | Where-Object { $_.Extension -in '.zip','.unitypackage' } | ForEach-Object {
+$hashes = Get-ChildItem -LiteralPath $dist -File | Where-Object { $_.Extension -in '.zip','.unitypackage' -and $_.Name.Contains($version) } | ForEach-Object {
     $hash = Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256
     "$($hash.Hash.ToLowerInvariant())  $($_.Name)"
 }
-$hashes | Set-Content -LiteralPath (Join-Path $dist 'SHA256SUMS.txt') -Encoding ascii
+$hashes | Set-Content -LiteralPath (Join-Path $dist ('SHA256SUMS-' + $version + '.txt')) -Encoding ascii
 Write-Output "Packaged assets at $dist"
 Get-ChildItem -LiteralPath $dist -File | Select-Object Name,Length

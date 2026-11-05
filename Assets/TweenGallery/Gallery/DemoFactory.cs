@@ -101,6 +101,12 @@ namespace TweenGallery
                     Trail(root,b); break;
                 case "E07":
                     Gesture(root,b); break;
+                case "F01": Holographic(root,b); break;
+                case "F02": Constellation(root,b); break;
+                case "F03": KineticTitle(root,b); break;
+                case "F04": Dashboard(root,b); break;
+                case "F05": FocusCarousel(root,b); break;
+                case "F06": PortalReveal(root,b); break;
                 default:
                     Bind(b, GameButton(root,effectId,Purple)); break;
             }
@@ -443,6 +449,113 @@ namespace TweenGallery
             var hand=Picture("Tutorial hand",root,new Vector2(88,110),new Vector2(105,-91),Color.white,GalleryShapes.Get("hand"));
             hand.rectTransform.localEulerAngles=new Vector3(0,0,-20);
             Bind(b,hand.rectTransform);b.secondary=halo.rectTransform;b.secondaryGroup=Group(halo.rectTransform);
+        }
+
+        // Original graphic fixtures: their staged motion is provided solely by MotionPlayer.
+        static void Holographic(Transform root,MotionBindings b)
+        {
+            Text("Eyebrow",root,"SIGNAL / 01",16,new Vector2(400,30),new Vector2(0,150),Cyan);
+            var card=Panel("Holographic reward card",root,new Vector2(380,240),Vector2.zero,Hex("26325B"));
+            card.gameObject.AddComponent<RectMask2D>();
+            Picture("Header accent",card,new Vector2(380,12),new Vector2(0,111),Pink);
+            Gem(card,new Vector2(-100,0),100,Cyan);
+            Text("Title",card,"棱镜珍藏",30,new Vector2(225,44),new Vector2(66,47),Color.white);
+            Text("Serial",card,"PRISM / 003",16,new Vector2(225,26),new Vector2(66,11),Yellow);
+            Text("Description",card,"已解锁 · 限定外观",17,new Vector2(235,32),new Vector2(66,-30),Muted);
+            var shine=Picture("Scanning beam",card,new Vector2(72,300),Vector2.zero,new Color(.40f,1f,1f,.48f));
+            shine.rectTransform.localEulerAngles=new Vector3(0,0,-16);
+            var rows=new List<RectTransform>();var groups=new List<CanvasGroup>();
+            for(int i=0;i<5;i++){var line=Picture("Scan line "+i,card,new Vector2(330,3),new Vector2(0,72-i*36),new Color(.3f,1,1,.28f)).rectTransform; rows.Add(line);groups.Add(Group(line));}
+            var wipe=Picture("Chromatic wipe block",card,new Vector2(380,240),new Vector2(-380,0),Pink).rectTransform;
+            Bind(b,card);b.shine=shine.rectTransform;b.mask=wipe;b.items=rows.ToArray();b.itemGroups=groups.ToArray();
+        }
+        static void Constellation(Transform root,MotionBindings b)
+        {
+            Text("Eyebrow",root,"CONSTELLATION / UNLOCK",17,new Vector2(500,34),new Vector2(0,145),Cyan);
+            var ring=Picture("Orbit ring",root,new Vector2(235,235),Vector2.zero,Purple,GalleryShapes.Get("ring")).rectTransform;
+            Picture("Ring interior",root,new Vector2(164,164),Vector2.zero,Hex("252D5C"),GalleryShapes.Get("circle"));
+            var items=new List<RectTransform>();var groups=new List<CanvasGroup>();
+            var nodes=new[]{new Vector2(-184,52),new Vector2(-128,110),new Vector2(-40,93),new Vector2(52,118),new Vector2(151,70),new Vector2(178,-25),new Vector2(100,-105),new Vector2(-116,-93)};
+            for(int i=0;i<nodes.Length;i++)
+            {
+                Vector2 a=nodes[i],z=nodes[(i+1)%nodes.Length],delta=z-a;
+                var connection=Picture("Constellation connection "+i,root,new Vector2(delta.magnitude,2),(a+z)*.5f,new Color(.24f,.85f,1,.35f)).rectTransform;
+                connection.localEulerAngles=new Vector3(0,0,Mathf.Atan2(delta.y,delta.x)*Mathf.Rad2Deg);
+                var star=Star(root,a,i%2==0?23:14,i%2==0?Yellow:Cyan);items.Add(star);groups.Add(Group(star));
+            }
+            for(int i=0;i<12;i++){float a=i*Mathf.PI*2/12f;var tick=Picture("Orbit tick",root,new Vector2(3,10),new Vector2(Mathf.Cos(a)*125,Mathf.Sin(a)*125),new Color(.65f,.9f,1,.65f)).rectTransform;tick.localEulerAngles=new Vector3(0,0,a*Mathf.Rad2Deg-90);}
+            var core=Gem(root,Vector2.zero,94,Pink);Bind(b,core);b.secondary=ring;b.items=items.ToArray();b.itemGroups=groups.ToArray();
+            var footer=Text("Footer",root,"星轨徽章 · 已解锁",21,new Vector2(400,38),new Vector2(0,-145),Color.white);b.labels=new[]{footer};
+        }
+        static void KineticTitle(Transform root,MotionBindings b)
+        {
+            var panel=Rect("Editorial title stage",root,new Vector2(530,300));Bind(b,panel);
+            var items=new List<RectTransform>();var groups=new List<CanvasGroup>();
+            var tag=Panel("Chapter tag",panel,new Vector2(154,34),new Vector2(195,132),Cyan);Text("Tag",tag,"CHAPTER / 07",15,new Vector2(150,30),Vector2.zero,Ink);items.Add(tag);groups.Add(Group(tag));
+            string[] glyphs={"跃","入","星","光"};
+            for(int i=0;i<glyphs.Length;i++)
+            {
+                var glyph=Text("Glyph "+i,panel,glyphs[i],i<2?58:70,new Vector2(90,100),new Vector2(-170+i*96, i<2?28:-16),i<2?Color.white:Yellow).rectTransform;
+                items.Add(glyph); groups.Add(Group(glyph));
+            }
+            var stamp=Panel("Round stamp",panel,new Vector2(93,93),new Vector2(195,35),Pink); stamp.localEulerAngles=new Vector3(0,0,12);Text("Stamp",stamp,"NEW\nWORLD",17,new Vector2(85,82),Vector2.zero,Ink);items.Add(stamp);groups.Add(Group(stamp));
+            var caption=Text("Caption",panel,"下一段旅程，从这里开始",18,new Vector2(410,34),new Vector2(-42,-104),Muted).rectTransform;items.Add(caption);groups.Add(Group(caption));
+            var line=Picture("Growing underline",panel,new Vector2(425,7),new Vector2(-220,-71),Pink).rectTransform;line.pivot=new Vector2(0,.5f);
+            b.secondary=line;b.items=items.ToArray();b.itemGroups=groups.ToArray();
+        }
+        static void Dashboard(Transform root,MotionBindings b)
+        {
+            var stage=Rect("Dashboard stage",root,new Vector2(550,310));Bind(b,stage);
+            Text("Dashboard label",stage,"QUEST SUMMARY  /  TODAY",17,new Vector2(520,34),new Vector2(0,132),Cyan);
+            var cards=new List<RectTransform>();var groups=new List<CanvasGroup>();
+            var hero=Panel("Primary mission",stage,new Vector2(250,176),new Vector2(-135,21),Purple);Text("Primary heading",hero,"探索星域",28,new Vector2(220,50),new Vector2(0,44),Color.white);Gem(hero,new Vector2(-62,-28),55,Cyan);Text("Primary stat",hero,"08 / 12",25,new Vector2(125,44),new Vector2(53,-30),Yellow);cards.Add(hero);groups.Add(Group(hero));
+            var small1=Panel("Reward summary",stage,new Vector2(240,78),new Vector2(128,70),Orange);Text("Reward text",small1,"奖励  +640",24,new Vector2(220,62),Vector2.zero,Ink);cards.Add(small1);groups.Add(Group(small1));
+            var small2=Panel("Streak summary",stage,new Vector2(240,78),new Vector2(128,-27),Green);Text("Streak text",small2,"连胜  07 天",24,new Vector2(220,62),Vector2.zero,Ink);cards.Add(small2);groups.Add(Group(small2));
+            var bottom=Panel("Achievement ribbon",stage,new Vector2(505,46),new Vector2(0,-109),Pink);Text("Ribbon text",bottom,"每日目标 · 正在推进",20,new Vector2(490,42),Vector2.zero,Ink);cards.Add(bottom);groups.Add(Group(bottom));
+            var track=Picture("Progress track",hero,new Vector2(190,12),new Vector2(0,-68),Ink).rectTransform;
+            var fill=Picture("Progress fill",track,new Vector2(180,8),Vector2.zero,Cyan);fill.type=Image.Type.Filled;fill.fillMethod=Image.FillMethod.Horizontal;fill.fillAmount=1;
+            b.secondary=track;b.fill=fill;b.items=cards.ToArray();b.itemGroups=groups.ToArray();
+        }
+        static void FocusCarousel(Transform root,MotionBindings b)
+        {
+            Text("Carousel heading",root,"SELECT YOUR ROUTE",17,new Vector2(500,36),new Vector2(0,145),Cyan);
+            var left=Panel("Previous focus",root,new Vector2(150,190),new Vector2(-160,-8),Purple);Text("Previous",left,"01\n云端",23,new Vector2(140,85),Vector2.zero,Color.white);
+            var right=Rect("Next focus",root,new Vector2(150,190));right.anchoredPosition=new Vector2(0,8);
+            var hit=right.gameObject.AddComponent<Image>();hit.color=new Color(1,1,1,.001f);hit.raycastTarget=true;
+            var surface=Panel("Tilt surface",right,new Vector2(150,190),Vector2.zero,Orange);
+            surface.gameObject.AddComponent<RectMask2D>();
+            Text("Selected",surface,"02\n星海",23,new Vector2(140,85),Vector2.zero,Ink);
+            var highlight=Picture("Primary reflection",surface,new Vector2(38,260),new Vector2(-43,0),new Color(1,1,1,.18f)).rectTransform;highlight.localEulerAngles=new Vector3(0,0,-22);
+            var glint=Picture("Secondary reflection",surface,new Vector2(15,260),new Vector2(28,0),new Color(1,.95f,.4f,.2f)).rectTransform;glint.localEulerAngles=new Vector3(0,0,-22);
+            var tilt=right.gameObject.AddComponent<MotionParallaxTilt>();tilt.surface=surface;tilt.highlight=highlight;tilt.glint=glint;tilt.CaptureBaseline();
+            var third=Panel("Candidate 03",root,new Vector2(150,190),new Vector2(160,-8),Hex("1A8FA6"));Text("Third",third,"03\n深空",23,new Vector2(140,85),Vector2.zero,Color.white);
+            var chip=Panel("Destination tag",root,new Vector2(118,28),new Vector2(0,-125),Yellow);Text("Tag",chip,"DESTINATION",12,new Vector2(112,25),Vector2.zero,Ink);
+            var dot1=Picture("Page dot 1",root,new Vector2(14,14),new Vector2(-24,-151),Muted,GalleryShapes.Get("circle")).rectTransform;
+            var dot2=Picture("Page dot 2",root,new Vector2(14,14),new Vector2(0,-151),Cyan,GalleryShapes.Get("circle")).rectTransform;
+            var dot3=Picture("Page dot 3",root,new Vector2(14,14),new Vector2(24,-151),Muted,GalleryShapes.Get("circle")).rectTransform;
+            right.SetAsLastSibling();
+            Bind(b,right);b.secondary=left;b.secondaryGroup=Group(left);b.items=new[]{third,dot1,dot2,dot3};b.itemGroups=new[]{Group(third),Group(dot1),Group(dot2),Group(dot3)};
+        }
+        static void PortalReveal(Transform root,MotionBindings b)
+        {
+            Text("Portal heading",root,"PORTAL / REWARD",16,new Vector2(460,32),new Vector2(0,145),Cyan);
+            // This is a broad portal aperture and vertical energy column, deliberately
+            // distinct from the round, star-studded constellation above.
+            Picture("Vertical beam",root,new Vector2(120,260),Vector2.zero,new Color(.05f,.9f,1f,.12f));
+            Picture("Core beam",root,new Vector2(42,270),Vector2.zero,new Color(1f,.8f,.08f,.13f));
+            var ring=Picture("Portal aperture",root,new Vector2(340,170),new Vector2(0,-50),Cyan,GalleryShapes.Get("ring")).rectTransform;
+            Picture("Portal aperture center",root,new Vector2(250,105),new Vector2(0,-50),Hex("244B72"),GalleryShapes.Get("circle"));
+            var pieces=new List<RectTransform>();var groups=new List<CanvasGroup>();
+            for(int i=0;i<8;i++){float a=i*Mathf.PI/4;var shard=Gem(root,new Vector2(Mathf.Cos(a)*190,Mathf.Sin(a)*118),i%2==0?30:22,i%2==0?Orange:Cyan);pieces.Add(shard);groups.Add(Group(shard));}
+            var core=Gem(root,Vector2.zero,106,Yellow);Bind(b,core);b.secondary=ring;b.secondaryGroup=Group(ring);b.items=pieces.ToArray();b.itemGroups=groups.ToArray();
+            for(int i=0;i<5;i++)
+            {
+                float x=(i-2)*22;
+                Picture("Beam ray "+i,root,new Vector2(2,148-Mathf.Abs(i-2)*22),new Vector2(x,15),new Color(.2f,1f,1f,.42f)).transform.SetAsFirstSibling();
+            }
+            Text("Portal coordinate left",root,"X: 018",13,new Vector2(90,25),new Vector2(-226,-69),Cyan);
+            Text("Portal coordinate right",root,"Y: 047",13,new Vector2(90,25),new Vector2(226,-69),Cyan);
+            var footer=Text("Portal footer",root,"超稀有 · 曙光晶石",22,new Vector2(420,40),new Vector2(0,-145),Color.white);b.labels=new[]{footer};
         }
 
         static void Interactive(MotionPlayer player,RectTransform target)

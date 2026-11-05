@@ -1,6 +1,6 @@
 # Unity 模板与参数接入手册
 
-版本 0.1.0。基线为 Unity 6000.0.26f1、UGUI 2.0.0、DOTween 免费版 1.3.045、Built-in 渲染管线。实际验证结果见随发布包提供的验收记录；版本信息不代表所有平台与管线均已验证。
+版本 0.2.0。基线为 Unity 6000.0.26f1、UGUI 2.0.0、DOTween 免费版 1.3.045、Built-in 渲染管线。实际验证结果见随发布包提供的验收记录；版本信息不代表所有平台与管线均已验证。
 
 ## 三种接入方式
 
@@ -125,3 +125,9 @@ Play 重入先取消本实例动画并恢复基线，避免累积偏移；停用
 
 循环、反向和动画结束都不代表发奖、扣费或页面导航已成功。调用方继续负责这些业务。验收建议见 [提示词与验收](acceptance.md)。
 
+
+## F05 真实鼠标跟随与自动演示
+
+F05 的 MotionPlayer 自动编排只负责新旧焦点卡交接；真实指针移动由独立组件 `MotionParallaxTilt` 负责。将组件放在有可射线命中 Graphic 的对象上，场景需要 EventSystem 和 GraphicRaycaster。将 `surface` 绑定到 F05 的 `MotionPlayer.target` **内部的独立视觉包装层**，不要与 target 指向同一 Transform；`highlight` 与 `glint` 绑定两个独立半透明高光层。默认 `maxAngle=10`、`highlightTravel=36`、`glintTravel=18`、`response=12`；动态 AddComponent 后再赋绑定时调用 `CaptureBaseline()`。指针移出后缓慢回中，组件禁用时恢复初始状态。不要让父遮罩裁掉整个卡片。
+
+自动播放可展示焦点切换；必须实际测试 PointerEnter/Move/Exit 和遮挡情况，才能宣称真实鼠标跟随可用。按参考资料抽象层次和指针关系，不使用原示例图像或商标。

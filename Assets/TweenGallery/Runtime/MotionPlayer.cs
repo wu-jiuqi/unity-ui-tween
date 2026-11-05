@@ -146,6 +146,10 @@ namespace TweenGallery
                 case "D07": if (bindings.image == null || bindings.secondaryImage == null) missing = "image (back) + secondaryImage (front)"; break;
                 case "D08": if (bindings.lid == null) missing = "lid"; break;
                 case "E03": if (bindings.shine == null || bindings.mask == null) missing = "shine + mask"; break;
+                case "F01": if (bindings.group == null || bindings.shine == null || bindings.items == null || bindings.items.Length == 0) missing = "group + shine + items"; break;
+                case "F02": case "F06": if (bindings.group == null || bindings.secondary == null || bindings.items == null || bindings.items.Length == 0) missing = "group + secondary + items"; break;
+                case "F03": case "F04": if (bindings.secondary == null || bindings.items == null || bindings.items.Length == 0) missing = "secondary + items"; break;
+                case "F05": if (bindings.secondary == null || bindings.items == null || bindings.items.Length == 0) missing = "secondary + items"; break;
             }
             if (missing != null) throw new InvalidOperationException(effectId + " requires MotionBindings." + missing + ". See the template manual.");
         }
@@ -286,7 +290,125 @@ namespace TweenGallery
                     q=E(Phase(t,0f,.45f),Ease.InOutSine); Move(target,new Vector2(-d*.5f*q,d*.35f*q));
                     float press=Mathf.Sin(Phase(t,.45f,.85f)*Mathf.PI); Scale(target,1f-.22f*a*press); Alpha(bindings.secondaryGroup,.25f+.75f*press);
                     if(t>.85f) { float leave=E(Phase(t,.85f,1f),Ease.InOutSine); Move(target,new Vector2(-d*.5f,d*.35f)*(1f-leave)); } break;
+                case "F01": EvaluateHologram(t,a,d); break;
+                case "F02": EvaluateConstellation(t,a,d); break;
+                case "F03": EvaluateEditorial(t,a,d); break;
+                case "F04": EvaluateDashboard(t,a,d); break;
+                case "F05": EvaluateCarousel(t,a,d); break;
+                case "F06": EvaluatePortal(t,a,d); break;
             }
+        }
+
+        // All compositions use deterministic normalized time so the gallery, prefab,
+        // project and snapshot tests render exactly the same sequences.
+        private void EvaluateHologram(float t,float strength,float distance)
+        {
+            float sx=E(Phase(t,0f,.30f),Ease.OutCubic);
+            float sy=E(Phase(t,.12f,.48f),Ease.OutBack);
+            ScaleXY(bindings.target,Mathf.LerpUnclamped(.08f,1f,sx),Mathf.LerpUnclamped(.12f,1f,sy));
+            Alpha(bindings.group,Phase(t,0f,.16f));
+            float scan=E(Phase(t,.20f,.78f),Ease.InOutSine);
+            Move(bindings.shine,Vector2.right*Mathf.Lerp(-Mathf.Abs(distance),Mathf.Abs(distance),scan));
+            GraphicAlpha(bindings.shine.GetComponent<Graphic>(),Mathf.Sin(Mathf.PI*Phase(t,.2f,.8f))*Mathf.Clamp01(strength));
+            // Optional independent colored wipe. The parent uses RectMask2D so
+            // the moving panel covers the card, then exits to reveal the artwork.
+            if(bindings.mask!=null)
+            {
+                float width=Mathf.Max(Mathf.Abs(distance)*2f,baseline.RectSize(bindings.mask).x);
+                float inBlock=E(Phase(t,0f,.35f),Ease.InOutSine);
+                float outBlock=E(Phase(t,.35f,.8f),Ease.InOutSine);
+                Move(bindings.mask,Vector2.right*(width*inBlock+width*outBlock));
+            }
+            for(int i=0;i<bindings.items.Length;i++)
+            {
+                float p=StaggerPhase(Phase(t,.15f,.92f),i,bindings.items.Length);
+                ScaleXY(bindings.items[i],Mathf.Clamp01(E(p,Ease.OutCubic)),1f);
+                ItemAlpha(i,Phase(p,0f,.25f));
+            }
+        }
+        private void EvaluateConstellation(float t,float strength,float distance)
+        {
+            float ring=E(Phase(t,.05f,.8f),Ease.OutCubic);
+            Rotate(bindings.secondary,new Vector3(0f,0f,-100f*(1f-ring)*strength));
+            Scale(bindings.secondary,Mathf.Lerp(.48f,1f,ring));
+            for(int i=0;i<bindings.items.Length;i++)
+            {
+                float p=StaggerPhase(Phase(t,.08f,.82f),i,bindings.items.Length);
+                float angle=(i*137.508f+25f)*Mathf.Deg2Rad;
+                var direction=new Vector2(Mathf.Cos(angle),Mathf.Sin(angle));
+                Move(bindings.items[i],direction*Mathf.Abs(distance)*strength*(1f-E(p,Ease.OutCubic)));
+                Scale(bindings.items[i],Mathf.LerpUnclamped(.2f,1f,E(p,Ease.OutBack)));
+                ItemAlpha(i,Phase(p,0f,.3f));
+            }
+            float badge=E(Phase(t,.48f,.9f),Ease.OutBack);
+            Scale(bindings.target,Mathf.LerpUnclamped(.25f,1f,badge));
+            Alpha(bindings.group,Phase(t,.48f,.65f));
+            if(bindings.labels!=null) foreach(var label in bindings.labels) GraphicAlpha(label,Phase(t,.55f,.78f));
+        }
+        private void EvaluateEditorial(float t,float strength,float distance)
+        {
+            for(int i=0;i<bindings.items.Length;i++)
+            {
+                float p=StaggerPhase(Phase(t,0f,.9f),i,bindings.items.Length);
+                float remaining=1f-E(p,Ease.OutCubic);
+                var offset=i%2==0 ? new Vector2(-distance*.4f,-distance) : new Vector2(distance*.4f,distance);
+                Move(bindings.items[i],offset*remaining*strength);
+                ItemAlpha(i,Phase(p,0f,.3f));
+            }
+            ScaleXY(bindings.secondary,Mathf.Clamp01(E(Phase(t,.3f,.9f),Ease.OutCubic)),1f);
+        }
+        private void EvaluateDashboard(float t,float strength,float distance)
+        {
+            for(int i=0;i<bindings.items.Length;i++)
+            {
+                float p=StaggerPhase(Phase(t,0f,.9f),i,bindings.items.Length);
+                float remaining=1f-E(p,Ease.OutCubic);
+                var offset=new Vector2((i%2==0?-1:1)*distance*.28f,-distance)*remaining*strength;
+                Move(bindings.items[i],offset);
+                Scale(bindings.items[i],Mathf.LerpUnclamped(.9f,1f,E(p,Ease.OutBack)));
+                ItemAlpha(i,Phase(p,0f,.3f));
+            }
+            ScaleXY(bindings.secondary,Mathf.Lerp(.2f,1f,E(Phase(t,.35f,.75f))),1f);
+            if(bindings.fill!=null) bindings.fill.fillAmount=Mathf.Lerp(settings.fillFrom,settings.fillTo,E(Phase(t,.55f,1f),Ease.InOutSine));
+        }
+        private void EvaluateCarousel(float t,float strength,float distance)
+        {
+            float inPhase=E(Phase(t,.08f,.88f),Ease.OutCubic);
+            Move(bindings.target,new Vector2(distance*.8f,-distance*.22f)*(1f-inPhase));
+            Scale(bindings.target,Mathf.LerpUnclamped(.68f,1f,E(Phase(t,.08f,.88f),Ease.OutBack)));
+            Rotate(bindings.target,new Vector3(0f,0f,-9f*strength*(1f-inPhase)));
+            Alpha(bindings.group,Phase(t,.08f,.36f));
+            float outPhase=E(Phase(t,0f,.72f),Ease.InOutSine);
+            Move(bindings.secondary,new Vector2(-distance*.8f,-distance*.22f)*outPhase);
+            Scale(bindings.secondary,Mathf.Lerp(1f,.68f,outPhase));
+            Rotate(bindings.secondary,new Vector3(0f,0f,9f*strength*outPhase));
+            Alpha(bindings.secondaryGroup,1f-Phase(t,.38f,.75f));
+            for(int i=0;i<bindings.items.Length;i++)
+            {
+                float p=StaggerPhase(Phase(t,.12f,.9f),i,bindings.items.Length);
+                Move(bindings.items[i],new Vector2((i%2==0?-1:1)*distance*.18f, -distance*.12f)*(1f-E(p)));
+                ItemAlpha(i,Mathf.Lerp(.4f,1f,Phase(p,0f,.5f)));
+            }
+        }
+        private void EvaluatePortal(float t,float strength,float distance)
+        {
+            float open=E(Phase(t,.03f,.48f),Ease.OutBack);
+            ScaleXY(bindings.secondary,Mathf.LerpUnclamped(.04f,1f,open),Mathf.LerpUnclamped(.3f,1f,open));
+            Rotate(bindings.secondary,new Vector3(0f,0f,110f*(1f-open)*strength));
+            Alpha(bindings.secondaryGroup,Phase(t,.03f,.2f));
+            for(int i=0;i<bindings.items.Length;i++)
+            {
+                float p=StaggerPhase(Phase(t,.18f,.87f),i,bindings.items.Length);
+                float angle=i*Mathf.PI*2f/Mathf.Max(1,bindings.items.Length);
+                Vector2 radial=new Vector2(Mathf.Cos(angle),Mathf.Sin(angle));
+                Move(bindings.items[i],-radial*Mathf.Abs(distance)*.55f*(1f-E(p,Ease.OutCubic)));
+                Scale(bindings.items[i],Mathf.LerpUnclamped(.05f,1f,E(p,Ease.OutBack)));
+                ItemAlpha(i,Phase(p,0f,.3f));
+            }
+            float core=E(Phase(t,.36f,.8f),Ease.OutBack);
+            Scale(bindings.target,Mathf.LerpUnclamped(.05f,1f,core));
+            Alpha(bindings.group,Phase(t,.36f,.52f));
+            if(bindings.labels!=null) foreach(var label in bindings.labels) GraphicAlpha(label,Phase(t,.47f,.7f));
         }
 
         private void EvaluateBurst(float t,float strength,float distance)
@@ -423,6 +545,12 @@ namespace TweenGallery
                     case "E05": Items(3,releaseInput); break;
                     case "E06": Items(1,releaseInput); break;
                     case "E07": Rect(b.target,3); Group(b.secondaryGroup,releaseInput); break;
+                    case "F01": Rect(b.target,2); Group(b.group,releaseInput); Rect(b.shine,1); Rect(b.mask,1); if(b.shine!=null) GraphicAlpha(b.shine.GetComponent<Graphic>()); Items(2,releaseInput); break;
+                    case "F02": Rect(b.target,2); Group(b.group,releaseInput); Rect(b.secondary,6); Items(3,releaseInput); if(b.labels!=null) foreach(var label in b.labels) GraphicAlpha(label); break;
+                    case "F03": Rect(b.secondary,2); Items(1,releaseInput); break;
+                    case "F04": Rect(b.secondary,2); Fill(b.fill); Items(3,releaseInput); break;
+                    case "F05": Rect(b.target,7); Rect(b.secondary,7); Group(b.group,releaseInput); Group(b.secondaryGroup,releaseInput); Items(1,releaseInput); break;
+                    case "F06": Rect(b.target,2); Group(b.group,releaseInput); Rect(b.secondary,6); Group(b.secondaryGroup,releaseInput); Items(3,releaseInput); if(b.labels!=null) foreach(var label in b.labels) GraphicAlpha(label); break;
                 }
             }
             private void Rect(RectTransform rect,int flags)

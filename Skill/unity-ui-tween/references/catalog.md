@@ -1,6 +1,6 @@
-# 40 项 UI 动效图鉴
+# 46 项 UI 动效图鉴
 
-版本 0.1.0。编号、名称和默认参数以 `Resources/motion-catalog.json` 为单一数据源；展馆、模板预设与本文使用同一清单。每项对应 `Prefabs/<ID>.prefab` 和 `Presets/<ID>.asset`，实际播放统一使用 `MotionPlayer`。
+版本 0.2.0。编号、名称和默认参数以 `Resources/motion-catalog.json` 为单一数据源；展馆、模板预设与本文使用同一清单。每项对应 `Prefabs/<ID>.prefab` 和 `Presets/<ID>.asset`，实际播放统一使用 `MotionPlayer`。
 
 ## 如何区分相似效果
 
@@ -673,3 +673,112 @@ Codex 提示词：
 
 > 为我的目标 UGUI 接入 E07 引导手势（Tutorial Gesture）。预期效果：指示手移动到目标、做按压动作，随后复位。 使用共享 MotionPlayer 模板，duration=1.8s、strength=1、distance=90、stagger=0.1s、ease=Preset、speed=1、reverse=false、loop=false、unscaledTime=true。绑定 target 为手势图形；destination 为目标；secondary 为高亮目标；UI 手势图形与高亮由绑定对象提供；不自动触发真实按钮点击。 保留现有业务交互；重复触发先取消本实例动画并恢复基线，关闭或销毁时清理，透明对象不阻挡点击。实际编译与运行后报告验证结果和未验证项。
 
+## F · 进阶设计组合
+
+以下效果以公开资料中的运动设计原则为参考，使用原创形状、配色和编排进行转化。最终交付以实际构建和验收结果为准。
+
+### F01 全息扫描揭晓 · Holographic Scan Reveal
+
+卡片分段展开，光带横扫，扫描细条依次点亮，最后露出完整内容。
+
+- **用途**：稀有卡、科技奖励、档案解锁。
+- **视觉差异**：分段几何展开与扫描线协同，而非单纯透明度或单次扫光。
+- **默认参数**：1.6s / 1 / 140 / 0.1s；ease=Preset。
+- **绑定**：target=卡片；group=卡片组；shine=光带；items=扫描细条。
+- **依赖**：UGUI 与 DOTween 免费版；各绑定对象需按模板建立，动画对象使用布局内包装层。
+- **模板**：`Prefabs/F01.prefab`、`Presets/F01.asset`；调用 `MotionPlayer.Play("F01", settings)`。
+- **参考来源**：[Animation in the League Client](https://www.riotgames.com/en/news/animation-league-legends-client)。借鉴客户端战利品场景的分层动画与焦点建立，原创改造为几何卡片、扫描带和信息显现；不使用原游戏素材。 只借鉴运动原则，不复制源站商标、插画或素材。
+
+Codex 提示词：
+
+> 为我的 Unity UGUI 界面接入 F01 全息扫描揭晓（Holographic Scan Reveal）：卡片分段展开，光带横扫，扫描细条依次点亮，最后露出完整内容。 使用同源 MotionPlayer，duration=1.6s、strength=1、distance=140、stagger=0.1s、ease=Preset。绑定 target=卡片；group=卡片组；shine=光带；items=扫描细条。保留业务逻辑，处理重复播放、中断、禁用销毁和布局重算；实际预览并报告验证结果。
+
+### F02 星图解锁 · Constellation Assemble
+
+星点由外向中心逐颗汇聚，环旋转，徽章延后显现。
+
+- **用途**：成就解锁、章节里程碑。
+- **视觉差异**：多个相互关联星点先汇聚，再揭示徽章，区别于普通逐个点亮。
+- **默认参数**：2.0s / 1 / 150 / 0.12s；ease=Preset。
+- **绑定**：target=徽章；group=徽章组；secondary=旋环；items/itemGroups=星点。
+- **依赖**：UGUI 与 DOTween 免费版；各绑定对象需按模板建立，动画对象使用布局内包装层。
+- **模板**：`Prefabs/F02.prefab`、`Presets/F02.asset`；调用 `MotionPlayer.Play("F02", settings)`。
+- **参考来源**：[VALORANT 0.50 patch notes](https://playvalorant.com/en-us/news/game-updates/valorant-patch-notes-0-50/)。仅借鉴契约升级与解锁反馈的设计意图；星图、汇聚与徽章为本项目原创，并非源游戏所述视觉。 只借鉴运动原则，不复制源站商标、插画或素材。
+
+Codex 提示词：
+
+> 为我的 Unity UGUI 界面接入 F02 星图解锁（Constellation Assemble）：星点由外向中心逐颗汇聚，环旋转，徽章延后显现。 使用同源 MotionPlayer，duration=2.0s、strength=1、distance=150、stagger=0.12s、ease=Preset。绑定 target=徽章；group=徽章组；secondary=旋环；items/itemGroups=星点。保留业务逻辑，处理重复播放、中断、禁用销毁和布局重算；实际预览并报告验证结果。
+
+### F03 动态排版标题 · Kinetic Editorial Title
+
+标题字块错时从不同方向进入，下划线逐渐展开形成终态。
+
+- **用途**：章节标题、活动开场、结算标题。
+- **视觉差异**：强调字块节奏与方向对位，区别于相同元素统一位移的错列。
+- **默认参数**：1.7s / 1 / 120 / 0.1s；ease=Preset。
+- **绑定**：target=稳定容器；items/itemGroups=字块；secondary=底线。
+- **依赖**：UGUI 与 DOTween 免费版；各绑定对象需按模板建立，动画对象使用布局内包装层。
+- **模板**：`Prefabs/F03.prefab`、`Presets/F03.asset`；调用 `MotionPlayer.Play("F03", settings)`。
+- **参考来源**：[Making Stagger Reveal Animations for Text](https://tympanus.net/codrops/2020/06/17/making-stagger-reveal-animations-for-text/)。借鉴文字错时揭示原则，原创改造为鲜艳游戏标题、独立字块与底线编排，不复制源码和版式。 只借鉴运动原则，不复制源站商标、插画或素材。
+
+Codex 提示词：
+
+> 为我的 Unity UGUI 界面接入 F03 动态排版标题（Kinetic Editorial Title）：标题字块错时从不同方向进入，下划线逐渐展开形成终态。 使用同源 MotionPlayer，duration=1.7s、strength=1、distance=120、stagger=0.1s、ease=Preset。绑定 target=稳定容器；items/itemGroups=字块；secondary=底线。保留业务逻辑，处理重复播放、中断、禁用销毁和布局重算；实际预览并报告验证结果。
+
+### F04 分层仪表板 · Layered Dashboard Entrance
+
+信息卡按层级和时间差进入，进度条尾随填充，形成有阅读顺序的界面。
+
+- **用途**：数据面板、结算概览、任务仪表板。
+- **视觉差异**：卡片与进度的先后关系有明确因果，不是整体面板缩放。
+- **默认参数**：1.9s / 1 / 120 / 0.12s；ease=Preset。
+- **绑定**：target=稳定容器；items/itemGroups=卡片；secondary=进度条；fill=填充 Image。
+- **依赖**：UGUI 与 DOTween 免费版；各绑定对象需按模板建立，动画对象使用布局内包装层。
+- **模板**：`Prefabs/F04.prefab`、`Presets/F04.asset`；调用 `MotionPlayer.Play("F04", settings)`。
+- **参考来源**：[Rovo motion](https://atlassian.design/rovo-ui/motion)。借鉴标题、内容和卡片的视觉先后，原创设计信息卡与进度条的因果编排。 只借鉴运动原则，不复制源站商标、插画或素材。
+
+Codex 提示词：
+
+> 为我的 Unity UGUI 界面接入 F04 分层仪表板（Layered Dashboard Entrance）：信息卡按层级和时间差进入，进度条尾随填充，形成有阅读顺序的界面。 使用同源 MotionPlayer，duration=1.9s、strength=1、distance=120、stagger=0.12s、ease=Preset。绑定 target=稳定容器；items/itemGroups=卡片；secondary=进度条；fill=填充 Image。保留业务逻辑，处理重复播放、中断、禁用销毁和布局重算；实际预览并报告验证结果。
+
+### F05 磁吸焦点轮播 · Magnetic Focus Carousel
+
+新卡移到焦点并放大上移，旧卡退场缩小，周围候选错位；真实鼠标跟随由独立 MotionParallaxTilt 组件提供。
+
+- **用途**：角色选择、商店推荐、关卡选择。
+- **视觉差异**：表现新旧焦点交接与相邻卡的空间层级，不只是单对象选中缩放。
+- **默认参数**：1.6s / 1 / 160 / 0.08s；ease=Preset。
+- **绑定**：target=新卡；secondary=旧卡；items/itemGroups=候选；鼠标倾斜另需 MotionParallaxTilt 的 surface、highlight、glint 和 EventSystem。
+- **依赖**：UGUI 与 DOTween 免费版；各绑定对象需按模板建立，动画对象使用布局内包装层。
+- **模板**：`Prefabs/F05.prefab`、`Presets/F05.asset`；调用 `MotionPlayer.Play("F05", settings)`。
+- **参考来源**：[Material Design Awards 2019](https://design.google/library/material-design-awards-2019)。借鉴 Reflectly 案例轮播升层和选择状态，原创改造为焦点卡、新旧卡及候选的权重转换。 只借鉴运动原则，不复制源站商标、插画或素材。
+
+Codex 提示词：
+
+> 为我的 Unity UGUI 界面接入 F05 磁吸焦点轮播（Magnetic Focus Carousel）：新卡移到焦点并放大上移，旧卡退场缩小，周围候选错位；真实鼠标跟随由独立 MotionParallaxTilt 组件提供。 使用同源 MotionPlayer，duration=1.6s、strength=1、distance=160、stagger=0.08s、ease=Preset。绑定 target=新卡；secondary=旧卡；items/itemGroups=候选；鼠标倾斜另需 MotionParallaxTilt 的 surface、highlight、glint 和 EventSystem。保留业务逻辑，处理重复播放、中断、禁用销毁和布局重算；实际预览并报告验证结果。
+
+### F06 门户奖励揭晓 · Portal Prize Reveal
+
+光环先展开旋转，碎片向外辐射，中心奖励延后显现。
+
+- **用途**：高级奖励、成就揭晓、章节通关。
+- **视觉差异**：多层景深与延迟揭示形成完整节奏，区别于单个 Pop 或爆散汇聚。
+- **默认参数**：2.2s / 1 / 150 / 0.14s；ease=Preset。
+- **绑定**：target=核心；group=核心组；secondary=光环；secondaryGroup=光环组；items/itemGroups=碎片。
+- **依赖**：UGUI 与 DOTween 免费版；各绑定对象需按模板建立，动画对象使用布局内包装层。
+- **模板**：`Prefabs/F06.prefab`、`Presets/F06.asset`；调用 `MotionPlayer.Play("F06", settings)`。
+- **参考来源**：[Animation in the League Client](https://www.riotgames.com/en/news/animation-league-legends-client)。借鉴奖励界面的分层视觉庆祝；传送环、碎片和奖励核心为本项目原创，原文未描述传送门。 只借鉴运动原则，不复制源站商标、插画或素材。
+
+Codex 提示词：
+
+> 为我的 Unity UGUI 界面接入 F06 门户奖励揭晓（Portal Prize Reveal）：光环先展开旋转，碎片向外辐射，中心奖励延后显现。 使用同源 MotionPlayer，duration=2.2s、strength=1、distance=150、stagger=0.14s、ease=Preset。绑定 target=核心；group=核心组；secondary=光环；secondaryGroup=光环组；items/itemGroups=碎片。保留业务逻辑，处理重复播放、中断、禁用销毁和布局重算；实际预览并报告验证结果。
+
+
+## 用户提供的补充参考
+
+以下链接以作者描述、示例项目说明或用户提供的入口作为研究依据，未逐帧核验其演示；各项目的画面和脚本均未复制。
+
+- F01 方块/遮罩揭示：[Codrops BlockRevealers](https://github.com/codrops/BlockRevealers)；抽象色块揭示的节奏，转为原创扫描卡片。
+- F03 逐字符编排：[TypographyMotion](https://github.com/codrops/TypographyMotion/)，以及 [作者文章：错时文字揭示](https://tympanus.net/codrops/2020/06/17/making-stagger-reveal-animations-for-text/)。参考错时与阅读顺序，原创标题内容和版式。
+- F05 轮播焦点层级：[Material Design Awards 中的 Reflectly](https://design.google/library/material-design-awards-2019)；另查阅 [Rapid Image Hover Menu](https://tympanus.net/codrops/2020/07/01/creating-a-menu-image-animation-on-hover/) 的悬停视觉跟随概念，示例图片标注 CC BY-NC-ND，本项目不分发或复制图片。
+- F05 卡片层次另参考 [Balatro 卡片鼠标悬停研究](https://www.wavebeem.com/toybox/2025/balatro/) 的多层反光描述；卡图与几何层为原创。仅当实现经实际测试时，才能宣称支持鼠标悬停，自动播放演示不能代替真实输入验证。

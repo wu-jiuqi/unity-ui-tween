@@ -1,6 +1,6 @@
 ---
 name: unity-ui-tween
-description: "为 Unity UGUI 选择、预览和接入 40 种可复用 UI 补间动效，使用 DOTween 免费版模板；适用于按钮、弹窗、页面切换、奖励数值和引导动画。"
+description: "为 Unity UGUI 选择、预览和接入 46 种可复用 UI 补间动效，使用 DOTween 免费版模板；适用于按钮、弹窗、页面切换、奖励数值和引导动画。"
 ---
 
 # Unity UI Tween
@@ -15,7 +15,7 @@ description: "为 Unity UGUI 选择、预览和接入 40 种可复用 UI 补间�
 
 ## 选定编号与表现
 
-阅读 [40 项动效图鉴](references/catalog.md)，按用户给出的编号、动作描述或用途定位条目。A01–A08 为出现消失，B01–B08 为按钮反馈，C01–C07 为页面切换，D01–D10 为奖励数值，E01–E07 为循环引导与编排。图鉴中的每项都保留独立含义，不因为底层实现相似合并条目。
+阅读 [46 项动效图鉴](references/catalog.md)，按用户给出的编号、动作描述或用途定位条目。A01–A08 为出现消失，B01–B08 为按钮反馈，C01–C07 为页面切换，D01–D10 为奖励数值，E01–E07 为循环引导与编排，F01–F06 为进阶原创设计组合。图鉴中的每项都保留独立含义，不因为底层实现相似合并条目。
 
 容易混淆时先用可观察的差异解释选择：
 
@@ -27,7 +27,7 @@ description: "为 Unity UGUI 选择、预览和接入 40 种可复用 UI 补间�
 
 ## 接入同源模板
 
-按 [模板接入与参数](references/integration.md) 选择所需绑定和调用方式。完整模板资产位于 `assets/TweenGallery/`，对应目标项目的 `Assets/TweenGallery/`。其中包含 [Runtime](assets/TweenGallery/Runtime/)、[Shaders](assets/TweenGallery/Shaders/)、[40 个预制体](assets/TweenGallery/Prefabs/)、[40 个参数预设](assets/TweenGallery/Presets/) 和 [motion-catalog.json](assets/TweenGallery/Resources/motion-catalog.json)，以及示例所需图形、字体、展馆与场景。这些相对路径以 Skill 文件夹为根，不依赖制作机器上的绝对路径。复制资源时保留 `.meta`；只接入已有 UI 时按依赖选择必要部分。
+按 [模板接入与参数](references/integration.md) 选择所需绑定和调用方式。完整模板资产位于 `assets/TweenGallery/`，对应目标项目的 `Assets/TweenGallery/`。其中包含 [Runtime](assets/TweenGallery/Runtime/)、[Shaders](assets/TweenGallery/Shaders/)、[46 个预制体](assets/TweenGallery/Prefabs/)、[46 个参数预设](assets/TweenGallery/Presets/) 和 [motion-catalog.json](assets/TweenGallery/Resources/motion-catalog.json)，以及示例所需图形、字体、展馆与场景。这些相对路径以 Skill 文件夹为根，不依赖制作机器上的绝对路径。复制资源时保留 `.meta`；只接入已有 UI 时按依赖选择必要部分。
 
 使用命名空间 `TweenGallery` 的 `MotionPlayer`、`MotionBindings`、`MotionSettings` 和 `MotionCatalog`。将目标元素绑定到对应字段，在布局稳定后捕获基线，再通过 `Play(id, options)` 播放。用 `Pause()` / `Resume()` 控制暂停，用 `StopAndRestore()` 取消并恢复。若复制模板资产，只复制目标项目实际需要的代码、着色器和目录数据，保留已有脚本和依赖。
 
@@ -47,3 +47,9 @@ description: "为 Unity UGUI 选择、预览和接入 40 种可复用 UI 补间�
 按 [验收与提示词](references/acceptance.md) 检查本次接入涉及的行为。至少覆盖实际编译、可运行时的视觉预览、连续重播、中途关闭/禁用、销毁、布局缩放及结束后的可点击状态。按钮按压还要验证按住、松开和移出；奖励动画要确认视觉到达与业务结算不会重复触发。
 
 说明选用的编号、绑定位置、最终参数、调用入口，以及实际通过和未验证的检查。静态检查、`Sample()` 采样、编辑器运行和独立 Windows 运行属于不同证据，不互相替代。不能运行 Unity 时明确这一限制，不将代码生成描述为运行通过。
+
+## 进阶设计组合
+
+F01 是扫描揭晓，F02 是星图汇聚后解锁，F03 是字块与底线的排版编排，F04 是卡片和进度的分层入场，F05 是新旧焦点卡交接，F06 是多层门户奖励揭晓。按图鉴读取各自绑定、来源及原创转化；不要直接复制参考站的素材或商标。先核对目标项目素材、布局与交互语义，再适配同源模板。
+
+F05 的焦点交接是自动演示；真实指针倾斜/高光需要 `MotionParallaxTilt`、可射线命中 Graphic 和 EventSystem，surface 绑定 target 内部独立包装层。具体绑定、默认值和动态赋值后重新采集基线见接入文档；需要实测指针 enter/move/exit。

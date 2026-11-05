@@ -18,9 +18,9 @@ namespace TweenGallery
 
         static readonly Color Ink = Hex("11142B"), Panel = Hex("202442"), Muted = Hex("AEB5D5");
         static readonly Color Violet = Hex("9254FF"), Cyan = Hex("19D9FF"), Yellow = Hex("FFE14A"), Pink = Hex("FF4EAF");
-        const string StrengthIds = "A03 A04 A06 A08 B01 B02 B03 B04 B05 B06 B07 D03 D04 D05 D06 D08 D09 D10 E01 E03 E04 E05 E06 E07";
-        const string DistanceIds = "A02 A05 B04 B07 C01 C02 C05 D03 D04 D08 D09 E01 E03 E05 E06 E07";
-        const string StaggerIds = "D04 D05 D06 D08 E05 E06";
+        const string StrengthIds = "A03 A04 A06 A08 B01 B02 B03 B04 B05 B06 B07 D03 D04 D05 D06 D08 D09 D10 F01 F02 F03 F04 F05 F06 E01 E03 E04 E05 E06 E07";
+        const string DistanceIds = "A02 A05 B04 B07 C01 C02 C05 D03 D04 D08 D09 E01 E03 E05 E06 E07 F01 F02 F03 F04 F05 F06";
+        const string StaggerIds = "D04 D05 D06 D08 E05 E06 F01 F02 F03 F04 F05 F06";
         readonly List<MotionPlayer> players = new List<MotionPlayer>();
         readonly Dictionary<string, Image> rows = new Dictionary<string, Image>();
         readonly Dictionary<string, Button> categories = new Dictionary<string, Button>();
@@ -90,19 +90,19 @@ namespace TweenGallery
             Label(root, "M", 30, 27, 46, 40, 27, Color.white, TextAnchor.MiddleCenter, true);
             Label(root, "UI MOTION LAB", 91, 13, 490, 44, 27, Color.white, TextAnchor.MiddleLeft, true);
             Label(root, "Unity UI 动效展馆  /  看见差别，带走手感", 92, 56, 650, 24, 15, Muted);
-            Chip(root, "40 项动效", 1285, 30, 118, Cyan, Ink);
+            Chip(root, MotionCatalog.All.Length + " 项动效", 1285, 30, 118, Cyan, Ink);
             Chip(root, "UNITY 6", 1417, 30, 150, Violet, Color.white);
 
             ImageAt(root, "Catalog panel", 28, 104, 290, 752, Panel);
             Label(root, "动效图鉴", 48, 116, 200, 44, 24, Color.white, TextAnchor.MiddleLeft, true);
-            countLabel = Label(root, "40 / 40", 230, 125, 65, 26, 14, Muted, TextAnchor.MiddleRight);
+            countLabel = Label(root, MotionCatalog.All.Length + " / " + MotionCatalog.All.Length, 230, 125, 65, 26, 14, Muted, TextAnchor.MiddleRight);
             MakeSearch();
-            string[] keys = { "", "A", "B", "C", "D", "E" };
-            string[] labels = { "全部", "出现", "交互", "转场", "奖励", "引导" };
+            string[] keys = { "", "A", "B", "C", "D", "E", "F" };
+            string[] labels = { "全部", "出现", "交互", "转场", "奖励", "引导", "进阶" };
             for (int i = 0; i < keys.Length; i++)
             {
                 string key = keys[i];
-                Button button = ButtonAt(root, labels[i], 45 + i % 3 * 86, 218 + i / 3 * 36, 80, 29,
+                Button button = ButtonAt(root, labels[i], 45 + i % 4 * 64, 218 + i / 4 * 36, 60, 29,
                     key == "" ? Violet : Hex("303657"), Color.white, 14, () => SetCategory(key));
                 categories.Add(key, button);
             }
@@ -151,7 +151,7 @@ namespace TweenGallery
             Label(root, "将编号和当前参数带入你的 Unity 项目", 1257, 778, 292, 47, 12, Muted, TextAnchor.UpperCenter);
             Label(root, "UGUI + DOTween FREE", 30, 871, 290, 20, 11, Muted);
             status = Label(root, "准备完成", 341, 870, 870, 22, 12, Muted);
-            Label(root, "v0.1.0  ·  ESC 退出", 1262, 870, 300, 22, 11, Muted, TextAnchor.MiddleRight);
+            Label(root, "v" + Application.version + "  ·  ESC 退出", 1262, 870, 300, 22, 11, Muted, TextAnchor.MiddleRight);
             MakeEasingPopup();
             RefreshList();
         }
@@ -224,7 +224,7 @@ namespace TweenGallery
             }
             listContent.sizeDelta = new Vector2(254, Mathf.Max(y, 536));
             listScroll.verticalNormalizedPosition = 1;
-            countLabel.text = visibleIds.Count + " / 40";
+            countLabel.text = visibleIds.Count + " / " + MotionCatalog.All.Length;
             if (visibleIds.Count == 0) Label(listContent, "没有匹配的动效\n试试 A04 或 Pop", 8, 35, 230, 100, 16, Muted, TextAnchor.MiddleCenter);
         }
 
@@ -251,7 +251,9 @@ namespace TweenGallery
             effectBadge.text = current.kind;
             useCase.text = current.description + "  适用：" + current.useCase;
             distinction.text = current.difference;
-            dependency.text = "接入提示：" + current.dependencies;
+            dependency.text = string.IsNullOrEmpty(current.sourceTitle)
+                ? "接入提示：" + current.dependencies
+                : "参考：" + current.sourceTitle + "  ·  完整链接与原创转化见图鉴";
         }
 
         void BuildDemos(string[] ids)
@@ -314,6 +316,7 @@ namespace TweenGallery
             else if (CurrentEffectId.StartsWith("C")) ShowComparison("C05", "C06", "C07");
             else if (CurrentEffectId.StartsWith("D")) ShowComparison("D03", "D04", "D10");
             else if (CurrentEffectId.StartsWith("E")) ShowComparison("E01", "E02", "E04");
+            else if (CurrentEffectId.StartsWith("F")) ShowComparison("F01", "F02", "F06");
             else ShowComparison("A03", "A04", "A05");
         }
 
@@ -449,6 +452,7 @@ namespace TweenGallery
             if (definition.id == "D05") prompt.AppendFormat(CultureInfo.InvariantCulture, "结算总分 endValue={0:0.##}，各项从0累加。", options.endValue);
             if (definition.id == "D02") prompt.AppendFormat(CultureInfo.InvariantCulture, "填充范围 fillFrom={0:0.##}，fillTo={1:0.##}。", options.fillFrom, options.fillTo);
             prompt.Append("绑定 " + definition.binding + "。保留原有交互；重复播放先取消本实例的动画并恢复基线，禁用和销毁时清理；验收连续触发、恢复、布局和分辨率。");
+            if (!string.IsNullOrEmpty(definition.sourceUrl)) prompt.Append(" 参考来源：" + definition.sourceTitle + " " + definition.sourceUrl + "；原创转化：" + definition.transformation);
             return prompt.ToString();
         }
 
@@ -562,7 +566,7 @@ namespace TweenGallery
         static Color Hex(string value) { ColorUtility.TryParseHtmlString("#" + value, out Color color); return color; }
         static Color CategoryColor(string group)
         {
-            switch (group) { case "A": return Violet; case "B": return Pink; case "C": return Cyan; case "D": return Yellow; default: return Hex("65EA75"); }
+            switch (group) { case "A": return Violet; case "B": return Pink; case "C": return Cyan; case "D": return Yellow; case "F": return Hex("FF8A22"); default: return Hex("65EA75"); }
         }
 
         static Sprite MakeRoundedSprite()

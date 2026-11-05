@@ -80,7 +80,17 @@ namespace TweenGallery
                 yield return new WaitForEndOfFrame();
                 ScreenCapture.CaptureScreenshot(Path.Combine(folder, def.id + ".png"));
                 yield return null;
-                if (player != null && new[] { "A08", "C04", "D03", "D04", "D07", "D08", "E07" }.Contains(def.id))
+                if (player != null && def.id.StartsWith("F"))
+                {
+                    foreach (float sample in new[] { .15f, .50f })
+                    {
+                        player.Sample(sample);
+                        yield return new WaitForEndOfFrame();
+                        ScreenCapture.CaptureScreenshot(Path.Combine(folder, def.id + "-" + Mathf.RoundToInt(sample*100) + ".png"));
+                        yield return null;
+                    }
+                }
+                if (player != null && (def.id.StartsWith("F") || new[] { "A08", "C04", "D03", "D04", "D07", "D08", "E07" }.Contains(def.id)))
                 {
                     player.Sample(def.id == "C04" || def.id == "A08" ? 1f : .85f);
                     yield return new WaitForEndOfFrame(); ScreenCapture.CaptureScreenshot(Path.Combine(folder, def.id + "-late.png"));
@@ -195,14 +205,38 @@ namespace TweenGallery
                 yield return null;
             }
             gallery.SetCategory("D"); yield return null;
-            Check(gallery.GetComponentsInChildren<Text>().Any(t => t.text == "10 / 40"), "Category D exposes ten catalog entries");
+            Check(gallery.GetComponentsInChildren<Text>().Any(t => t.text == "10 / 46"), "Category D exposes ten catalog entries");
             gallery.SetCategory("");
             var search = gallery.GetComponentInChildren<InputField>();
             search.text = "A04"; yield return null;
-            Check(gallery.GetComponentsInChildren<Text>().Any(t => t.text == "1 / 40"), "Search A04 isolates one catalog entry");
+            Check(gallery.GetComponentsInChildren<Text>().Any(t => t.text == "1 / 46"), "Search A04 isolates one catalog entry");
             search.text = "no-such-motion-xyz"; yield return null;
-            Check(gallery.GetComponentsInChildren<Text>().Any(t => t.text == "0 / 40"), "Search handles zero results");
+            Check(gallery.GetComponentsInChildren<Text>().Any(t => t.text == "0 / 46"), "Search handles zero results");
             search.text = ""; yield return null;
+            gallery.SelectEffect("F05"); yield return null;
+            Canvas.ForceUpdateCanvases();
+            var tilt = gallery.CurrentPlayer.GetComponentInChildren<MotionParallaxTilt>(true);
+            if (tilt == null || tilt.surface == null || tilt.highlight == null || tilt.glint == null) report.errors.Add("F05 pointer layers are missing");
+            else
+            {
+                gallery.CurrentPlayer.StopAndRestore();
+                tilt.CaptureBaseline();
+                Quaternion rest = tilt.surface.localRotation;
+                Vector2 shineRest = tilt.highlight.anchoredPosition;
+                RectTransform hit = tilt.transform as RectTransform;
+                Vector3 world = hit.TransformPoint(new Vector3(hit.rect.xMax * .8f, hit.rect.yMax * .8f, 0));
+                var eventData = new PointerEventData(EventSystem.current) { position = RectTransformUtility.WorldToScreenPoint(null, world) };
+                var hits = new List<RaycastResult>();
+                EventSystem.current.RaycastAll(eventData, hits);
+                var handler = hits.Count > 0 ? ExecuteEvents.GetEventHandler<IPointerEnterHandler>(hits[0].gameObject) : null;
+                Check(handler == tilt.gameObject, "F05 card receives the topmost real EventSystem raycast");
+                if (handler != null) ExecuteEvents.Execute(handler, eventData, ExecuteEvents.pointerEnterHandler);
+                yield return new WaitForSecondsRealtime(.3f);
+                Check(Quaternion.Angle(tilt.surface.localRotation, rest) > 1f && Vector2.Distance(tilt.highlight.anchoredPosition, shineRest) > 1f, "F05 pointer enter tilts surface and shifts independent highlight");
+                ExecuteEvents.Execute(tilt.gameObject, eventData, ExecuteEvents.pointerExitHandler);
+                yield return new WaitForSecondsRealtime(.8f);
+                Check(Quaternion.Angle(tilt.surface.localRotation, rest) < .3f && Vector2.Distance(tilt.highlight.anchoredPosition, shineRest) < .5f, "F05 pointer exit returns layers to baseline");
+            }
             gallery.SelectEffect("A04"); yield return null;
             var replay = gallery.GetComponentsInChildren<Button>().FirstOrDefault(b => b.GetComponentsInChildren<Text>().Any(t => t.text == "重播"));
             gallery.CurrentPlayer.Sample(.8f);
@@ -213,7 +247,10 @@ namespace TweenGallery
             gallery.CurrentPlayer.Sample(1);
             yield return new WaitForEndOfFrame(); ScreenCapture.CaptureScreenshot(Path.Combine(folder, "gallery-overview.png"));
             yield return null;
-            report.passed = report.cases.Count == 40 && report.cases.All(c => c.changed && c.restored && c.replay && c.disabled && c.finite && c.played) && report.errors.Count == 0;
+            var seenIds = new HashSet<string>(report.cases.Select(c => c.id));
+            bool originalComplete = new[] { ("A",8), ("B",8), ("C",7), ("D",10), ("E",7), ("F",6) }.All(g => Enumerable.Range(1,g.Item2).All(n => seenIds.Contains(g.Item1 + n.ToString("00"))));
+            Check(originalComplete, "Original 40 plus six advanced effects have stable unique IDs");
+            report.passed = report.cases.Count == 46 && originalComplete && report.cases.All(c => c.changed && c.restored && c.replay && c.disabled && c.finite && c.played) && report.errors.Count == 0;
             Finish();
         }
 

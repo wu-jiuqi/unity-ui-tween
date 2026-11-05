@@ -8,6 +8,7 @@ namespace TweenGallery
     public sealed class MotionDefinition
     {
         public string id, name, english, category, kind, description, useCase, difference, dependencies, binding, ease, prompt;
+        public string sourceUrl, sourceTitle, transformation;
         public float duration = .7f, strength = 1f, distance = 120f, stagger = .1f;
         public float startValue = 100f, endValue = 1250f, fillFrom = .08f, fillTo = .9f;
     }
@@ -24,12 +25,16 @@ namespace TweenGallery
                 TextAsset json = Resources.Load<TextAsset>("motion-catalog");
                 if (json == null) throw new InvalidOperationException("Missing Resources/motion-catalog.json. Import the catalog with the runtime templates.");
                 var parsed = JsonUtility.FromJson<Wrapper>(json.text);
-                if (parsed == null || parsed.effects == null || parsed.effects.Length != 40)
-                    throw new InvalidOperationException("Motion catalog must contain exactly 40 effects.");
+                if (parsed == null || parsed.effects == null || parsed.effects.Length != 46)
+                    throw new InvalidOperationException("Motion catalog must contain the 40 base and six advanced effects.");
                 var ids = new HashSet<string>();
                 foreach (var effect in parsed.effects)
                     if (effect == null || string.IsNullOrEmpty(effect.id) || !ids.Add(effect.id))
                         throw new InvalidOperationException("Motion catalog contains a missing or duplicate ID.");
+                foreach (var category in new[] { ("A",8), ("B",8), ("C",7), ("D",10), ("E",7), ("F",6) })
+                    for (int i=1; i<=category.Item2; i++)
+                        if (!ids.Contains(category.Item1 + i.ToString("00")))
+                            throw new InvalidOperationException("Motion catalog is missing required ID " + category.Item1 + i.ToString("00"));
                 all = parsed.effects;
                 return all;
             }
