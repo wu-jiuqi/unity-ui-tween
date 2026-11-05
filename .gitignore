@@ -1,0 +1,16 @@
+/Library/
+/Temp/
+/Obj/
+/Logs/
+/UserSettings/
+/Builds/
+/dist/
+/validation-output/
+/downloads/
+/packaging-*/
+/Skill/unity-ui-tween/assets/
+*.csproj
+*.sln
+*.suo
+*.user
+*.log
