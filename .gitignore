@@ -9,6 +9,8 @@
 /downloads/
 /packaging-*/
 /Skill/unity-ui-tween/assets/
+/evidence/
+/BUILD_INFO.json
 *.csproj
 *.sln
 *.suo

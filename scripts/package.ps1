@@ -35,7 +35,7 @@ Compress-Archive -LiteralPath $skill -DestinationPath (Join-Path $dist "unity-ui
 
 $source = Join-Path $staging 'UnityTweenGallery'
 New-Item -ItemType Directory -Path $source -Force | Out-Null
-foreach ($name in @('Assets','Packages','ProjectSettings','docs','scripts','Skill','ThirdPartyLicenses','README.md','VERSION','BUILD_INFO.json','.gitignore','ARCHITECTURE.md','PROGRESS.md')) {
+foreach ($name in @('Assets','Packages','ProjectSettings','docs','scripts','Skill','ThirdPartyLicenses','README.md','VERSION','BUILD_INFO.json','.gitignore','.gitattributes','ARCHITECTURE.md','PROGRESS.md')) {
     Copy-Item -LiteralPath (Join-Path $project $name) -Destination $source -Recurse
 }
 Compress-Archive -LiteralPath $source -DestinationPath (Join-Path $dist "UnityTweenGallery-$version-Source.zip") -Force
