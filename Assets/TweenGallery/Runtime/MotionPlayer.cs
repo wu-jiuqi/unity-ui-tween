@@ -16,21 +16,34 @@ namespace TweenGallery
         private Tween ownedTween;
         private Snapshot baseline;
         private string ownedEffect;
+        private readonly HashSet<string> continuationPriorEffects = new HashSet<string>();
+        private bool poseDirty;
         private float progress;
         private Material blurMaterial;
         private Image blurOwner;
         private static readonly Dictionary<RectTransform, MotionPlayer> Owners = new Dictionary<RectTransform, MotionPlayer>();
         private RectTransform claimedTarget;
+        public ulong PlayVersion { get; private set; }
+        public bool IsCurrentPlayback(ulong version) { return isActiveAndEnabled && version == PlayVersion; }
+        private void InvalidatePlayback() { unchecked { PlayVersion++; } }
         public bool IsPlaying { get { return ownedTween != null && ownedTween.IsActive() && ownedTween.IsPlaying(); } }
         public float Progress { get { return progress; } }
 
         public void CaptureBaseline()
         {
+            InvalidatePlayback();
             KillOwnedTween();
             baseline = new Snapshot(bindings);
             ownedEffect = null;
+            continuationPriorEffects.Clear();
+            poseDirty = false;
             progress = 0f;
         }
+        /// <summary>Call after a bound subtree changes; stop and restore before changing layout, then refresh once.</summary>
+        public void RefreshBindings() { CaptureBaseline(); }
+        /// <summary>Refresh changed descendant components without changing already captured baseline values.</summary>
+        public void RefreshHierarchyCache() { if (baseline != null) baseline.RefreshHierarchy(); }
+        private void OnTransformChildrenChanged() { RefreshHierarchyCache(); }
 
         public void Play(string id, MotionSettings options = null)
         {
@@ -38,6 +51,7 @@ namespace TweenGallery
             if (bindings == null || bindings.target == null)
                 throw new InvalidOperationException("MotionPlayer requires bindings.target (a RectTransform).");
             if (!isActiveAndEnabled) return;
+            InvalidatePlayback();
             // Newest request owns this target. Other targets and unrelated tweens remain untouched.
             if (Owners.TryGetValue(bindings.target, out var previous) && previous != null && previous != this) previous.StopAndRestore();
             ReleaseTarget();
@@ -48,6 +62,9 @@ namespace TweenGallery
             KillOwnedTween();
             if (baseline == null) baseline = new Snapshot(bindings);
             baseline.Restore(ownedEffect, true);
+            if (poseDirty && ownedEffect != "__POSE") baseline.Restore("__POSE", true);
+            RestoreContinuationEffects();
+            poseDirty = false;
             effectId = id;
             ownedEffect = id;
             ValidateBindings();
@@ -59,26 +76,66 @@ namespace TweenGallery
             ownedTween.timeScale = Mathf.Clamp(settings.speed, .05f, 4f);
         }
 
+        /// <summary>
+        /// Cancel the active tween and interpolate from its visible pose without replacing
+        /// the stable captured baseline. This fixed-duration tween preserves position,
+        /// not velocity. For momentum-preserving retargeting use MotionSpring1D/2D.
+        /// </summary>
+        public void ContinueTo(MotionPose destination, float duration, Ease ease = Ease.OutCubic)
+        {
+            if (bindings == null || bindings.target == null) throw new InvalidOperationException("MotionPlayer requires bindings.target.");
+            if (!isActiveAndEnabled) return;
+            // Continuation must never silently make an in-flight pose the stable baseline.
+            if (baseline == null) throw new InvalidOperationException("ContinueTo needs a stable baseline. Call CaptureBaseline after binding, or Play first.");
+            InvalidatePlayback();
+            var start = MotionPose.Read(bindings.target, bindings.group);
+            if (Owners.TryGetValue(bindings.target, out var previous) && previous != null && previous != this)
+            {
+                previous.StopAndRestore();
+                start.Apply(bindings.target, bindings.group);
+            }
+            ReleaseTarget(); claimedTarget = bindings.target; Owners[claimedTarget] = this;
+            KillOwnedTween();
+            if (!string.IsNullOrEmpty(ownedEffect) && ownedEffect != "__POSE") continuationPriorEffects.Add(ownedEffect);
+            ownedEffect = "__POSE";
+            poseDirty = true;
+            progress = 0f;
+            ownedTween = DOTween.To(() => progress, value => {
+                progress = value;
+                float phase = EaseManager.Evaluate(ease, null, Mathf.Clamp01(value), 1f, 1.70158f, 0f);
+                MotionPose.Interpolate(start, destination, phase).Apply(bindings.target, bindings.group);
+                if (bindings.group != null) baseline.ManageRaycasts(bindings.group, bindings.group.alpha <= .001f);
+            }, 1f, Mathf.Max(.001f, duration)).SetEase(Ease.Linear)
+                .SetUpdate(settings == null || settings.unscaledTime).SetAutoKill(false);
+            ownedTween.timeScale = settings == null ? 1f : Mathf.Clamp(settings.speed, .05f, 4f);
+        }
+
         public void Pause() { if (ownedTween != null && ownedTween.IsActive()) ownedTween.Pause(); }
         public void Resume() { if (ownedTween != null && ownedTween.IsActive()) ownedTween.Play(); }
         /// <summary>Real pointer feedback: hold the compressed state until release, then return smoothly.</summary>
         public void SetPressed(bool pressed, bool rebound = true)
         {
             if (!isActiveAndEnabled || bindings == null || bindings.target == null) return;
-            if (Owners.TryGetValue(bindings.target, out var previous) && previous != null && previous != this) previous.StopAndRestore();
+            InvalidatePlayback();
+            MotionPose start = MotionPose.Read(bindings.target, bindings.group);
+            if (Owners.TryGetValue(bindings.target, out var previous) && previous != null && previous != this) { previous.StopAndRestore(); start.Apply(bindings.target, bindings.group); }
             ReleaseTarget();
             claimedTarget = bindings.target;
             Owners[claimedTarget] = this;
             if (settings == null) settings = new MotionSettings();
             if (baseline == null) baseline = new Snapshot(bindings);
-            float baseX = S(bindings.target).x;
-            float factor = Mathf.Abs(baseX) > .0001f ? bindings.target.localScale.x / baseX : 1f;
             KillOwnedTween();
-            baseline.Restore(ownedEffect, true);
+            // Preserve the currently visible target pose across press interruption.
+            // Other animated objects are restored, and their owned properties are
+            // retained for final cleanup rather than letting pose channels jump.
+            if (ownedEffect != "__POSE") baseline.Restore(ownedEffect, true);
+            if (!string.IsNullOrEmpty(ownedEffect) && ownedEffect != "__POSE" && ownedEffect != "B01" && ownedEffect != "B02") continuationPriorEffects.Add(ownedEffect);
+            start.Apply(bindings.target, bindings.group);
             ownedEffect = rebound ? "B02" : "B01";
-            Scale(bindings.target, factor);
             float end = pressed ? 1f - .14f * Mathf.Clamp(settings.strength, 0f, 3f) : 1f;
-            ownedTween = DOTween.To(() => factor, value => { factor = value; Scale(bindings.target, value); }, end,
+            Vector3 fromScale = start.scale, toScale = S(bindings.target) * end;
+            float phase = 0f;
+            ownedTween = DOTween.To(() => phase, value => { phase = value; if (bindings.target != null) bindings.target.localScale = Vector3.LerpUnclamped(fromScale,toScale,value); }, 1f,
                     pressed ? Mathf.Min(.15f, Mathf.Max(.05f, settings.duration * .25f)) : Mathf.Max(.1f, settings.duration * .6f))
                 .SetEase(pressed ? Ease.OutQuad : rebound ? Ease.OutElastic : Ease.OutQuad)
                 .SetUpdate(settings.unscaledTime).SetAutoKill(false);
@@ -86,11 +143,31 @@ namespace TweenGallery
         }
         public void StopAndRestore()
         {
+            InvalidatePlayback();
             KillOwnedTween();
             ReleaseTarget();
             if (baseline != null) baseline.Restore(ownedEffect, true);
+            if (baseline != null && poseDirty && ownedEffect != "__POSE") baseline.Restore("__POSE", true);
+            RestoreContinuationEffects();
             ownedEffect = null;
+            poseDirty = false;
             progress = 0f;
+        }
+
+        /// <summary>
+        /// Explicitly commit the current visual state: cancel this tween and release
+        /// restoration ownership so disable/destroy cannot undo a necessary final state.
+        /// This does not change the previously captured baseline or invoke callbacks.
+        /// The host remains responsible for the corresponding business state.
+        /// </summary>
+        public void ReleaseAtCurrentState()
+        {
+            InvalidatePlayback();
+            KillOwnedTween();
+            ReleaseTarget();
+            ownedEffect = null;
+            continuationPriorEffects.Clear();
+            poseDirty = false;
         }
 
         /// <summary>Samples the production evaluator without creating a second animation implementation.</summary>
@@ -107,14 +184,17 @@ namespace TweenGallery
 
         private void Update()
         {
-            if (ownedTween != null && ownedTween.IsActive()) ownedTween.timeScale = Mathf.Clamp(settings.speed, .05f, 4f);
+            if (ownedTween != null && ownedTween.IsActive()) ownedTween.timeScale = settings == null ? 1f : Mathf.Clamp(settings.speed, .05f, 4f);
         }
         private void OnDisable() { StopAndRestore(); }
         private void OnDestroy()
         {
+            InvalidatePlayback();
             KillOwnedTween();
             ReleaseTarget();
             if (baseline != null) baseline.Restore(ownedEffect, true);
+            if (baseline != null && poseDirty && ownedEffect != "__POSE") baseline.Restore("__POSE", true);
+            RestoreContinuationEffects();
             if (blurMaterial != null) Destroy(blurMaterial);
         }
         private void KillOwnedTween()
@@ -126,6 +206,11 @@ namespace TweenGallery
         {
             if (!ReferenceEquals(claimedTarget, null) && Owners.TryGetValue(claimedTarget, out var owner) && owner == this) Owners.Remove(claimedTarget);
             claimedTarget = null;
+        }
+        private void RestoreContinuationEffects()
+        {
+            if (baseline != null) foreach (string effect in continuationPriorEffects) baseline.Restore(effect, true);
+            continuationPriorEffects.Clear();
         }
 
         private void ValidateBindings()
@@ -183,7 +268,7 @@ namespace TweenGallery
             if (bindings.itemGroups != null && index < bindings.itemGroups.Length && bindings.itemGroups[index] != null)
                 Alpha(bindings.itemGroups[index], alpha);
             else if (bindings.items != null && index < bindings.items.Length && bindings.items[index] != null)
-                foreach (Graphic graphic in bindings.items[index].GetComponentsInChildren<Graphic>(true)) GraphicAlpha(graphic, alpha);
+                foreach (Graphic graphic in baseline.Graphics(bindings.items[index])) GraphicAlpha(graphic, alpha);
         }
         private float StaggerPhase(float t, int index, int count, float available = 1f)
         {
@@ -223,7 +308,7 @@ namespace TweenGallery
                 case "E03":
                     float travel = Mathf.Abs(d) > 1f ? Mathf.Abs(d) : bindings.mask.rect.width;
                     Move(bindings.shine, Vector2.right * Mathf.Lerp(-travel, travel, E(t, Ease.InOutSine)));
-                    GraphicAlpha(bindings.shine.GetComponent<Graphic>(), Mathf.Sin(Mathf.PI * t) * Mathf.Min(1f, a)); break;
+                    GraphicAlpha(baseline.PrimaryGraphic(bindings.shine), Mathf.Sin(Mathf.PI * t) * Mathf.Min(1f, a)); break;
 
                 case "A01": Alpha(bindings.group, E(t, Ease.InOutSine)); break;
                 case "A02": Move(target, Vector2.left * d * (1f - E(t))); Alpha(bindings.group, Phase(t, 0f, .35f)); break;
@@ -270,7 +355,7 @@ namespace TweenGallery
                 case "D04": EvaluateBurst(t,a,d); break;
                 case "D05": EvaluateSettlement(t,a); break;
                 case "D06":
-                    for(int i=0;i<bindings.items.Length;i++) { q=StaggerPhase(t,i,bindings.items.Length); Scale(bindings.items[i],Mathf.LerpUnclamped(Mathf.Clamp(1f-.65f*a,.05f,1f),1f,E(q,Ease.OutBack))); ItemAlpha(i,Mathf.Lerp(.15f,1f,Phase(q,0f,.3f))); Image star=bindings.items[i]==null?null:bindings.items[i].GetComponent<Image>(); if(star!=null) star.color=Color.Lerp(new Color(.24f,.27f,.39f,1f),baseline.Color(star),Phase(q,0f,.25f)); } break;
+                    for(int i=0;i<bindings.items.Length;i++) { q=StaggerPhase(t,i,bindings.items.Length); Scale(bindings.items[i],Mathf.LerpUnclamped(Mathf.Clamp(1f-.65f*a,.05f,1f),1f,E(q,Ease.OutBack))); ItemAlpha(i,Mathf.Lerp(.15f,1f,Phase(q,0f,.3f))); Image star=baseline.PrimaryImage(bindings.items[i]); if(star!=null) star.color=Color.Lerp(new Color(.24f,.27f,.39f,1f),baseline.Color(star),Phase(q,0f,.25f)); } break;
                 case "D07":
                     q=E(t,Ease.InOutSine); Rotate(target,new Vector3(0f,q<.5f?q*180f:(q-1f)*180f,0f));
                     GraphicAlpha(bindings.image,q<.5f?1f:0f); GraphicAlpha(bindings.secondaryImage,q>=.5f?1f:0f); Alpha(bindings.group,q<.5f?1f:0f); Alpha(bindings.secondaryGroup,q>=.5f?1f:0f); break;
@@ -309,7 +394,7 @@ namespace TweenGallery
             Alpha(bindings.group,Phase(t,0f,.16f));
             float scan=E(Phase(t,.20f,.78f),Ease.InOutSine);
             Move(bindings.shine,Vector2.right*Mathf.Lerp(-Mathf.Abs(distance),Mathf.Abs(distance),scan));
-            GraphicAlpha(bindings.shine.GetComponent<Graphic>(),Mathf.Sin(Mathf.PI*Phase(t,.2f,.8f))*Mathf.Clamp01(strength));
+            GraphicAlpha(baseline.PrimaryGraphic(bindings.shine),Mathf.Sin(Mathf.PI*Phase(t,.2f,.8f))*Mathf.Clamp01(strength));
             // Optional independent colored wipe. The parent uses RectMask2D so
             // the moving panel covers the card, then exits to reveal the artwork.
             if(bindings.mask!=null)
@@ -474,6 +559,9 @@ namespace TweenGallery
             private readonly Dictionary<RectTransform,RectState> rects=new Dictionary<RectTransform,RectState>();
             private readonly Dictionary<Graphic,GraphicState> graphics=new Dictionary<Graphic,GraphicState>();
             private readonly Dictionary<CanvasGroup,GroupState> groups=new Dictionary<CanvasGroup,GroupState>();
+            private readonly Dictionary<RectTransform,Graphic[]> children=new Dictionary<RectTransform,Graphic[]>();
+            private readonly Dictionary<RectTransform,Graphic> primary=new Dictionary<RectTransform,Graphic>();
+            private readonly Dictionary<RectTransform,Image> images=new Dictionary<RectTransform,Image>();
             public Snapshot(MotionBindings b)
             {
                 bindings=b;
@@ -487,8 +575,21 @@ namespace TweenGallery
             {
                 if(rect==null||rects.ContainsKey(rect)) return;
                 rects.Add(rect,new RectState {target=rect,position=rect.anchoredPosition3D,scale=rect.localScale,rotation=rect.localRotation,size=rect.sizeDelta,rectSize=rect.rect.size});
-                foreach(var graphic in rect.GetComponentsInChildren<Graphic>(true)) Add(graphic);
+                CacheSubtree(rect);
+            }
+            private void CacheSubtree(RectTransform rect)
+            {
+                var subtree=rect.GetComponentsInChildren<Graphic>(true);
+                children[rect]=subtree;
+                primary[rect]=rect.GetComponent<Graphic>();
+                images[rect]=rect.GetComponent<Image>();
+                foreach(var graphic in subtree) Add(graphic);
                 foreach(var group in rect.GetComponentsInChildren<CanvasGroup>(true)) Add(group);
+            }
+            public void RefreshHierarchy()
+            {
+                // New components capture their own baseline; existing component baselines remain stable.
+                foreach (var rect in new List<RectTransform>(rects.Keys)) if(rect!=null) CacheSubtree(rect);
             }
             private void Add(Graphic graphic)
             {
@@ -507,6 +608,9 @@ namespace TweenGallery
             public Vector2 RectSize(RectTransform rect) { return rect!=null&&rects.TryGetValue(rect,out var state)?state.rectSize:Vector2.zero; }
             public Color Color(Graphic graphic) { return graphic!=null&&graphics.TryGetValue(graphic,out var state)?state.color:UnityEngine.Color.white; }
             public float Alpha(CanvasGroup group) { return group!=null&&groups.TryGetValue(group,out var state)?state.alpha:1f; }
+            public Graphic[] Graphics(RectTransform rect) { return rect!=null&&children.TryGetValue(rect,out var found)?found:Array.Empty<Graphic>(); }
+            public Graphic PrimaryGraphic(RectTransform rect) { return rect!=null&&primary.TryGetValue(rect,out var found)?found:null; }
+            public Image PrimaryImage(RectTransform rect) { return rect!=null&&images.TryGetValue(rect,out var found)?found:null; }
             // Restore only properties owned by the selected effect. Business text, disabled
             // controls and unrelated artwork may change while an animation is running.
             public void Restore(string effect, bool releaseInput)
@@ -515,6 +619,7 @@ namespace TweenGallery
                 var b=bindings;
                 switch(effect)
                 {
+                    case "__POSE": Rect(b.target,7); Group(b.group,releaseInput); break;
                     case "A01": Group(b.group,releaseInput); break;
                     case "A02": case "A05": case "C01": Rect(b.target,1); Group(b.group,releaseInput); break;
                     case "A03": case "A04": Rect(b.target,2); Group(b.group,releaseInput); break;
@@ -535,17 +640,17 @@ namespace TweenGallery
                     case "D03": Rect(b.target,3); Rect(b.destination,2); Group(b.group,releaseInput); break;
                     case "D04": Items(3,releaseInput); Rect(b.destination,2); break;
                     case "D05": Items(2,releaseInput); Text(b.label); if(b.labels!=null) foreach(var text in b.labels) Text(text); break;
-                    case "D06": Items(2,releaseInput); if(b.items!=null) foreach(var item in b.items) if(item!=null) FullColor(item.GetComponent<Image>()); break;
+                    case "D06": Items(2,releaseInput); if(b.items!=null) foreach(var item in b.items) FullColor(PrimaryImage(item)); break;
                     case "D07": Rect(b.target,4); GraphicAlpha(b.image); GraphicAlpha(b.secondaryImage); Group(b.group,releaseInput); Group(b.secondaryGroup,releaseInput); break;
                     case "D08": Rect(b.target,6); Rect(b.lid,4); Items(3,releaseInput); break;
                     case "D09": Rect(b.target,3); Group(b.group,releaseInput); break;
                     case "D10": Rect(b.target,2); FullColor(b.image); break;
-                    case "E03": Rect(b.shine,1); if(b.shine!=null) GraphicAlpha(b.shine.GetComponent<Graphic>()); break;
+                    case "E03": Rect(b.shine,1); GraphicAlpha(PrimaryGraphic(b.shine)); break;
                     case "E04": Group(b.group,releaseInput); break;
                     case "E05": Items(3,releaseInput); break;
                     case "E06": Items(1,releaseInput); break;
                     case "E07": Rect(b.target,3); Group(b.secondaryGroup,releaseInput); break;
-                    case "F01": Rect(b.target,2); Group(b.group,releaseInput); Rect(b.shine,1); Rect(b.mask,1); if(b.shine!=null) GraphicAlpha(b.shine.GetComponent<Graphic>()); Items(2,releaseInput); break;
+                    case "F01": Rect(b.target,2); Group(b.group,releaseInput); Rect(b.shine,1); Rect(b.mask,1); GraphicAlpha(PrimaryGraphic(b.shine)); Items(2,releaseInput); break;
                     case "F02": Rect(b.target,2); Group(b.group,releaseInput); Rect(b.secondary,6); Items(3,releaseInput); if(b.labels!=null) foreach(var label in b.labels) GraphicAlpha(label); break;
                     case "F03": Rect(b.secondary,2); Items(1,releaseInput); break;
                     case "F04": Rect(b.secondary,2); Fill(b.fill); Items(3,releaseInput); break;
@@ -598,7 +703,7 @@ namespace TweenGallery
                 {
                     RectTransform item=bindings.items[i]; Rect(item,flags);
                     if(bindings.itemGroups!=null&&i<bindings.itemGroups.Length&&bindings.itemGroups[i]!=null) Group(bindings.itemGroups[i],releaseInput);
-                    else if(item!=null) foreach(var graphic in item.GetComponentsInChildren<Graphic>(true)) GraphicAlpha(graphic);
+                    else if(item!=null) foreach(var graphic in Graphics(item)) GraphicAlpha(graphic);
                 }
             }
         }
