@@ -1,13 +1,16 @@
 # Unity UI Motion Gallery
 
-一套以 **Unity UGUI + DOTween 免费版** 实现的 46 项 UI 动效：可运行 Windows 展馆、46 个预设与示例预制体、通用 Runtime、Codex Skill 和中文文档。版本 **0.2.1**。
+一套以 **Unity UGUI + DOTween 免费版** 实现的 46 项 UI 动效：可运行 Windows 展馆、46 个预设与示例预制体、通用 Runtime、Codex Skill 和中文文档。版本 **0.3.0**。
 
 展馆使用鲜艳、高饱和度的休闲游戏 UI，并以同一份 MotionPlayer 播放实际交付的模板。A01–F06 固定编号覆盖出现消失、交互反馈、页面转场、奖励数值、循环和编排。
+
+0.3.0 增加交互实验室、姿态接续、阻尼弹簧、果冻拖拽、事件与对象池保护、减弱动效和可选 TMP 适配；旧的 46 项预制体保留。完整 Skill 包可独立生成，不需先构建 Windows 展馆。
 
 - [快速上手](docs/quickstart.md)：Windows 展馆、Unity 工程与模板、Skill 安装。
 - [46 项图鉴](docs/catalog.md)：效果差异、参数、绑定、依赖和逐项提示词。
 - [进阶参考与原创转化](docs/design-references.md)。
 - [接入与参数](docs/integration.md)：真实项目 API、布局与生命周期规则。
+- [交互组件](docs/interaction.md)、[编排与音频](docs/orchestration.md)、[移动与性能](docs/mobile-performance.md)及 [Skill 独立打包](docs/skill-packaging.md)。
 - [提示词与验收](docs/acceptance.md)：组合请求与检查标准。
 - [实际验证记录](docs/validation.md)：以日志和实测为准。
 - [发布使用指南](docs/release-guide.md)：完整解压、资产核对和已知范围。
@@ -37,5 +40,5 @@ Unity **6000.0.26f1**、UGUI **2.0.0**、DOTween 免费版 **1.3.045**、Built-i
 
 打开 Gallery.unity 可在编辑器运行。需要重新生成展馆场景和模板时，在此独立工程使用菜单 **Tools → UI Motion Gallery → Prepare scene and templates**；Windows 构建使用 **Build Windows and export templates**。Prepare 会重建当前展馆场景，先保存手动改动。
 
-v0.1.0 已发布，v0.2.1 的构建及发布状态以实际记录为准。当前交付与阻碍记录见 PROGRESS.md。
+v0.3.0 当前为本地交付版，未向公开仓库推送或发布。当前验证和限制见 PROGRESS.md 与验证记录。
 
