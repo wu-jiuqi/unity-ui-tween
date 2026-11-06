@@ -1,5 +1,23 @@
 # 验证记录
 
+补充：在隔离 Unity 工程中移除测试用 UGUI 副本的 TMP 代码并关闭适配宏，基础 Runtime 编译通过，程序集未引用或加载 TextMeshPro；测试时 14 个 Runtime 脚本与主工程逐文件哈希一致。启用 TMP 的另一个独立 Windows Player 测试为 failures=0，覆盖整数更新次数、最终值、百分比、过期回调、暂停恢复、富文本逐字及禁用清理；需先配置 TMP Essential Resources。证据分别在工作区 `NoTMPCheck/evidence/` 和 `TMPAdapterCheck/evidence/`。
+
+## 0.3.0 本地升级候选
+
+本机 Windows 上使用 Unity 6000.0.26f1、Windows x64 Mono 构建成功；最终构建报告为 0 错误、0 警告。`validation-output/v030-upgrade-final/upgrade-report.json` 的 Player 回归结果为通过、无错误。实验室在 Player 中加载了 image gen 生成的原创背景，画面记录为 `validation-output/v030-upgrade-final/interaction-lab.png`。
+
+该次运行覆盖：姿态中断与反向接续、稳定基线恢复、播放版本失效、物理弹簧的长帧和速度连续、果冻拖拽位移约束、对象池租约及过期回调、声音事件时间轴、减弱动效和必要终态。输入用例通过 EventSystem **程序模拟**了双指竞争、拖拽阈值、ScrollRect 路由、区域外释放、失焦和后台取消；这不等同于触摸设备或真实系统切后台测试。音效时间轴需要宿主维护播放时钟并调用 `Advance`，不是 `MotionPlayer` 的自动音频绑定。
+
+桌面 Player 曾对 100 个奖励对象各执行 60 次 `Sample`：计时代码记录当前线程 CPU 合计 **6.5705 ms**、当前线程托管分配 **0 字节**。这是单次受控采样，仅覆盖该测试线程和采样路径，既不是连续帧真实并发或对象池完整开销，也不能作为移动端性能或优化幅度结论。
+
+可选 TMP 适配在本机独立工程中启用并测试，Player 结果 `failures=0`；该测试工程另装入 TMP 所需资源。另在最终模板导入工程开启 `TWEEN_GALLERY_TMP` 后编译并验证即时数值通过。主展馆工程未启用该 define，基础运行时保留 UGUI Text 路径，并不要求项目安装 TMP。独立 Skill 包无需构建 Windows 即可生成；打包检查覆盖 46 项、Prefab/预设、GUID、依赖和 ZIP 内容。跨平台检查包括 Windows 生成包在 Ubuntu WSL 解压，以及 Ubuntu 创建包含中文路径的 ZIP 由 Windows 读取；Skill 测试 3 项和便携 ZIP 测试 1 项通过。最终源码稳定后应重新执行打包检查。
+
+0.3.0 最终 Player 原有 46 项回归通过，报告 `validation-output/v030-base-final/report.json` 记录 46/46、无错误；构建日志 `evidence/build-v030-final2.log` 对应的构建报告为 0 错误、0 警告。
+
+最终模板包已在本机独立 Unity 6000.0.26f1 工程中导入，46/46 Prefab、预设、依赖和采样检查通过；比较 v0.2.1 包确认原有 46 个 Prefab 的 GUID 与内部 fileID 一致。被测模板包 SHA-256 为 `f5fce9b83b810533ebac36e3ce60a883e13d67619a0c1809bcf66d732cc23315`，独立工程报告保存在 `IntegrationCheckV030/evidence/`。
+
+竖屏及不同安全区、真实触摸与 ScrollRect、按住时真实切后台、移动设备低帧与单次长帧、移动端 Profiler/真实并发奖励及对象池性能均尚未实测；也未在第二台干净 Windows 设备或断网环境运行。
+
 ## 0.2.1 进阶版候选
 
 Unity 6000.0.26f1，Windows x64 Mono；本机 1600×900、1280×720 的可见 Player 自动测试均为 46/46 通过，覆盖原 40 项和 F01–F06 的播放、重播、状态恢复与有限数值。F05 经 EventSystem 的实际射线命中后派发指针进入与退出，验证卡片倾斜、独立高光位移和归中。对每个新效果记录约 15%、50%、85% 三个阶段的画面，复查了星图、门户和标题等视觉区分。此次测试使用程序派发指针事件，尚不是人工鼠标手感评测。
@@ -14,4 +32,4 @@ Unity 6000.0.26f1，Windows x64 Mono；本机 1600×900、1280×720 的可见 Pl
 
 在一个独立 Unity 6000.0.26f1 工程中导入最终模板包并安装同一 DOTween 免费版，编译成功；40 个 Prefab 的必要绑定、Sprite、纹理、字体、Shader 及动画采样检查通过。该模板包 SHA-256 为 `7f8163df3039125c1d7f153592bce4bacb271b8228215ad9a84379264ff7f5a6`。独立工程验证仍在本机完成。
 
-自动冒烟不能证明各效果适配所有项目、分辨率和操作节奏。尚未在第二台干净 Windows 设备或断开网络环境验证；尚未发布 GitHub Release 或验证发布资产下载。目标项目应根据 Canvas、Layout 和实际输入继续测试。
+上述为 0.1.0 构建时的历史记录；自动冒烟不能证明各效果适配所有项目、分辨率和操作节奏。目标项目应根据 Canvas、Layout 和实际输入继续测试。

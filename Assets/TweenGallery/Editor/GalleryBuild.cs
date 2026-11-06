@@ -11,7 +11,7 @@ namespace TweenGallery.Editor
 {
     public static class GalleryBuild
     {
-        public const string Version = "0.2.1";
+        public const string Version = "0.3.0";
         const string Root = "Assets/TweenGallery";
 
         [MenuItem("Tools/UI Motion Gallery/Prepare scene and templates")]
@@ -27,6 +27,7 @@ namespace TweenGallery.Editor
             var root = new GameObject("UI Motion Gallery");
             root.AddComponent<GalleryBootstrap>();
             root.AddComponent<GallerySelfTest>();
+            root.AddComponent<UpgradeSelfTest>();
             var camera = new GameObject("Camera").AddComponent<Camera>();
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(0.045f, 0.055f, 0.11f);
@@ -47,7 +48,7 @@ namespace TweenGallery.Editor
                 // Existing base prefabs are part of the public API: preserve their
                 // serialized child fileIDs so downstream overrides remain valid.
                 string prefabPath = Root + "/Prefabs/" + effect.id + ".prefab";
-                if (!effect.id.StartsWith("F", StringComparison.Ordinal) && AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null) continue;
+                if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null) continue;
                 var player = DemoFactory.Create(effect.id, preview.transform, new Vector2(600, 420));
                 var prefabRoot = player.transform;
                 while (prefabRoot.parent != preview.transform && prefabRoot.parent != null) prefabRoot = prefabRoot.parent;

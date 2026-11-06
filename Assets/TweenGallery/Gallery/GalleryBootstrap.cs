@@ -34,6 +34,9 @@ namespace TweenGallery
         Slider durationSlider, strengthSlider, distanceSlider, staggerSlider;
         Text durationValue, strengthValue, distanceValue, staggerValue;
         Button reverseButton, easingButton;
+        InteractionLab interactionLab;
+        public bool IsInteractionLabOpen => interactionLab != null;
+        public InteractionLab CurrentInteractionLab => interactionLab;
         MotionDefinition current;
         MotionSettings options;
         string category = "", search = "";
@@ -53,7 +56,8 @@ namespace TweenGallery
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                if (easingPopup != null && easingPopup.gameObject.activeSelf) easingPopup.gameObject.SetActive(false);
+                if (interactionLab != null) interactionLab.Close();
+                else if (easingPopup != null && easingPopup.gameObject.activeSelf) easingPopup.gameObject.SetActive(false);
                 else Application.Quit();
             }
             if (!IsReady || players.Count == 0) return;
@@ -90,6 +94,7 @@ namespace TweenGallery
             Label(root, "M", 30, 27, 46, 40, 27, Color.white, TextAnchor.MiddleCenter, true);
             Label(root, "UI MOTION LAB", 91, 13, 490, 44, 27, Color.white, TextAnchor.MiddleLeft, true);
             Label(root, "Unity UI 动效展馆  /  看见差别，带走手感", 92, 56, 650, 24, 15, Muted);
+            ButtonAt(root, "交互实验室", 1046, 30, 200, 42, Pink, Color.white, 17, OpenInteractionLab);
             Chip(root, MotionCatalog.All.Length + " 项动效", 1285, 30, 118, Cyan, Ink);
             Chip(root, "UNITY 6", 1417, 30, 150, Violet, Color.white);
 
@@ -505,6 +510,12 @@ namespace TweenGallery
         }
 
         void ToggleEasingPopup() { easingPopup.gameObject.SetActive(!easingPopup.gameObject.activeSelf); easingPopup.SetAsLastSibling(); }
+        public void OpenInteractionLab()
+        {
+            if (interactionLab != null) return;
+            foreach (var player in players) if (player != null) player.StopAndRestore();
+            interactionLab = InteractionLab.Create(root, () => { interactionLab = null; Replay(); });
+        }
         void Notice(string message) { if (status == null) return; status.text = message; statusUntil = Time.unscaledTime + 4; }
 
         Button ButtonAt(Transform parent, string title, float x, float y, float w, float h, Color color, Color textColor, int size, Action onClick)

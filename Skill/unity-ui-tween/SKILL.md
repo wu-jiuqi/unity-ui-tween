@@ -27,7 +27,7 @@ description: "为 Unity UGUI 选择、预览和接入 46 种可复用 UI 补间�
 
 ## 接入同源模板
 
-按 [模板接入与参数](references/integration.md) 选择所需绑定和调用方式。完整模板资产位于 `assets/TweenGallery/`，对应目标项目的 `Assets/TweenGallery/`。其中包含 [Runtime](assets/TweenGallery/Runtime/)、[Shaders](assets/TweenGallery/Shaders/)、[46 个预制体](assets/TweenGallery/Prefabs/)、[46 个参数预设](assets/TweenGallery/Presets/) 和 [motion-catalog.json](assets/TweenGallery/Resources/motion-catalog.json)，以及示例所需图形、字体、展馆与场景。这些相对路径以 Skill 文件夹为根，不依赖制作机器上的绝对路径。复制资源时保留 `.meta`；只接入已有 UI 时按依赖选择必要部分。
+按 [模板接入与参数](references/integration.md) 选择所需绑定和调用方式。发行 ZIP 中的完整模板资产位于 `assets/TweenGallery/`，对应目标项目的 `Assets/TweenGallery/`；包括 Runtime、Shader、46 个预制体、46 个预设、图鉴数据、图形和字体。Git 源目录的 `Skill/unity-ui-tween/assets/` 是被忽略的生成物，可能不存在或过时；源码开发时以项目根 `Assets/TweenGallery/` 为准，执行 `python -X utf8 scripts/package_skill.py` 独立生成并验证发行包，无需 Windows 构建。安装发行包后，相对路径以 Skill 文件夹为根。复制时保留 `.meta`；只接入已有 UI 时按依赖选择必要部分。
 
 使用命名空间 `TweenGallery` 的 `MotionPlayer`、`MotionBindings`、`MotionSettings` 和 `MotionCatalog`。将目标元素绑定到对应字段，在布局稳定后捕获基线，再通过 `Play(id, options)` 播放。用 `Pause()` / `Resume()` 控制暂停，用 `StopAndRestore()` 取消并恢复。若复制模板资产，只复制目标项目实际需要的代码、着色器和目录数据，保留已有脚本和依赖。
 
@@ -45,6 +45,8 @@ description: "为 Unity UGUI 选择、预览和接入 46 种可复用 UI 补间�
 ## 验证并交付
 
 按 [验收与提示词](references/acceptance.md) 检查本次接入涉及的行为。至少覆盖实际编译、可运行时的视觉预览、连续重播、中途关闭/禁用、销毁、布局缩放及结束后的可点击状态。按钮按压还要验证按住、松开和移出；奖励动画要确认视觉到达与业务结算不会重复触发。
+
+按需查阅 [指针交互](references/interaction.md)、[编排与生命周期](references/orchestration.md) 和 [移动端与性能](references/mobile-performance.md)。它们区分已提供的组件、项目需接线的逻辑和必须在实际设备测试的行为。
 
 说明选用的编号、绑定位置、最终参数、调用入口，以及实际通过和未验证的检查。静态检查、`Sample()` 采样、编辑器运行和独立 Windows 运行属于不同证据，不互相替代。不能运行 Unity 时明确这一限制，不将代码生成描述为运行通过。
 

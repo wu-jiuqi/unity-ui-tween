@@ -24,21 +24,24 @@ Unity UI 动效展馆
 左侧选择动效，中间播放/暂停/慢放/对比，右侧调参和复制 Codex 提示词。
 按 Escape 退出。详细使用方法与实际验证范围见 docs 文件夹。
 '@ | Set-Content -LiteralPath (Join-Path $win '请先阅读.txt') -Encoding utf8
-Compress-Archive -Path (Join-Path $win '*') -DestinationPath (Join-Path $dist "UnityTweenGallery-$version-Windows-x64.zip") -Force
+& python -X utf8 (Join-Path $PSScriptRoot 'portable_zip.py') $win (Join-Path $dist "UnityTweenGallery-$version-Windows-x64.zip") --force
+if ($LASTEXITCODE -ne 0) { throw 'Windows ZIP verification failed' }
 
-$skill = Join-Path $project 'Skill\unity-ui-tween'
-$skillAssets = Join-Path $skill 'assets'
-New-Item -ItemType Directory -Path $skillAssets -Force | Out-Null
-Copy-Item -LiteralPath (Join-Path $project 'Assets\TweenGallery') -Destination $skillAssets -Recurse -Force
-Copy-Item -LiteralPath (Join-Path $project 'Assets\TweenGallery.meta') -Destination $skillAssets -Force
-Compress-Archive -LiteralPath $skill -DestinationPath (Join-Path $dist "unity-ui-tween-$version.zip") -Force
+$skillZip = Join-Path $dist "unity-ui-tween-$version.zip"
+& python -X utf8 (Join-Path $PSScriptRoot 'package_skill.py') --output $skillZip --force
+if ($LASTEXITCODE -ne 0) { throw 'Skill ZIP verification failed' }
+$skillStage = Join-Path $staging 'SkillPackage'
+Expand-Archive -LiteralPath $skillZip -DestinationPath $skillStage
 
 $source = Join-Path $staging 'UnityTweenGallery'
 New-Item -ItemType Directory -Path $source -Force | Out-Null
-foreach ($name in @('Assets','Packages','ProjectSettings','docs','scripts','Skill','ThirdPartyLicenses','README.md','VERSION','BUILD_INFO.json','.gitignore','.gitattributes','ARCHITECTURE.md','PROGRESS.md')) {
+foreach ($name in @('Assets','Packages','ProjectSettings','docs','scripts','ThirdPartyLicenses','README.md','VERSION','BUILD_INFO.json','.gitignore','.gitattributes','ARCHITECTURE.md','PROGRESS.md')) {
     Copy-Item -LiteralPath (Join-Path $project $name) -Destination $source -Recurse
 }
-Compress-Archive -LiteralPath $source -DestinationPath (Join-Path $dist "UnityTweenGallery-$version-Source.zip") -Force
+New-Item -ItemType Directory -Path (Join-Path $source 'Skill') -Force | Out-Null
+Copy-Item -LiteralPath (Join-Path $skillStage 'unity-ui-tween') -Destination (Join-Path $source 'Skill') -Recurse
+& python -X utf8 (Join-Path $PSScriptRoot 'portable_zip.py') $source (Join-Path $dist "UnityTweenGallery-$version-Source.zip") --include-root --force
+if ($LASTEXITCODE -ne 0) { throw 'Source ZIP verification failed' }
 $hashes = Get-ChildItem -LiteralPath $dist -File | Where-Object { $_.Extension -in '.zip','.unitypackage' -and $_.Name.Contains($version) } | ForEach-Object {
     $hash = Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256
     "$($hash.Hash.ToLowerInvariant())  $($_.Name)"
