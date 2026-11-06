@@ -40,5 +40,5 @@ Unity **6000.0.26f1**、UGUI **2.0.0**、DOTween 免费版 **1.3.045**、Built-i
 
 打开 Gallery.unity 可在编辑器运行。需要重新生成展馆场景和模板时，在此独立工程使用菜单 **Tools → UI Motion Gallery → Prepare scene and templates**；Windows 构建使用 **Build Windows and export templates**。Prepare 会重建当前展馆场景，先保存手动改动。
 
-v0.3.0 当前为本地交付版，未向公开仓库推送或发布。当前验证和限制见 PROGRESS.md 与验证记录。
+v0.3.0 的发布状态以 GitHub Release 为准。当前验证和限制见 PROGRESS.md 与验证记录。
 
