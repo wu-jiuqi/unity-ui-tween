@@ -12,6 +12,8 @@
 
 可选 TMP 适配在本机独立工程中启用并测试，Player 结果 `failures=0`；该测试工程另装入 TMP 所需资源。另在最终模板导入工程开启 `TWEEN_GALLERY_TMP` 后编译并验证即时数值通过。主展馆工程未启用该 define，基础运行时保留 UGUI Text 路径，并不要求项目安装 TMP。独立 Skill 包无需构建 Windows 即可生成；打包检查覆盖 46 项、Prefab/预设、GUID、依赖和 ZIP 内容。跨平台检查包括 Windows 生成包在 Ubuntu WSL 解压，以及 Ubuntu 创建包含中文路径的 ZIP 由 Windows 读取；Skill 测试 3 项和便携 ZIP 测试 1 项通过。最终源码稳定后应重新执行打包检查。
 
+最终源码已重新生成并验证 Skill 包；Windows 展馆、源码及 Skill 三个 ZIP 在本机 Ubuntu WSL 中均通过 CRC 检查且条目路径不含反斜杠。Windows 包解压后启动的升级 Player 自测通过。
+
 0.3.0 最终 Player 原有 46 项回归通过，报告 `validation-output/v030-base-final/report.json` 记录 46/46、无错误；构建日志 `evidence/build-v030-final2.log` 对应的构建报告为 0 错误、0 警告。
 
 最终模板包已在本机独立 Unity 6000.0.26f1 工程中导入，46/46 Prefab、预设、依赖和采样检查通过；比较 v0.2.1 包确认原有 46 个 Prefab 的 GUID 与内部 fileID 一致。被测模板包 SHA-256 为 `f5fce9b83b810533ebac36e3ce60a883e13d67619a0c1809bcf66d732cc23315`，独立工程报告保存在 `IntegrationCheckV030/evidence/`。
