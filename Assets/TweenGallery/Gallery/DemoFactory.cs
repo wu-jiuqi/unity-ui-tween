@@ -36,7 +36,7 @@ namespace TweenGallery
                 case "A07":
                     Reveal(root,b,false); break;
                 case "A08":
-                    var art = Picture("Reward illustration",root,new Vector2(384,256),Vector2.zero,Color.white,GalleryShapes.RewardArt());
+                    var art = Picture("Reward illustration",root,new Vector2(384,256),Vector2.zero,Color.white,GeneratedGalleryArt.Get("adventure-world"));
                     Bind(b,art.rectTransform); b.image=art;
                     Text("Art note",root,"稀有奖励",22,new Vector2(320,38),new Vector2(0,-150),Yellow); break;
                 case "B01": case "B02":
@@ -126,7 +126,7 @@ namespace TweenGallery
         {
             var card=Panel("Victory popup",parent,new Vector2(330,250),Vector2.zero,Purple);
             Picture("Top shine",card,new Vector2(300,4),new Vector2(0,110),new Color(1,1,1,.35f));
-            Star(card,new Vector2(-62,56),56,Yellow); Star(card,new Vector2(0,70),76,Yellow); Star(card,new Vector2(62,56),56,Yellow);
+            Picture("Generated reward chest",card,new Vector2(164,126),new Vector2(0,61),Color.white,GeneratedGalleryArt.Get("reward-chest")).preserveAspect=true;
             Text("Title",card,"挑战成功",34,new Vector2(290,52),new Vector2(0,-3),Color.white);
             Text("Subtitle",card,"精彩表现，继续前进！",17,new Vector2(295,32),new Vector2(0,-43),new Color(1,1,1,.82f));
             var cta=Panel("Continue",card,new Vector2(220,48),new Vector2(0,-88),Yellow);
@@ -158,8 +158,9 @@ namespace TweenGallery
         {
             var card=Panel("Hero card",parent,new Vector2(210,278),Vector2.zero,color);
             var face=Panel("Portrait",card,new Vector2(180,164),new Vector2(0,34),Hex("242B59"));
-            Picture("Halo",face,new Vector2(115,115),new Vector2(0,6),new Color(.8f,.5f,1,.4f),GalleryShapes.Get("ring"));
-            Gem(face,new Vector2(0,4),83,Cyan);
+            face.gameObject.AddComponent<RectMask2D>();
+            Picture("Generated adventure portrait",face,new Vector2(246,164),Vector2.zero,Color.white,GeneratedGalleryArt.Get("adventure-world"));
+            Gem(face,new Vector2(0,-9),86,Cyan);
             Text("Rarity",card,rarity,14,new Vector2(190,32),new Vector2(0,-66),Yellow);
             Text("Name",card,title,24,new Vector2(195,40),new Vector2(0,-101),Color.white);
             return card;
@@ -195,14 +196,8 @@ namespace TweenGallery
 
         static RectTransform Gift(Transform parent)
         {
-            var root=Rect("Gift",parent,new Vector2(180,180));
-            var body=Panel("Box",root,new Vector2(154,130),new Vector2(0,-20),Pink);
-            Picture("Ribbon",body,new Vector2(30,130),Vector2.zero,Yellow);
-            Panel("Lid",root,new Vector2(174,40),new Vector2(0,57),Purple);
-            Picture("Lid ribbon",root,new Vector2(30,40),new Vector2(0,57),Yellow);
-            var left=Picture("Bow left",root,new Vector2(53,35),new Vector2(-24,91),Yellow,GalleryShapes.Get("ring"));left.rectTransform.localEulerAngles=new Vector3(0,0,-25);
-            var right=Picture("Bow right",root,new Vector2(53,35),new Vector2(24,91),Yellow,GalleryShapes.Get("ring"));right.rectTransform.localEulerAngles=new Vector3(0,0,25);
-            return root;
+            return Picture("Generated treasure gift",parent,new Vector2(220,220),Vector2.zero,Color.white,
+                GeneratedGalleryArt.Get("reward-chest")).rectTransform;
         }
 
         static void Selection(Transform root,MotionBindings b)
@@ -286,12 +281,13 @@ namespace TweenGallery
         static void Progress(Transform root,MotionBindings b)
         {
             var card=Panel("Experience card",root,new Vector2(430,200),Vector2.zero,Hex("1E6B88"));
-            Text("Level",card,"LEVEL 08",22,new Vector2(350,40),new Vector2(0,56),Yellow);
+            Text("Level",card,"LEVEL 08",22,new Vector2(215,40),new Vector2(-66,56),Yellow);
+            var percentage=Text("Percentage",card,"15%",28,new Vector2(120,40),new Vector2(126,56),Color.white);
             var track=Panel("Progress track",card,new Vector2(354,36),new Vector2(0,-4),Ink);
             var fill=Picture("Progress fill",track,new Vector2(342,24),Vector2.zero,Green,GalleryShapes.Get("rounded"));
             fill.type=Image.Type.Filled;fill.fillMethod=Image.FillMethod.Horizontal;fill.fillOrigin=0;fill.fillAmount=.15f;
             Text("Caption",card,"距离下一级更近一步",18,new Vector2(360,40),new Vector2(0,-58),Color.white);
-            Bind(b,card);b.fill=fill;
+            Bind(b,card);b.fill=fill;b.label=percentage;
         }
 
         static RectTransform ResourcePill(Transform root,Vector2 position,string amount)
@@ -568,9 +564,9 @@ namespace TweenGallery
 
         static RectTransform Gem(Transform parent,Vector2 position,float size,Color color)
         {
-            var gem=Picture("Gem",parent,new Vector2(size,size*1.12f),position,color,GalleryShapes.Get("diamond")).rectTransform;
-            var shine=Picture("Gem facet",gem,new Vector2(size*.48f,size*.54f),new Vector2(-size*.13f,size*.14f),new Color(1,1,1,.48f),GalleryShapes.Get("diamond"));
-            return gem;
+            // Preserve authored colors. The surrounding fixture still carries the effect accent.
+            return Picture("Generated energy crystal",parent,new Vector2(size*1.18f,size*1.18f),position,Color.white,
+                GeneratedGalleryArt.Get("energy-crystal")).rectTransform;
         }
 
         static RectTransform Coin(Transform parent,Vector2 position,float size)

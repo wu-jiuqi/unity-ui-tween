@@ -31,7 +31,9 @@ namespace TweenGallery
         ScrollRect listScroll;
         Text effectTitle, effectEnglish, effectBadge, useCase, distinction, dependency, status, playLabel, slowLabel, loopLabel, reverseLabel, compareLabel, easingLabel, progressLabel, countLabel;
         Image progressFill;
-        Slider durationSlider, strengthSlider, distanceSlider, staggerSlider;
+        Slider durationSlider, strengthSlider, distanceSlider, staggerSlider, timelineSlider;
+        int lastProgressPercent = -1;
+        float lastProgress = -1f;
         Text durationValue, strengthValue, distanceValue, staggerValue;
         Button reverseButton, easingButton;
         InteractionLab interactionLab;
@@ -61,11 +63,9 @@ namespace TweenGallery
                 else Application.Quit();
             }
             if (!IsReady || players.Count == 0) return;
-            float p = Mathf.Clamp01(players[0].Progress);
-            progressFill.rectTransform.anchorMax = new Vector2(p, 1);
-            progressLabel.text = Mathf.RoundToInt(p * 100) + "%";
+            SyncTimeline();
             if (Time.unscaledTime > statusUntil)
-                status.text = paused ? "已暂停 · 可以逐项观察当前状态" : players[0].IsPlaying ? "正在播放 · 展馆与模板使用相同动画逻辑" : "播放完成 · 点击重播，或选择另一项动效";
+                SetTextIfChanged(status, paused ? "已暂停 · 拖动时间轴逐帧观察，点击继续从此处播放" : players[0].IsPlaying ? "正在播放 · 展馆与模板使用相同动画逻辑" : "播放完成 · 点击重播，或拖动时间轴查看任意时刻");
         }
 
         void Build()
@@ -126,11 +126,9 @@ namespace TweenGallery
             slowLabel = ButtonAt(root, "1× 速度", 573, 604, 113, 42, Hex("343A60"), Color.white, 15, () => SetSpeed(options != null && options.speed < .9f ? 1 : .25f)).GetComponentInChildren<Text>();
             loopLabel = ButtonAt(root, "循环 关", 696, 604, 103, 42, Hex("343A60"), Color.white, 15, () => { if (options == null) return; options.loop = !options.loop; RefreshControlLabels(); Replay(); }).GetComponentInChildren<Text>();
             compareLabel = ButtonAt(root, "相似动效对比", 810, 604, 192, 42, Cyan, Ink, 16, ToggleComparison).GetComponentInChildren<Text>();
-            progressLabel = Label(root, "0%", 1030, 602, 149, 27, 17, Muted, TextAnchor.MiddleRight);
-            var track = ImageAt(root, "Playback progress", 1030, 638, 150, 4, Hex("3B4266"), false);
-            progressFill = ImageAt(track.transform, "Fill", 0, 0, 150, 4, Cyan, false);
-            Stretch(progressFill.rectTransform);
-            Label(root, "点击示例也可重播", 362, 650, 400, 19, 11, Muted);
+            progressLabel = Label(root, "0%", 1040, 600, 139, 23, 15, Muted, TextAnchor.MiddleRight);
+            MakeTimeline();
+            Label(root, "拖动右侧时间轴定位；继续播放不会跳回", 362, 650, 630, 19, 11, Muted);
 
             ImageAt(root, "Notes panel", 340, 692, 872, 164, Panel);
             Label(root, "适合用在", 362, 706, 103, 24, 14, Cyan, TextAnchor.MiddleLeft, true);
@@ -152,8 +150,9 @@ namespace TweenGallery
             reverseButton = ButtonAt(root, "方向：进入 / 正向", 1257, 598, 292, 40, Hex("343A60"), Color.white, 14, () => { if (options == null) return; options.reverse = !options.reverse; RefreshControlLabels(); Replay(); });
             reverseLabel = reverseButton.GetComponentInChildren<Text>();
             ButtonAt(root, "恢复推荐参数", 1257, 653, 292, 41, Hex("343A60"), Color.white, 15, ResetParameters);
-            ButtonAt(root, "复制 Codex 提示词", 1257, 714, 292, 50, Yellow, Ink, 17, () => CopyPrompt());
-            Label(root, "将编号和当前参数带入你的 Unity 项目", 1257, 778, 292, 47, 12, Muted, TextAnchor.UpperCenter);
+            ButtonAt(root, "复制 Codex 提示词", 1257, 710, 292, 45, Yellow, Ink, 16, () => CopyPrompt());
+            ButtonAt(root, "复制参数 JSON", 1257, 768, 292, 40, Cyan, Ink, 15, () => CopyConfigurationJson());
+            Label(root, "含编号、全部参数及对比项目", 1257, 816, 292, 25, 11, Muted, TextAnchor.UpperCenter);
             Label(root, "UGUI + DOTween FREE", 30, 871, 290, 20, 11, Muted);
             status = Label(root, "准备完成", 341, 870, 870, 22, 12, Muted);
             Label(root, "v" + Application.version + "  ·  ESC 退出", 1262, 870, 300, 22, 11, Muted, TextAnchor.MiddleRight);
@@ -459,6 +458,99 @@ namespace TweenGallery
             prompt.Append("绑定 " + definition.binding + "。保留原有交互；重复播放先取消本实例的动画并恢复基线，禁用和销毁时清理；验收连续触发、恢复、布局和分辨率。");
             if (!string.IsNullOrEmpty(definition.sourceUrl)) prompt.Append(" 参考来源：" + definition.sourceTitle + " " + definition.sourceUrl + "；原创转化：" + definition.transformation);
             return prompt.ToString();
+        }
+
+        /// <summary>Serializable settings only. No scene references, device data or filesystem paths.</summary>
+        [Serializable] public sealed class ConfigurationEntry
+        {
+            public string effectId;
+            public MotionSettings settings;
+        }
+        [Serializable] public sealed class GalleryConfiguration
+        {
+            public int schemaVersion = 1;
+            public string catalog = "unity-ui-tween";
+            public ConfigurationEntry[] effects;
+        }
+
+        public string ExportConfigurationJson()
+        {
+            var entries = new ConfigurationEntry[players.Count];
+            for (int i = 0; i < entries.Length; i++)
+                entries[i] = new ConfigurationEntry { effectId = players[i].effectId, settings = players[i].settings.Clone() };
+            return JsonUtility.ToJson(new GalleryConfiguration { effects = entries }, true);
+        }
+
+        public string CopyConfigurationJson()
+        {
+            string json = ExportConfigurationJson();
+            GUIUtility.systemCopyBuffer = json;
+            Notice("已复制可复用参数 JSON；可保存为 .json 文件或交给 Codex 接入");
+            return json;
+        }
+
+        public void SeekPreview(float normalizedTime)
+        {
+            if (float.IsNaN(normalizedTime) || float.IsInfinity(normalizedTime)) return;
+            foreach (var player in players)
+            {
+                if (player == null) continue;
+                try { player.Seek(Mathf.Clamp01(normalizedTime)); }
+                catch (InvalidOperationException)
+                {
+                    // A real press may have taken over the preview. Return to its catalog timeline.
+                    player.Play(player.effectId, CloneOptions());
+                    player.Seek(Mathf.Clamp01(normalizedTime));
+                }
+            }
+            paused = true;
+            SyncTimeline();
+            RefreshControlLabels();
+        }
+
+        void SyncTimeline()
+        {
+            if (players.Count == 0 || timelineSlider == null) return;
+            float p = Mathf.Clamp01(players[0].Progress);
+            if (!Mathf.Approximately(lastProgress, p))
+            {
+                timelineSlider.SetValueWithoutNotify(p);
+                lastProgress = p;
+            }
+            int percent = Mathf.RoundToInt(p * 100);
+            if (percent != lastProgressPercent)
+            {
+                progressLabel.text = percent + "%";
+                lastProgressPercent = percent;
+            }
+        }
+
+        void MakeTimeline()
+        {
+            var control = Rect(root, "Preview timeline", 1030, 625, 150, 30);
+            var hit = control.gameObject.AddComponent<Image>(); hit.color = Color.clear; hit.raycastTarget = true;
+            timelineSlider = control.gameObject.AddComponent<Slider>();
+            timelineSlider.minValue = 0; timelineSlider.maxValue = 1;
+            ImageAt(control, "Timeline track", 7, 13, 136, 5, Hex("3F466C"));
+            var area = Rect(control, "Timeline fill area", 7, 13, 136, 5);
+            progressFill = ImageAt(area, "Timeline fill", 0, 0, 136, 5, Cyan, false);
+            Stretch(progressFill.rectTransform);
+            var handles = Rect(control, "Timeline handle area", 7, 5, 136, 20);
+            var handle = ImageAt(handles, "Timeline handle", 0, 0, 16, 20, Yellow);
+            handle.raycastTarget = true;
+            handle.rectTransform.anchorMin = handle.rectTransform.anchorMax = new Vector2(0, .5f);
+            handle.rectTransform.pivot = new Vector2(.5f, .5f);
+            handle.rectTransform.anchoredPosition = Vector2.zero;
+            handle.rectTransform.sizeDelta = new Vector2(14, 0);
+            timelineSlider.fillRect = progressFill.rectTransform;
+            timelineSlider.handleRect = handle.rectTransform;
+            timelineSlider.targetGraphic = handle;
+            timelineSlider.onValueChanged.AddListener(SeekPreview);
+        }
+
+        static void SetTextIfChanged(Text text, string value)
+        {
+            if (text != null && text.text != value) text.text = value;
         }
 
         static MotionDefinition FindDefinition(string id)

@@ -131,3 +131,45 @@ Play 重入先取消本实例动画并恢复基线，避免累积偏移；停用
 F05 的 MotionPlayer 自动编排只负责新旧焦点卡交接；真实指针移动由独立组件 `MotionParallaxTilt` 负责。将组件放在有可射线命中 Graphic 的对象上，场景需要 EventSystem 和 GraphicRaycaster。将 `surface` 绑定到 F05 的 `MotionPlayer.target` **内部的独立视觉包装层**，不要与 target 指向同一 Transform；`highlight` 与 `glint` 绑定两个独立半透明高光层。默认 `maxAngle=10`、`highlightTravel=36`、`glintTravel=18`、`response=12`；动态 AddComponent 后再赋绑定时调用 `CaptureBaseline()`。指针移出后缓慢回中，组件禁用时恢复初始状态。不要让父遮罩裁掉整个卡片。
 
 自动播放可展示焦点切换；必须实际测试 PointerEnter/Move/Exit 和遮挡情况，才能宣称真实鼠标跟随可用。按参考资料抽象层次和指针关系，不使用原示例图像或商标。
+
+
+## Minimal distribution and documentation source
+
+For your own UI, the opt-in [runtime package](runtime-package.md) includes
+Runtime, Optional/TMP, Shaders, all 46 presets and the catalog, without demo
+prefabs, gallery fonts or generated artwork. The default full Skill package
+still includes all 46 templates. `docs/integration.md` is canonical; update it
+here and run `python -X utf8 scripts/sync_skill_docs.py` rather than editing
+`Skill/unity-ui-tween/references/integration.md` independently. Packaging reads
+the canonical document directly.
+
+
+## Timeline seeking and parameter export (preview)
+
+`MotionPlayer.Seek(float normalizedTime)` is for catalog timelines started by
+`Play`. Supply a finite number; progress is clamped to 0..1. Seek pauses the
+active timeline, aligns the actual DOTween clock and evaluates that point;
+`Resume()` continues from there. `Sample()` remains the deterministic visual
+evaluator for comparison/testing and does not promise to reposition the live
+tween clock. Pose/press playback is not a resumable catalog timeline: call
+`Play` first before using Seek/Resume for catalog playback.
+
+The gallery's JSON export copies a payload to the clipboard. Its format is:
+
+```json
+{
+  "schemaVersion": 1,
+  "catalog": "unity-ui-tween",
+  "effects": [
+    { "effectId": "A04", "settings": {} }
+  ]
+}
+```
+
+The empty settings object above shows only the envelope: actual exports
+serialize every `MotionSettings` field (duration, strength, distance, stagger,
+ease, reverse, loop, speed, unscaledTime, startValue, endValue, fillFrom and
+fillTo). Comparison export preserves the three chosen effect IDs as separate
+entries, each with its settings. This is a clipboard export, not a preset
+importer; no JSON import UI or automatic application to your game is provided.
+Review the effect IDs and settings before adapting the values in your project.

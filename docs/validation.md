@@ -1,6 +1,24 @@
 # 验证记录
 
-补充：在隔离 Unity 工程中移除测试用 UGUI 副本的 TMP 代码并关闭适配宏，基础 Runtime 编译通过，程序集未引用或加载 TextMeshPro；测试时 14 个 Runtime 脚本与主工程逐文件哈希一致。启用 TMP 的另一个独立 Windows Player 测试为 failures=0，覆盖整数更新次数、最终值、百分比、过期回调、暂停恢复、富文本逐字及禁用清理；需先配置 TMP Essential Resources。证据分别在工作区 `NoTMPCheck/evidence/` 和 `TMPAdapterCheck/evidence/`。
+## 0.4.0-preview1 预览版本
+
+2026-11-07，本机 Unity 6000.0.26f1 编译与 Prepare 通过，目录仍为 46 项。D02 原有表达式已经正确地先乘 100 再取整；本次统一填充与文字的钳制值、补上展馆可见的百分比绑定，并验证 8% / 49% / 90%、反向、恢复和范围钳制，避免把原有正确逻辑描述为新修复。
+
+Editor RuntimeValidation 最终 39 项通过。还复现并修复了创建当帧 Play → Sample(0.5) → Seek(0.2) → Resume 的延迟初始化问题：手动推进 0.1 秒后原为 65%，修复后为预期 30%；使用 ForceInit 固定 DOTween 的初始值。复现失败与修复通过日志分别为 `evidence/runtime-lazy-init-before.log`、`runtime-lazy-init-after.log`。
+
+Windows x64 Mono 最终构建记录为 0 错误、0 警告。1600×900 与 1280×720 两种尺寸均运行实际 Player：原有 46 项案例及 29 项通用检查通过；新增展馆回归每种尺寸 25 项通过，覆盖三张 PNG Sprite、时间轴定位与继续、终点后倒拖、对比联动、B01/B02 按压接管后恢复时间轴，以及参数 JSON 中的真实设置与编号。升级回归 24 项通过。证据位于 `validation-output/v040-base-final-*/report.json`、`v040-gallery-final-*/gallery-enhancement-report.json`、`v040-upgrade-final/upgrade-report.json` 及 `evidence/build-v040-final.log`。
+
+新美术已接入动态展馆。A04、A06、A08、B05、D02、E01、F01、F06 均保存了 1600×900 和 1280×720 的非空画面；逐张抽查确认宝箱透明边缘、晶石、场景插画与文字布局正常。图片是对同一个实际 Canvas 的离屏渲染，不是系统屏幕截图。隐藏窗口最初返回黑色交换链截图，已弃用该证据并改为专用 Camera/RenderTexture 捕获。自动化通过不等同于人工触屏或系统切后台测试。
+
+Editor 受控采样中，C04 预热后 1000 次采样与 D02 1000 次不变数值采样记录当前线程托管分配 0 字节。Windows 升级检查另含 100 个 D03 对象 × 60 次 Sample 的受控采样，精确耗时见最终报告。以上仅适用于所测调用路径，不代表全部 UI 帧、GPU/过绘、移动端性能或帧率保证。
+
+9 项 Python 打包测试与文档同步检查通过。Runtime 独立包剔除 Gallery、Editor、场景、Prefab、字体与美术，保留 46 项预设、图集和可选 TMP 适配器。相同输入与相同 Python/zlib 环境下，两次打包逐字节比较；这不意味着 Unity Player 构建本身可复现。完整包保留原 46 个 Prefab 及新增 PNG，原有 Prefab、预设、GUID 和内部 fileID 未改动。
+
+隔离工程 `RuntimeOnlyCheckV040` 只导入 Runtime 包并加入已有 DOTween DLL 与 UGUI 2.0.0，实际 Unity Play Mode 验证全部 46 个编号、46 项预设和 D02 正反向 Sample / Seek / Resume / Reset / 禁用重启。精确次数、ZIP 校验值和日志保存在该工程 `evidence/`。这不是独立 Player 或移动端性能测试。
+
+本机 `adb devices -l` 没有列出设备；Unity 只安装 Windows 构建支持。因此移动端构建、真实触摸、系统切后台、安全区/横竖屏和移动 Profiler 均未执行。
+
+最终 Runtime ZIP 为 132,581 字节、145 个条目，A/B 两次构建逐字节一致，SHA-256 `f8679595b4d4f73abadc4bb3439f112b2a18589c23383dbd75e44771a1442d47`。该精确 ZIP 在隔离工程中通过 88 项断言（含创建当帧混合 Sample / Seek / Resume 回归），退出码 0；导入后的 135 个资源文件与包内容核对一致。
 
 ## 0.3.0 本地升级候选
 

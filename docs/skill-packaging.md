@@ -16,3 +16,40 @@ python -X utf8 scripts/test_package_skill.py
 UGUI 与 DOTween 免费版由目标工程提供；本 ZIP 不包含或静默安装 DOTween Pro。`Optional/TMP/` 被打包，但未定义 `TWEEN_GALLERY_TMP` 时不依赖 TMP。不要因为工程有已有 DOTween 而复制第二份。
 
 `test_package_skill.py` 在隔离临时目录构造合成工程，检查无 Windows 构建时可打包、缺 `.meta` 和重复编号会失败，以及打包后源被改动能被检测。实际工程还需检查 Unity 编译、导入和播放器运行；仅有脚本校验不能替代这些测试。
+
+
+## Reproducible packaging and canonical references (unreleased work)
+
+`docs/` is the source of truth for the reference documents listed in
+`scripts/package_skill.py: DOC_NAMES`. Do not independently edit the tracked
+copies in `Skill/unity-ui-tween/references/`. After editing canonical docs:
+
+```powershell
+python -X utf8 scripts/sync_skill_docs.py
+python -X utf8 scripts/sync_skill_docs.py --check
+python -X utf8 scripts/test_package_skill.py
+python -X utf8 scripts/test_portable_zip.py
+```
+
+Packaging always reads canonical docs directly, even when a tracked Skill
+reference is stale. No Unity build or cached `Skill/assets/` is used.
+`--profile full` is the default and retains all 46 prefabs and gallery assets.
+`--profile runtime` excludes gallery-only content; see
+[runtime-package.md](runtime-package.md) for exact boundaries and import steps.
+Both profiles validate the source catalog and all asset metadata first; the
+runtime profile additionally verifies its selected YAML dependencies.
+
+Both ZIP writers sort paths and pin ZIP timestamps to 1980-01-01, Unix file
+modes to 0644 (directories 0755), and compression level to 6. Source file
+mtime, local timezone and filesystem mode do not affect the archive bytes.
+Unchanged source bytes/names with the same Python/zlib implementation produce
+byte-identical ZIPs. Compression bytes across different zlib versions are not
+guaranteed. No source timestamps are modified. Output checksums are SHA-256;
+the sidecar includes the output filename, so differently named outputs have
+different sidecar text even when their ZIP hashes are identical.
+
+Reproducibility applies to packaging fixed inputs, not rebuilding Unity player
+binaries or generated art. Build metadata, image generation, source changes
+or new asset files intentionally change the hash. Development validation
+outputs do not announce or publish a new release; a preview VERSION labels a
+local candidate only. Released v0.3.0 artifacts must not be overwritten.

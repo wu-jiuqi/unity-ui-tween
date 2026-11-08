@@ -2,18 +2,22 @@
 
 ## 只看效果：Windows 展馆
 
-1. 解压整个 `UnityTweenGallery-0.3.0-Windows-x64.zip`。
+1. 解压整个 `UnityTweenGallery-0.4.0-preview1-Windows-x64.zip`。
 2. 双击 `UIMotionGallery.exe`。EXE 需和 Data 文件夹、UnityPlayer.dll 等一起保留。
 3. 左侧选分类或搜索编号/名称，点击效果。
 4. 使用播放、暂停、重播、0.25x 慢放和循环观察动作；调整时长、强度、位移、间隔与曲线。
 5. 在相似效果对比中查看 A03/A04/A05 等差异。恢复默认后复制提示词，交给 Codex 接入真实项目。
 6. 顶部点击“交互实验室”可体验固定命中区按钮、果冻拖拽、当前姿态接续与减弱动效；点击“返回图鉴”退出。
 
+7. 拖动播放控制区右侧时间轴，暂停在指定位置后点击“继续”。
+8. 点击“复制参数 JSON”导出当前动效设置；对比模式会保留全部对比编号。
+
+
 “反向”只为适合反向展示的条目开放。数值和进度的具体起止值可在 Unity Inspector/代码设置。Escape 可退出。Windows 包是否已通过本机和独立环境验证，以 validation.md 为准。
 
 ## 打开独立 Unity 工程
 
-1. 解压 `UnityTweenGallery-0.3.0-Source.zip`。
+1. 解压 `UnityTweenGallery-0.4.0-preview1-Source.zip`。
 2. 使用 Unity Hub 添加包含 Assets、Packages、ProjectSettings 的目录。
 3. 优先用 Unity 6000.0.26f1 打开，等待导入和编译完成。
 4. 打开 `Assets/TweenGallery/Scenes/Gallery.unity`，按 Play。
@@ -23,7 +27,7 @@
 ## 导入模板到现有项目
 
 1. 备份项目或创建分支。检查 UGUI 与现有 DOTween，避免重复安装。模板包只导出 TweenGallery 资源，不内置 DOTween；缺少依赖时先从 [DOTween 官方下载页](https://dotween.demigiant.com/download.php) 获取免费版，按其说明完成导入与 Setup，再导入模板。已存在 DOTween 时先确认兼容，不覆盖升级。
-2. 导入 `UnityUITween-Templates-0.3.0.unitypackage`。保留所选示例所依赖的 Runtime、预设、GeneratedArt、Shader 与字体资源。
+2. 导入 `UnityUITween-Templates-0.4.0-preview1.unitypackage`。保留所选示例所依赖的 Runtime、预设、GeneratedArt、Shader 与字体资源。
 3. 将 `Prefabs/A04.prefab` 等示例放进 Canvas，或给现有包装层添加 MotionPlayer。
 4. 依据图鉴核对 target、group、items、destination 等绑定，布局稳定后 CaptureBaseline。
 5. 调用 Play，并测试连续触发、关闭、销毁、分辨率改变。具体见 [接入手册](integration.md)。
@@ -32,7 +36,7 @@
 
 ## 安装 Codex Skill
 
-将 `unity-ui-tween-0.3.0.zip` 解压得到的 `unity-ui-tween` 文件夹放入：
+将 `unity-ui-tween-0.4.0-preview1.zip` 解压得到的 `unity-ui-tween` 文件夹放入：
 
 - 默认：`%USERPROFILE%\.codex\skills\unity-ui-tween`
 - 如果设置了 CODEX_HOME：`%CODEX_HOME%\skills\unity-ui-tween`
@@ -43,3 +47,5 @@
 
 Skill 提供实施方法和模板，不会自动把依赖安装进所有项目。遇到项目版本差异，Codex 应核对现状并在目标项目中实际验证。
 
+
+仅给已有 UI 接入 Runtime 时，也可使用 `unity-ui-tween-0.4.0-preview1-runtime.zip`。它不包含展馆、美术和示例 Prefab，详见 [Runtime 独立包](runtime-package.md)。

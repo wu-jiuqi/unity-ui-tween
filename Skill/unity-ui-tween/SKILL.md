@@ -55,3 +55,13 @@ description: "为 Unity UGUI 选择、预览和接入 46 种可复用 UI 补间�
 F01 是扫描揭晓，F02 是星图汇聚后解锁，F03 是字块与底线的排版编排，F04 是卡片和进度的分层入场，F05 是新旧焦点卡交接，F06 是多层门户奖励揭晓。按图鉴读取各自绑定、来源及原创转化；不要直接复制参考站的素材或商标。先核对目标项目素材、布局与交互语义，再适配同源模板。
 
 F05 的焦点交接是自动演示；真实指针倾斜/高光需要 `MotionParallaxTilt`、可射线命中 Graphic 和 EventSystem，surface 绑定 target 内部独立包装层。具体绑定、默认值和动态赋值后重新采集基线见接入文档；需要实测指针 enter/move/exit。
+
+
+## Package profile check
+
+Before promising demo prefabs, inspect the installed assets. The default full
+package contains all 46 demo prefabs. An optional runtime-only package omits
+them and the gallery's fonts/art; bind the user's own UI instead. See
+[profile boundaries](references/runtime-package.md). For repository work,
+`docs/` is canonical and `scripts/sync_skill_docs.py` updates reference copies;
+packaging embeds the canonical documents directly.

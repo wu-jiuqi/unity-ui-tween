@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using DG.Tweening;
 using DG.Tweening.Core.Easing;
 using UnityEngine;
@@ -14,6 +15,7 @@ namespace TweenGallery
         public MotionSettings settings = new MotionSettings();
         public MotionBindings bindings = new MotionBindings();
         private Tween ownedTween;
+        private bool catalogTween;
         private Snapshot baseline;
         private string ownedEffect;
         private readonly HashSet<string> continuationPriorEffects = new HashSet<string>();
@@ -23,6 +25,10 @@ namespace TweenGallery
         private Image blurOwner;
         private static readonly Dictionary<RectTransform, MotionPlayer> Owners = new Dictionary<RectTransform, MotionPlayer>();
         private RectTransform claimedTarget;
+        private readonly Vector3[] destinationCorners = new Vector3[4];
+        private string cachedEaseName;
+        private Ease cachedEase;
+        private bool hasCustomEase;
         public ulong PlayVersion { get; private set; }
         public bool IsCurrentPlayback(ulong version) { return isActiveAndEnabled && version == PlayVersion; }
         private void InvalidatePlayback() { unchecked { PlayVersion++; } }
@@ -51,6 +57,7 @@ namespace TweenGallery
             if (bindings == null || bindings.target == null)
                 throw new InvalidOperationException("MotionPlayer requires bindings.target (a RectTransform).");
             if (!isActiveAndEnabled) return;
+            ValidateBindings(id); // Reject before cancelling a valid playback or claiming its target.
             InvalidatePlayback();
             // Newest request owns this target. Other targets and unrelated tweens remain untouched.
             if (Owners.TryGetValue(bindings.target, out var previous) && previous != null && previous != this) previous.StopAndRestore();
@@ -67,13 +74,16 @@ namespace TweenGallery
             poseDirty = false;
             effectId = id;
             ownedEffect = id;
-            ValidateBindings();
             progress = 0f;
             Evaluate(0f);
             ownedTween = DOTween.To(() => progress, value => { progress = value; Evaluate(value); }, 1f, Mathf.Max(.05f, settings.duration))
                 .SetEase(Ease.Linear).SetUpdate(settings.unscaledTime).SetAutoKill(false)
                 .SetLoops(settings.loop ? -1 : 1, LoopType.Restart);
             ownedTween.timeScale = Mathf.Clamp(settings.speed, .05f, 4f);
+            // Capture the 0-to-1 interval now, before a same-frame Sample can
+            // change progress and become DOTween's lazily captured start value.
+            ownedTween.ForceInit();
+            catalogTween = true;
         }
 
         /// <summary>
@@ -173,13 +183,40 @@ namespace TweenGallery
         /// <summary>Samples the production evaluator without creating a second animation implementation.</summary>
         public void Sample(float normalizedTime)
         {
-            Pause();
             if (bindings == null || bindings.target == null) return;
+            MotionCatalog.Find(effectId);
+            ValidateBindings(effectId);
+            if (settings == null) settings = MotionSettings.FromDefinition(MotionCatalog.Find(effectId));
+            Pause();
             if (baseline == null) baseline = new Snapshot(bindings);
             if (ownedEffect != effectId) baseline.Restore(ownedEffect, true);
             ownedEffect = effectId;
             progress = Mathf.Clamp01(normalizedTime);
             Evaluate(progress);
+        }
+
+        /// <summary>Seek a catalog animation and leave it paused. Resume continues from this clock position.
+        /// Pose continuations and press/release tweens are not catalog timelines; start a catalog Play first.</summary>
+        public void Seek(float normalizedTime)
+        {
+            if(float.IsNaN(normalizedTime) || float.IsInfinity(normalizedTime))
+                throw new ArgumentOutOfRangeException(nameof(normalizedTime), "Seek requires a finite normalized time.");
+            if(ownedEffect == "__POSE" || (ownedTween != null && !catalogTween))
+                throw new InvalidOperationException("Seek supports catalog playback only. Call Play first.");
+            if(!isActiveAndEnabled) return;
+            MotionCatalog.Find(effectId);
+            if(bindings == null || bindings.target == null)
+                throw new InvalidOperationException("MotionPlayer requires bindings.target (a RectTransform).");
+            ValidateBindings(effectId);
+            if(settings == null) settings = MotionSettings.FromDefinition(MotionCatalog.Find(effectId));
+            if(ownedTween == null || !ownedTween.IsActive() || ownedEffect != effectId) Play(effectId);
+            if(ownedTween == null || !ownedTween.IsActive()) return;
+            float time = Mathf.Clamp01(normalizedTime);
+            ownedTween.Goto(ownedTween.Duration(false) * time, false);
+            // A looping tween wraps its clock at exactly one duration; scrub still
+            // displays the requested endpoint, and Resume continues into its next cycle.
+            progress = time;
+            Evaluate(time);
         }
 
         private void Update()
@@ -201,6 +238,7 @@ namespace TweenGallery
         {
             if (ownedTween != null && ownedTween.IsActive()) ownedTween.Kill(false);
             ownedTween = null;
+            catalogTween = false;
         }
         private void ReleaseTarget()
         {
@@ -213,10 +251,10 @@ namespace TweenGallery
             continuationPriorEffects.Clear();
         }
 
-        private void ValidateBindings()
+        private void ValidateBindings(string id)
         {
             string missing = null;
-            switch (effectId)
+            switch (id)
             {
                 case "A01": if (bindings.group == null) missing = "group"; break;
                 case "A07": case "C03": if (bindings.mask == null) missing = "mask"; break;
@@ -236,14 +274,17 @@ namespace TweenGallery
                 case "F03": case "F04": if (bindings.secondary == null || bindings.items == null || bindings.items.Length == 0) missing = "secondary + items"; break;
                 case "F05": if (bindings.secondary == null || bindings.items == null || bindings.items.Length == 0) missing = "secondary + items"; break;
             }
-            if (missing != null) throw new InvalidOperationException(effectId + " requires MotionBindings." + missing + ". See the template manual.");
+            if (missing != null) throw new InvalidOperationException(id + " requires MotionBindings." + missing + ". See the template manual.");
         }
 
         private float E(float t, Ease preset = Ease.OutCubic)
         {
-            Ease easing;
-            if (string.IsNullOrEmpty(settings.ease) || settings.ease == "Preset" || !Enum.TryParse(settings.ease, out easing)) easing = preset;
-            return EaseManager.Evaluate(easing, null, Mathf.Clamp01(t), 1f, 1.70158f, 0f);
+            if (cachedEaseName != settings.ease)
+            {
+                cachedEaseName = settings.ease;
+                hasCustomEase = !string.IsNullOrEmpty(cachedEaseName) && cachedEaseName != "Preset" && Enum.TryParse(cachedEaseName, out cachedEase);
+            }
+            return EaseManager.Evaluate(hasCustomEase ? cachedEase : preset, null, Mathf.Clamp01(t), 1f, 1.70158f, 0f);
         }
         private float Phase(float t, float begin, float end) { return Mathf.Clamp01((t - begin) / Mathf.Max(.001f, end - begin)); }
         private Vector2 P(RectTransform target) { return baseline.Position(target); }
@@ -337,8 +378,8 @@ namespace TweenGallery
                     q = E(t, Ease.InOutCubic); Vector2 destinationDelta = ToDestination(target);
                     if (bindings.destination != null)
                     {
-                        Vector3[] corners = new Vector3[4]; bindings.destination.GetWorldCorners(corners);
-                        Vector3 lo = target.InverseTransformPoint(corners[0]); Vector3 hi = target.InverseTransformPoint(corners[2]);
+                        bindings.destination.GetWorldCorners(destinationCorners);
+                        Vector3 lo = target.InverseTransformPoint(destinationCorners[0]); Vector3 hi = target.InverseTransformPoint(destinationCorners[2]);
                         Vector2 targetSize = new Vector2(Mathf.Abs(hi.x-lo.x), Mathf.Abs(hi.y-lo.y));
                         Vector2 baseRect = baseline.RectSize(target);
                         Vector2 sizeChange = (targetSize - baseRect) * q;
@@ -350,8 +391,13 @@ namespace TweenGallery
                     q = E(t, Ease.InOutCubic); Move(target, Vector2.left * d * q); Move(bindings.secondary, Vector2.right * d * (1f-q)); Alpha(bindings.group, 1f-q); Alpha(bindings.secondaryGroup,q); break;
                 case "C06": Alpha(bindings.group, 1f-E(Phase(t,0f,.4f), Ease.OutQuad)); Alpha(bindings.secondaryGroup,E(Phase(t,.6f,1f),Ease.OutQuad)); break;
                 case "C07": q=E(t,Ease.InOutSine); Alpha(bindings.group,1f-q); Alpha(bindings.secondaryGroup,q); break;
-                case "D01": if(bindings.label!=null) bindings.label.text=Mathf.RoundToInt(Mathf.LerpUnclamped(settings.startValue,settings.endValue,E(t,Ease.OutQuad))).ToString("N0"); break;
-                case "D02": if(bindings.fill!=null) bindings.fill.fillAmount=Mathf.Lerp(settings.fillFrom,settings.fillTo,E(t,Ease.InOutSine)); if(bindings.label!=null) bindings.label.text=Mathf.RoundToInt(Mathf.Lerp(settings.fillFrom,settings.fillTo,E(t,Ease.InOutSine))*100f)+"%"; break;
+                case "D01": baseline.Number(bindings.label, Mathf.RoundToInt(Mathf.LerpUnclamped(settings.startValue,settings.endValue,E(t,Ease.OutQuad)))); break;
+                case "D02":
+                    // Compute once, clamp to the same visible range as Image.fillAmount,
+                    // and multiply before rounding (e.g. 0.49 becomes 49%, not 0%).
+                    q = Mathf.Clamp01(Mathf.Lerp(settings.fillFrom,settings.fillTo,E(t,Ease.InOutSine)));
+                    if(bindings.fill!=null) bindings.fill.fillAmount=q;
+                    baseline.Number(bindings.label, Mathf.RoundToInt(q*100f), true); break;
                 case "D04": EvaluateBurst(t,a,d); break;
                 case "D05": EvaluateSettlement(t,a); break;
                 case "D06":
@@ -516,10 +562,10 @@ namespace TweenGallery
             for(int i=0;i<count;i++)
             {
                 float local=StaggerPhase(t,i,count); float value=Mathf.Lerp(0f,settings.endValue*(i+1)/(count*(count+1)*.5f),E(local,Ease.OutQuad)); total+=value;
-                if(bindings.labels[i]!=null) bindings.labels[i].text=Mathf.RoundToInt(value).ToString("N0");
+                baseline.Number(bindings.labels[i], Mathf.RoundToInt(value));
                 if(bindings.items!=null&&i<bindings.items.Length) { ItemAlpha(i,Phase(local,0f,.15f)); Scale(bindings.items[i],1f+.08f*strength*Mathf.Sin(local*Mathf.PI)); }
             }
-            if(bindings.label!=null) bindings.label.text=Mathf.RoundToInt(total).ToString("N0");
+            baseline.Number(bindings.label, Mathf.RoundToInt(total));
         }
         private void EvaluateChest(float t,float strength,float distance)
         {
@@ -553,7 +599,7 @@ namespace TweenGallery
         private sealed class Snapshot
         {
             private sealed class RectState { public RectTransform target; public Vector3 position,scale; public Quaternion rotation; public Vector2 size,rectSize; }
-            private sealed class GraphicState { public Graphic target; public Color color; public Material material; public float fill; public string text; }
+            private sealed class GraphicState { public Graphic target; public Color color; public Material material; public float fill; public string text; public int number; public bool hasNumber, percent; public string formatted; public CultureInfo culture; }
             private sealed class GroupState { public CanvasGroup target; public float alpha; public bool raycasts,suppressed; }
             private readonly MotionBindings bindings;
             private readonly Dictionary<RectTransform,RectState> rects=new Dictionary<RectTransform,RectState>();
@@ -635,11 +681,11 @@ namespace TweenGallery
                     case "C04": Rect(b.target,9); break;
                     case "C05": Rect(b.target,1); Rect(b.secondary,1); Group(b.group,releaseInput); Group(b.secondaryGroup,releaseInput); break;
                     case "C06": case "C07": Group(b.group,releaseInput); Group(b.secondaryGroup,releaseInput); break;
-                    case "D01": Text(b.label); break;
-                    case "D02": Fill(b.fill); Text(b.label); break;
+                    case "D01": if(releaseInput) Text(b.label); break;
+                    case "D02": if(releaseInput) { Fill(b.fill); Text(b.label); } break;
                     case "D03": Rect(b.target,3); Rect(b.destination,2); Group(b.group,releaseInput); break;
                     case "D04": Items(3,releaseInput); Rect(b.destination,2); break;
-                    case "D05": Items(2,releaseInput); Text(b.label); if(b.labels!=null) foreach(var text in b.labels) Text(text); break;
+                    case "D05": Items(2,releaseInput); if(releaseInput) { Text(b.label); if(b.labels!=null) foreach(var text in b.labels) Text(text); } break;
                     case "D06": Items(2,releaseInput); if(b.items!=null) foreach(var item in b.items) FullColor(PrimaryImage(item)); break;
                     case "D07": Rect(b.target,4); GraphicAlpha(b.image); GraphicAlpha(b.secondaryImage); Group(b.group,releaseInput); Group(b.secondaryGroup,releaseInput); break;
                     case "D08": Rect(b.target,6); Rect(b.lid,4); Items(3,releaseInput); break;
@@ -694,6 +740,20 @@ namespace TweenGallery
                 var color=graphic.color; color.a=state.color.a; graphic.color=color;
             }
             private void Material(Graphic graphic) { if(graphic!=null&&graphics.TryGetValue(graphic,out var state)) graphic.material=state.material; }
+            public void Number(UnityEngine.UI.Text label, int value, bool percent = false)
+            {
+                if(label == null) return;
+                if(!graphics.TryGetValue(label, out var state)) { Add(label); state = graphics[label]; }
+                var culture = CultureInfo.CurrentCulture;
+                if(!state.hasNumber || state.number != value || state.percent != percent || state.culture != culture)
+                {
+                    state.hasNumber = true; state.number = value; state.percent = percent; state.culture = culture;
+                    state.formatted = percent ? value.ToString(culture) + "%" : value.ToString("N0", culture);
+                }
+                // Keep external edits and reset/replay correct without allocating a new
+                // formatted string or dirtying the text mesh when nothing changed.
+                if(label.text != state.formatted) label.text = state.formatted;
+            }
             private void Text(UnityEngine.UI.Text text) { if(text!=null&&graphics.TryGetValue(text,out var state)) text.text=state.text; }
             private void Fill(Image image) { if(image!=null&&graphics.TryGetValue(image,out var state)) image.fillAmount=state.fill; }
             private void Items(int flags,bool releaseInput)

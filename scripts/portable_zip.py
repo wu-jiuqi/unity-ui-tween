@@ -9,6 +9,26 @@ import sys
 import zipfile
 
 
+# Pin metadata instead of inheriting workstation mtimes, permissions or OS.
+ZIP_TIME = (1980, 1, 1, 0, 0, 0)
+
+
+def write_entry(archive, name, source=None):
+    info = zipfile.ZipInfo(name, ZIP_TIME)
+    info.create_system = 3
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.external_attr = ((0o40755 if name.endswith("/") else 0o100644) << 16)
+    if name.endswith("/"):
+        info.external_attr |= 0x10
+    # Explicit level for ZipInfo entries; streaming avoids buffering large builds.
+    info._compresslevel = 6
+    with archive.open(info, "w", force_zip64=True) as target:
+        if source is not None:
+            with source.open("rb") as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    target.write(chunk)
+
+
 def digest(stream):
     h = hashlib.sha256()
     for chunk in iter(lambda: stream.read(1024 * 1024), b""):
@@ -41,9 +61,9 @@ def package(source: Path, target: Path, include_root: bool = False, force: bool 
     try:
         with zipfile.ZipFile(temp, "x", zipfile.ZIP_DEFLATED, compresslevel=6, allowZip64=True) as z:
             for name in sorted(directories):
-                z.writestr(name, b"")
+                write_entry(z, name)
             for name, path in files.items():
-                z.write(path, name)
+                write_entry(z, name, path)
         with zipfile.ZipFile(temp) as z:
             entries = z.namelist()
             if len(entries) != len(set(entries)) or set(entries) != set(files) | directories:

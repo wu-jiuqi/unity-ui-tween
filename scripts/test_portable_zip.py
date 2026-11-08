@@ -2,6 +2,7 @@
 import importlib.util
 from pathlib import Path
 import tempfile
+import os
 import unittest
 import zipfile
 
@@ -11,6 +12,28 @@ spec.loader.exec_module(portable)
 
 
 class PortableZipTests(unittest.TestCase):
+    def test_reproducible_despite_timestamps_and_modes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "source"
+            (source / "empty").mkdir(parents=True)
+            file = source / "data.txt"
+            file.write_text("same input", encoding="utf-8")
+            first, second = root / "first.zip", root / "second.zip"
+            portable.package(source, first, include_root=True)
+            os.utime(file, (946684800, 946684800))
+            os.utime(source / "empty", (946684800, 946684800))
+            portable.package(source, second, include_root=True)
+            self.assertEqual(first.read_bytes(), second.read_bytes())
+            with zipfile.ZipFile(second) as z:
+                for info in z.infolist():
+                    self.assertEqual(info.date_time, portable.ZIP_TIME)
+                    self.assertEqual(info.create_system, 3)
+                    self.assertEqual(info.external_attr >> 16, 0o40755 if info.is_dir() else 0o100644)
+            file.write_text("changed input", encoding="utf-8")
+            portable.package(source, second, include_root=True, force=True)
+            self.assertNotEqual(first.read_bytes(), second.read_bytes())
+
     def test_extract_with_forward_slashes_unicode_and_empty_folder(self):
         temp_root = Path(__file__).resolve().parent.parent / "validation-output"
         temp_root.mkdir(parents=True, exist_ok=True)

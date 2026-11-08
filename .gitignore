@@ -16,3 +16,6 @@
 *.suo
 *.user
 *.log
+
+__pycache__/
+*.pyc

@@ -30,13 +30,26 @@ if ($LASTEXITCODE -ne 0) { throw 'Windows ZIP verification failed' }
 $skillZip = Join-Path $dist "unity-ui-tween-$version.zip"
 & python -X utf8 (Join-Path $PSScriptRoot 'package_skill.py') --output $skillZip --force
 if ($LASTEXITCODE -ne 0) { throw 'Skill ZIP verification failed' }
+& python -X utf8 (Join-Path $PSScriptRoot 'package_skill.py') --profile runtime --output (Join-Path $dist "unity-ui-tween-$version-runtime.zip") --force
+if ($LASTEXITCODE -ne 0) { throw 'Runtime Skill ZIP verification failed' }
 $skillStage = Join-Path $staging 'SkillPackage'
 Expand-Archive -LiteralPath $skillZip -DestinationPath $skillStage
 
 $source = Join-Path $staging 'UnityTweenGallery'
 New-Item -ItemType Directory -Path $source -Force | Out-Null
-foreach ($name in @('Assets','Packages','ProjectSettings','docs','scripts','ThirdPartyLicenses','README.md','VERSION','BUILD_INFO.json','.gitignore','.gitattributes','ARCHITECTURE.md','PROGRESS.md')) {
+foreach ($name in @('Assets','Packages','ProjectSettings','docs','ThirdPartyLicenses','README.md','VERSION','BUILD_INFO.json','.gitignore','.gitattributes','ARCHITECTURE.md','PROGRESS.md')) {
     Copy-Item -LiteralPath (Join-Path $project $name) -Destination $source -Recurse
+}
+# Copy authored scripts only; Python caches vary by interpreter and are not source.
+$scriptDestination = Join-Path $source 'scripts'
+New-Item -ItemType Directory -Path $scriptDestination -Force | Out-Null
+Get-ChildItem -LiteralPath $PSScriptRoot -File -Recurse | Where-Object {
+    $_.FullName -notmatch '[\\/]__pycache__[\\/]' -and $_.Extension -notin '.pyc','.pyo'
+} | ForEach-Object {
+    $relative = $_.FullName.Substring($PSScriptRoot.Length).TrimStart('\','/')
+    $destination = Join-Path $scriptDestination $relative
+    New-Item -ItemType Directory -Path (Split-Path -Parent $destination) -Force | Out-Null
+    Copy-Item -LiteralPath $_.FullName -Destination $destination
 }
 New-Item -ItemType Directory -Path (Join-Path $source 'Skill') -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $skillStage 'unity-ui-tween') -Destination (Join-Path $source 'Skill') -Recurse

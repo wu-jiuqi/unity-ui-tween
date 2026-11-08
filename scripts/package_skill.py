@@ -15,6 +15,8 @@ import re
 import sys
 import zipfile
 
+from portable_zip import write_entry
+
 PROJECT = Path(__file__).resolve().parent.parent
 SKILL = PROJECT / "Skill" / "unity-ui-tween"
 UNITY = PROJECT / "Assets" / "TweenGallery"
@@ -29,7 +31,20 @@ def require(condition: bool, message: str) -> None:
         raise ValueError(message)
 
 
-def collect_files() -> dict[str, Path]:
+DOC_NAMES = ("acceptance.md", "catalog.md", "integration.md", "interaction.md",
+             "mobile-performance.md", "orchestration.md", "skill-packaging.md", "runtime-package.md")
+
+
+def runtime_asset(relative: str) -> bool:
+    first = relative.split("/")[0]
+    return (first in {"Runtime", "Optional", "Shaders", "Presets"}
+            or relative in {"Runtime.meta", "Optional.meta", "Shaders.meta", "Presets.meta",
+                            "Resources.meta", "Resources/motion-catalog.json",
+                            "Resources/motion-catalog.json.meta"})
+
+
+def collect_files(profile: str = "full") -> dict[str, Path]:
+    require(profile in ("full", "runtime"), "Unknown package profile")
     require((SKILL / "SKILL.md").is_file(), "Missing Skill/SKILL.md")
     require(UNITY.is_dir(), "Missing Assets/TweenGallery")
     require((PROJECT / "Assets" / "TweenGallery.meta").is_file(), "Missing TweenGallery.meta")
@@ -76,10 +91,28 @@ def collect_files() -> dict[str, Path]:
         require(not path.is_symlink(), f"Symbolic links are not allowed: {path}")
         out[(PurePosixPath("unity-ui-tween") / PurePosixPath(path.relative_to(SKILL).as_posix())).as_posix()] = path
     for path in sorted(UNITY.rglob("*")):
-        if path.is_file():
+        if path.is_file() and (profile == "full" or runtime_asset(path.relative_to(UNITY).as_posix())):
             out[(PurePosixPath("unity-ui-tween/assets/TweenGallery") / PurePosixPath(path.relative_to(UNITY).as_posix())).as_posix()] = path
     out["unity-ui-tween/assets/TweenGallery.meta"] = PROJECT / "Assets" / "TweenGallery.meta"
-    return out
+    # The docs directory is canonical; never ship stale Skill/reference copies.
+    for name in DOC_NAMES:
+        document = PROJECT / "docs" / name
+        require(document.is_file(), f"Missing canonical document: docs/{name}")
+        out[f"unity-ui-tween/references/{name}"] = document
+    if profile == "runtime":
+        # Check selected YAML against the selected package, not the full tree.
+        selected_guids = {re.search(r"^guid:\s*([0-9a-fA-F]{32})", path.read_text(encoding="utf-8-sig"), re.MULTILINE).group(1).lower()
+                          for name, path in out.items() if name.endswith(".meta")}
+        for name, path in out.items():
+            if path.suffix not in (".prefab", ".unity", ".asset"):
+                continue
+            data = path.read_bytes()
+            if data.startswith(b"%YAML"):
+                for guid_bytes in re.findall(rb"\bguid:\s*([0-9a-fA-F]{32})", data):
+                    guid = guid_bytes.decode("ascii").lower()
+                    require(guid in selected_guids or guid in UGUI_GUIDS or guid.startswith("0000000000000000"),
+                            f"Runtime profile omits dependency {guid} in {name}")
+    return dict(sorted(out.items()))
 
 
 def digest_file(path: Path) -> str:
@@ -104,22 +137,26 @@ def verify_archive(archive: Path, sources: dict[str, Path]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, help="Output ZIP (default: dist/unity-ui-tween-VERSION-standalone.zip)")
+    parser.add_argument("--profile", choices=("full", "runtime"), default="full", help="Full gallery assets or lean own-UI runtime integration")
     parser.add_argument("--force", action="store_true", help="Replace an existing output ZIP")
     args = parser.parse_args()
     version = (PROJECT / "VERSION").read_text(encoding="utf-8-sig").strip()
     require(version and all(c.isalnum() or c in ".-_" for c in version), "Invalid VERSION")
-    output = (args.output or PROJECT / "dist" / f"unity-ui-tween-{version}-standalone.zip").resolve()
+    output = (args.output or PROJECT / "dist" / f"unity-ui-tween-{version}-{'standalone' if args.profile == 'full' else 'runtime'}.zip").resolve()
     require(args.force or not output.exists(), f"Output already exists (use --force to replace): {output}")
+    require(not any(root.resolve() == output or root.resolve() in output.parents
+                    for root in (UNITY, SKILL, PROJECT / "docs")),
+            "ZIP destination cannot be inside source assets, Skill or docs")
     checksum = output.with_name(output.name + ".sha256")
     require(args.force or not checksum.exists(), f"Checksum already exists (use --force to replace): {checksum}")
-    sources = collect_files()
+    sources = collect_files(args.profile)
     output.parent.mkdir(parents=True, exist_ok=True)
     temp = output.with_name(output.name + ".tmp")
     require(not temp.exists(), f"Temporary output already exists: {temp}")
     try:
         with zipfile.ZipFile(temp, "x", compression=zipfile.ZIP_DEFLATED, compresslevel=6, allowZip64=True) as zf:
             for name, source in sources.items():
-                zf.write(source, arcname=name)
+                write_entry(zf, name, source)
         verify_archive(temp, sources)
         os.replace(temp, output)
     finally:
@@ -127,7 +164,7 @@ def main() -> int:
             temp.unlink()
     sha256 = digest_file(output)
     checksum.write_text(f"{sha256}  {output.name}\n", encoding="ascii")
-    print(f"Verified {len(sources)} entries; 46 effects; UGUI 2.0.0 and DOTween are external dependencies.")
+    print(f"Verified profile={args.profile}; {len(sources)} entries; 46 effects; UGUI 2.0.0 and DOTween are external dependencies.")
     print(f"ZIP: {output}")
     print(f"SHA256: {sha256}")
     print(f"Checksum: {checksum}")
