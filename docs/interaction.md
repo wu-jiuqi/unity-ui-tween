@@ -1,5 +1,7 @@
 # 指针、拖动与弹性反馈
 
+重排中的列表与教学引导还需处理稳定业务身份、滚动归属和输入让位，见 [生产配方](production-recipes.md)。视觉变形不能改变真实点击对象或代替用户输入。
+
 保留项目现有 Button 与业务回调。将固定且可射线命中的 `ButtonHitArea` 留给布局和交互，在其下单独建立 `MotionVisual` 作为动画目标；不要在按压中缩放命中区，也不要与 Animator、LayoutGroup 或另一脚本并写同一属性。
 
 `MotionButtonInput` 挂在已有 Button 的固定命中区上；`visualPlayer.bindings.target` 必须指向命中区的子对象而非本体。组件保留 Button.onClick，不实现拖拽处理器，允许父级 ScrollRect 接收滚动；依照 EventSystem 拖拽阈值撤销视觉按压。它仅跟踪当前活动指针；停用、失焦或应用暂停时取消状态。`releaseOnExit` 只控制移出时的按压视觉，区域外松开仍取消点击。用 `RefreshBindings()` 更新引用，用 `CancelInteraction()` 主动取消。不要与旧 `MotionPointerFeedback` 同时控制相同目标；旧 Prefab 并不会自动迁移。

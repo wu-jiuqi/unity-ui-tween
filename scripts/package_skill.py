@@ -14,6 +14,7 @@ from pathlib import Path, PurePosixPath
 import re
 import sys
 import zipfile
+from urllib.parse import unquote, urlsplit
 
 from portable_zip import write_entry
 
@@ -32,7 +33,59 @@ def require(condition: bool, message: str) -> None:
 
 
 DOC_NAMES = ("acceptance.md", "catalog.md", "integration.md", "interaction.md",
-             "mobile-performance.md", "orchestration.md", "skill-packaging.md", "runtime-package.md")
+             "mobile-performance.md", "orchestration.md", "skill-packaging.md", "runtime-package.md",
+             "production-recipes.md", "source-patterns.md")
+
+
+def markdown_link_targets(content: str):
+    """Yield common inline link/image destinations, excluding code examples.
+
+    This is deliberately not a full Markdown renderer: reference-style links,
+    HTML links and heading-anchor existence are outside this packaging check.
+    """
+    # Fenced blocks and inline code commonly demonstrate links that are not real.
+    content = re.sub(r"(?m)^ {0,3}(`{3,}|~{3,})[^\n]*\n.*?^ {0,3}\1[ \t]*$",
+                     "", content, flags=re.DOTALL)
+    content = re.sub(r"(`+)(?!`).*?(?<!`)\1(?!`)", "", content, flags=re.DOTALL)
+    # Support <angle destinations>, optional titles, escaped punctuation, and
+    # one level of balanced parentheses in bare filenames (e.g. guide(v2).md).
+    destination = r"(?:\\.|[^\s()\\]|\((?:\\.|[^()\\])*\))+"
+    pattern = (r"(?<!!)(?<!\\)!?\[(?:\\.|[^\]\\])*\]\(\s*"
+               r"(?:<(?P<angle>[^>\n]+)>|(?P<bare>" + destination + r"))"
+               r"(?:\s+(?:\"[^\"]*\"|'[^']*'|\([^)]*\)))?\s*\)")
+    for match in re.finditer(pattern, content):
+        target = match.group("angle") or match.group("bare")
+        yield re.sub(r"\\([!\"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])", r"\1", target)
+
+
+def validate_markdown_links(sources: dict[str, Path]) -> None:
+    """Resolve local links using archive locations, never repository locations."""
+    for name, source in sources.items():
+        if not name.lower().endswith(".md"):
+            continue
+        for target in markdown_link_targets(source.read_text(encoding="utf-8-sig")):
+            error = f"Broken package Markdown link in {name}: {target}"
+            require(not re.match(r"^[a-zA-Z]:[/\\]", unquote(target)),
+                    error + " (must be a package-relative file)")
+            url = urlsplit(target)
+            if url.scheme.lower() != "file" and (url.netloc or url.scheme):
+                continue
+            if not url.path and not url.scheme:  # same-document anchor/query
+                continue
+            path = unquote(url.path)
+            require(not url.scheme and not path.startswith("/") and "\\" not in path,
+                    error + " (must be a package-relative file)")
+            parts = list(PurePosixPath(name).parent.parts)
+            for part in path.split("/"):
+                if part in ("", "."):
+                    continue
+                if part == "..":
+                    require(len(parts) > 1, error + " (outside package)")
+                    parts.pop()
+                else:
+                    parts.append(part)
+            resolved = "/".join(parts)
+            require(resolved in sources, error + f" (missing or omitted: {resolved})")
 
 
 def runtime_asset(relative: str) -> bool:
@@ -112,6 +165,7 @@ def collect_files(profile: str = "full") -> dict[str, Path]:
                     guid = guid_bytes.decode("ascii").lower()
                     require(guid in selected_guids or guid in UGUI_GUIDS or guid.startswith("0000000000000000"),
                             f"Runtime profile omits dependency {guid} in {name}")
+    validate_markdown_links(out)
     return dict(sorted(out.items()))
 
 

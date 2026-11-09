@@ -82,15 +82,79 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "omits dependency"):
             pkg.collect_files("runtime")
 
+    def test_all_canonical_documents_ship_without_tracked_copies(self):
+        for profile in ("full", "runtime"):
+            with self.subTest(profile=profile):
+                sources = pkg.collect_files(profile)
+                archive = pkg.PROJECT / (profile + ".zip")
+                with zipfile.ZipFile(archive, "w") as z:
+                    for name, source in sources.items():
+                        pkg.write_entry(z, name, source)
+                pkg.verify_archive(archive, sources)
+                with zipfile.ZipFile(archive) as z:
+                    for name in pkg.DOC_NAMES:
+                        self.assertEqual(z.read("unity-ui-tween/references/" + name),
+                                         (pkg.PROJECT / "docs" / name).read_bytes())
+
     def test_canonical_documents_override_stale_skill_copies(self):
         refs = pkg.SKILL / "references"
         refs.mkdir()
-        (refs / "integration.md").write_text("stale", encoding="utf-8")
-        sources = pkg.collect_files()
-        self.assertEqual(sources["unity-ui-tween/references/integration.md"].read_text(), "canonical integration.md")
+        for name in pkg.DOC_NAMES:
+            (refs / name).write_text("stale [broken](missing.md)", encoding="utf-8")
+        for profile in ("full", "runtime"):
+            with self.subTest(profile=profile):
+                sources = pkg.collect_files(profile)
+                for name in pkg.DOC_NAMES:
+                    self.assertEqual(sources["unity-ui-tween/references/" + name],
+                                     pkg.PROJECT / "docs" / name)
         (pkg.PROJECT / "docs/integration.md").unlink()
-        with self.assertRaisesRegex(ValueError, "Missing canonical"):
+        for profile in ("full", "runtime"):
+            with self.subTest(profile=profile), self.assertRaisesRegex(ValueError, "Missing canonical"):
+                pkg.collect_files(profile)
+
+    def test_markdown_links_resolve_from_archive_paths(self):
+        (pkg.SKILL / "guide (v2).md").write_text("guide", encoding="utf-8")
+        (pkg.SKILL / "guide(v2).md").write_text("guide", encoding="utf-8")
+        (pkg.SKILL / "SKILL.md").write_text(
+            '[guide](references/integration.md#setup)\n'
+            '[space](guide%20%28v2%29.md "optional title")\n'
+            '[angle](<guide (v2).md>)\n'
+            '[parentheses](guide(v2).md)\n'
+            r'[escaped](guide\(v2\).md)' + '\n'
+            '[external](https://example.org/missing.md)\n'
+            '[relative protocol](//example.org/missing.md)\n'
+            '[email](mailto:example@example.org) [anchor](#section)\n'
+            '`[example](missing-inline.md)`\n'
+            '```markdown\n[example](missing-fenced.md)\n```\n'
+            '~~~markdown\n[example](missing-tilde.md)\n~~~\n', encoding="utf-8")
+        (pkg.PROJECT / "docs/integration.md").write_text(
+            '[home](../SKILL.md) [peer](./acceptance.md?view=1#test)\n'
+            '[source](../assets/TweenGallery/Runtime/MotionPlayer.cs)\n', encoding="utf-8")
+        for profile in ("full", "runtime"):
+            with self.subTest(profile=profile):
+                pkg.collect_files(profile)
+
+    def test_markdown_links_reject_missing_and_escaping_targets(self):
+        for target in ("references/missing.md", "../outside.md", "%2e%2e/outside.md",
+                       "references/../../unity-ui-tween/SKILL.md", "/SKILL.md",
+                       "%2FSKILL.md", "references%5Cacceptance.md", "file:///tmp/example.md",
+                       "file://server/share/example.md", "C:/skills/example.md", "C%3A%5Cskills%5Cexample.md"):
+            with self.subTest(target=target):
+                (pkg.SKILL / "SKILL.md").write_text(f"[bad]({target})", encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, "Broken package Markdown link.*SKILL.md"):
+                    pkg.collect_files()
+
+    def test_markdown_image_links_are_checked(self):
+        (pkg.SKILL / "SKILL.md").write_text("![missing image](absent.png)", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "missing or omitted"):
             pkg.collect_files()
+
+    def test_markdown_links_reject_assets_omitted_by_profile(self):
+        (pkg.PROJECT / "docs/integration.md").write_text(
+            "[demo](../assets/TweenGallery/Prefabs/A01.prefab)", encoding="utf-8")
+        pkg.collect_files("full")
+        with self.assertRaisesRegex(ValueError, "Broken package Markdown link.*integration.md.*missing or omitted"):
+            pkg.collect_files("runtime")
 
     def test_reproducible_skill_zip_ignores_mtime(self):
         sources = pkg.collect_files()

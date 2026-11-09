@@ -1,5 +1,7 @@
 # 编排、租约、播放条件与音频
 
+复合结算/加载页面、高频反馈、列表重排或 Sprite 混编请按需阅读 [生产配方](production-recipes.md)。其中阶段表、表现完成入口、聚合和列表 diff 由宿主实现，不是以下组件自动提供的能力。
+
 ## 播放与生命周期
 
 按 `MotionPlayer` 当前 API 区分基线重播和当前姿态接续。常规 `Play` 停掉本实例的旧 Tween 并从稳定基线开始；`ContinueTo(MotionPose destination, float duration, Ease ease)` 从当前位置、缩放、旋转和透明度出发，不重采稳定基线，固定时长 Tween 不保证速度连续。可由 `MotionPose.Read(target, group)` 读取并设置目标字段；需要速度连续的变目标运动时使用独立 `MotionSpring1D` / `MotionSpring2D`，避免声称 Tween 插值保留速度。关闭或回收时显式调用 `StopAndRestore()`。

@@ -1,5 +1,14 @@
 # 当前进度
 
+## 0.4.0 之后的 Skill 源码改进（未发布新 Release）
+
+- 对照 Bounce-Garden 固定提交的实际动效实现，补齐生产编排配方与来源矩阵：阶段/跳过/取消、表现时钟、高频合并、稳定 ID 列表、Sprite 帧、顶点形变、空闲教学与坐标映射。
+- 现有 Runtime、46 个 Prefab/预设及 GUID/fileID 均未改动；新增内容是 Skill 指南，不是新增运行组件。
+- 打包检查相对 Markdown 文件链接，完整包与 Runtime 包都包含新参考。Python 回归共 14 项通过，文档同步、Skill 校验与两种包的重复构建检查通过，详见 docs/validation.md。
+- 本轮环境未运行 Unity、Player 或移动端；没有创建/覆盖 Release，也没有修改 Bounce-Garden。
+
+## 0.4.0 正式版基线
+
 - 0.4.0 已完成 D02 可见百分比与数值写入优化、共享元素分配优化、时间轴拖动/继续与配置 JSON 导出；代码与回归覆盖保持 46 个固定编号。
 - image gen 生成的宝箱、晶石和冒险场景 PNG 已接入动态展馆；原 46 个 Prefab 序列化内容保持兼容，导入旧 Prefab 不会自动换肤。
 - Runtime 与完整 Skill 两种包可独立生成；主接入文档同步到 Skill 参考，固定输入 ZIP 可重复构建并检查清单。

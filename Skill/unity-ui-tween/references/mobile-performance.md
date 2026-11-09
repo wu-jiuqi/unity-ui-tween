@@ -1,5 +1,7 @@
 # 移动端、文本与性能
 
+需要 TMP 字形波浪、UGUI 网格剪切或 Sprite 帧动画时，先看 [生产配方](production-recipes.md) 的适配边界；现有数字/逐字适配器不自动支持顶点变形。缓存未变形顶点并在文本/布局变化时重建，不能逐帧累加上次变形。加载入场可选的表现时间限幅与物理弹簧消费完整 dt 是不同策略。
+
 ## UGUI Text 和可选 TMP
 
 基础 Runtime 继续使用 UGUI Text，未安装 TMP 的项目不需导入 TMP。可选 `Optional/TMP/TmpMotionAdapter.cs` 仅在项目已有 TMP、DOTween 且显式启用 `TWEEN_GALLERY_TMP` 后参与编译；详见同目录 README。不要安装或替换现有插件作为接入的隐含步骤。

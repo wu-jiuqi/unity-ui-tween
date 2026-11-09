@@ -1,5 +1,15 @@
 # 验证记录
 
+## 2026-11-09：生产配方与 Skill 打包改进（0.4.0 后续源码）
+
+基于本库 `8ecfafa`，静态对照 Bounce-Garden `78c069dac18a3af087b3d04ac0ff78460d641a8c` 主工程实际 C# 实现，补生产配方及来源矩阵。新文档清楚区分现有 Runtime API 与需目标工程适配的聚合、列表、Sprite 帧和网格能力。独立前向使用审阅覆盖“同步加载后入场 + 帧动画 + 持续加分 + 滚动列表重排 + Skip”，并据此补清自管时钟必须逐帧 Sample、不能仍让 Play 自主推进。
+
+本轮 Python 3 静态/打包验证：`test_package_skill.py` 12 项、`test_portable_zip.py` 2 项均通过；`sync_skill_docs.py --check`、Skill frontmatter 校验与 `git diff --check` 通过。新增测试覆盖两种 profile 的全部规范文档、缺失/过时副本、相对 Markdown 文件链接、被 runtime 排除的目标与路径越界。仅检查内联本地文件链接，不检查外链、引用式/HTML 链接或标题锚点。
+
+完整 Skill 包 316 个条目，Runtime 包 147 个条目；两种 profile 各打两次，同环境固定输入逐字节一致，CRC 和源文件 SHA-256 校验通过。新生产配方与来源文档在两种 ZIP 中均与 docs 源文件逐字节一致。测试 ZIP 只保存在本地验证目录，没有作为新 Release 发布。
+
+`Assets`、`Packages`、`ProjectSettings` 与基线无差异，因此保留全部 46 项运行模板、Prefab、预设与项目配置。本轮环境没有可用 Unity 编辑器或 C# 编译器，未重新执行 Unity 编译、Player、视觉/输入、独立工程导入或移动设备测试。下方历史运行记录不可当作本轮复测；本次结果只证明文档、Skill 结构和打包行为。
+
 ## 0.4.0 正式版发布验证
 
 2026-11-09，在仓库提交 ed39140 的代码基础上统一正式版版本号，使用 Unity 6000.0.26f1 重新构建 Windows x64 Mono，结果 Succeeded，0 错误、0 警告。Editor RuntimeValidation 39 项通过；9 项 Python 打包回归通过。

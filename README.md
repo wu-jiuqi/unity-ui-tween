@@ -14,6 +14,7 @@
 - [进阶参考与原创转化](docs/design-references.md)。
 - [接入与参数](docs/integration.md)：真实项目 API、布局与生命周期规则。
 - [交互组件](docs/interaction.md)、[编排与音频](docs/orchestration.md)、[移动与性能](docs/mobile-performance.md)及 [Skill 独立打包](docs/skill-packaging.md)。
+- [生产复用配方](docs/production-recipes.md)：阶段与跳过、时钟、高频事件、列表重排、帧动画、顶点变形和跨空间映射；[Bounce Garden 来源对照](docs/source-patterns.md)。这些是宿主适配指南，不是新增 Runtime API。
 - [提示词与验收](docs/acceptance.md)：组合请求与检查标准。
 - [实际验证记录](docs/validation.md)：以日志和实测为准。
 - [发布使用指南](docs/release-guide.md)：完整解压、资产核对和已知范围。
@@ -43,5 +44,5 @@ Unity **6000.0.26f1**、UGUI **2.0.0**、DOTween 免费版 **1.3.045**、Built-i
 
 打开 Gallery.unity 可在编辑器运行。需要重新生成展馆场景和模板时，在此独立工程使用菜单 **Tools → UI Motion Gallery → Prepare scene and templates**；Windows 构建使用 **Build Windows and export templates**。Prepare 会重建当前展馆场景，先保存手动改动。
 
-当前工作区为 0.4.0 预览版本，发布状态与下载资产以 GitHub Release 为准。当前验证和限制见 PROGRESS.md 与验证记录。
+0.4.0 正式发行资产以 GitHub Release 为准。当前 main 的后续 Skill 文档和打包改进不表示发行资产已更新；验证和限制见 PROGRESS.md 与验证记录。
 

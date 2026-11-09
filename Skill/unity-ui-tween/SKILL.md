@@ -1,6 +1,6 @@
 ---
 name: unity-ui-tween
-description: "为 Unity UGUI 选择、预览和接入 46 种可复用 UI 补间动效，使用 DOTween 免费版模板；适用于按钮、弹窗、页面切换、奖励数值和引导动画。"
+description: "为 Unity UGUI 选择、预览和接入 46 种 DOTween 免费版 UI 动效，或从现有项目提取补间与程序化动效的复用方法；适用于按钮、弹窗、奖励、列表重排、加载和教学编排。"
 ---
 
 # Unity UI Tween
@@ -12,6 +12,19 @@ description: "为 Unity UGUI 选择、预览和接入 46 种可复用 UI 补间�
 查看 Unity 版本、UGUI、已安装 DOTween 及其模块、渲染管线和项目动画约定。读取目标 UI 层级、布局组件、按钮事件及已有 Tween，确认谁负责打开、关闭和最终交互状态。保留项目风格与业务逻辑；展馆的鲜艳配色只是演示风格。
 
 复用项目已有 DOTween。缺少依赖时说明所需免费版与官方安装方式，不静默安装、升级、替换或重复导入，不引入 DOTween Pro。用户明确授权安装后再执行。
+
+## 从生产项目提取或组合
+
+若用户要求归纳现有项目，先找运行时真正使用的源目录，排除平台同步副本与历史构建。除了 DOTween 调用，也检查 Update/LateUpdate、协程、Lerp/Sin、Sprite 换帧、UGUI/TMP 顶点形变。记录实际文件/符号与提交，把“源项目已有”“本包已实现”“需要目标项目适配”“尚未运行验证”分开；不要只凭效果名称推断已覆盖。
+
+遇到加载、结算、多层角色、列表重排或高频反馈，阅读 [生产编排配方](references/production-recipes.md)，按需要选择章节：
+
+- 页面阶段、操作区就绪，以及自然完成、跳过和取消的不同契约。
+- 游戏时间、菜单时间、加载可读性时钟的选择；视觉与声音同钟，不能把表现 dt 限幅套到物理弹簧或权威倒计时。
+- 高频事件的重播/替换/有界合并/队列，稳定 ID 列表的当前姿态重排。
+- Sprite 帧与 Tween 混编、逐字显示与顶点变形的区别、带静默段的空闲提示、独立教学对象、世界与 UI 的坐标适配。
+
+先复用已存在的组件，不为了配方增添重复基础设施或改动 46 项稳定编号。生产配方中的聚合器、列表 diff、Sprite 帧播放器和顶点适配器并非本包现成 Runtime API；只在本次目标工程确实需要时实现并测试。追溯提取依据时查 [来源与覆盖矩阵](references/source-patterns.md)，不要求用户能访问源项目私有仓库，也不复制其素材或业务数据。
 
 ## 选定编号与表现
 
@@ -57,11 +70,8 @@ F01 是扫描揭晓，F02 是星图汇聚后解锁，F03 是字块与底线的�
 F05 的焦点交接是自动演示；真实指针倾斜/高光需要 `MotionParallaxTilt`、可射线命中 Graphic 和 EventSystem，surface 绑定 target 内部独立包装层。具体绑定、默认值和动态赋值后重新采集基线见接入文档；需要实测指针 enter/move/exit。
 
 
-## Package profile check
+## 包内容与文档同步
 
-Before promising demo prefabs, inspect the installed assets. The default full
-package contains all 46 demo prefabs. An optional runtime-only package omits
-them and the gallery's fonts/art; bind the user's own UI instead. See
-[profile boundaries](references/runtime-package.md). For repository work,
-`docs/` is canonical and `scripts/sync_skill_docs.py` updates reference copies;
-packaging embeds the canonical documents directly.
+承诺示例 Prefab 可用之前先检查安装资产。默认 full 包包含 46 个示例 Prefab；可选 runtime 包不含这些 Prefab 与展馆字体/美术，应绑定用户自己的 UI，详见 [包边界](references/runtime-package.md)。两种包都包含生产配方与来源对照。
+
+仓库维护以 `docs/` 为参考文档源，`scripts/sync_skill_docs.py` 更新 Skill 内副本；打包直接读取规范文档，并检查相对 Markdown 文件链接的目标是否在包内。该检查不验证外部网站或标题锚点，不能代替实际编译与播放。
