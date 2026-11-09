@@ -25,6 +25,7 @@ namespace TweenGallery
             Check(gallery.GetComponentsInChildren<Button>(true).All(b=>{var text=b.GetComponentInChildren<Text>();return text==null||text.text!="交互实验室"&&text.text!="按钮工坊";}),"No separate lab/workshop entry buttons");
             gallery.SetCategory("B");gallery.SelectEffect("B01");gallery.SetButtonSkin(3);yield return null;
             Check(gallery.CurrentPlayer!=null&&gallery.CurrentPlayer.bindings.target.GetComponent<Image>().sprite==GalleryTheme.Skin(3),"Main timeline uses the shared selected skin");
+            Check(gallery.CurrentPlayer.GetComponentsInChildren<MotionPointerFeedback>(true).All(f=>!f.enabled)&&gallery.CurrentPlayer.GetComponentsInChildren<Button>(true).All(b=>!b.enabled),"Automatic button preview does not capture held input");
             for(int skin=0;skin<6;skin++)
             {
                 gallery.SetButtonSkin(skin);yield return null;var target=gallery.CurrentPlayer.bindings.target;

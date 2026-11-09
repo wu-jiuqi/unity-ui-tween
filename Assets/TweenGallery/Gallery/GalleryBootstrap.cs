@@ -282,6 +282,12 @@ namespace TweenGallery
                 var view = Rect(backdrop.transform, "Fixture area", 0, ids.Length > 1 ? 38 : 0, width, ids.Length > 1 ? 279 : 319);
                 var player = DemoFactory.Create(ids[i], view, view.sizeDelta);
                 ApplySelectedSkin(player);
+                // Timeline buttons replay from the stage hit area; held input belongs to live mode.
+                if(ids[i].StartsWith("B"))
+                {
+                    foreach(var feedback in player.GetComponentsInChildren<MotionPointerFeedback>(true))feedback.enabled=false;
+                    foreach(var button in player.GetComponentsInChildren<Button>(true)){button.enabled=false;if(button.targetGraphic!=null)button.targetGraphic.raycastTarget=false;}
+                }
                 players.Add(player);
                 if (ids.Length > 1)
                 {
