@@ -1,6 +1,6 @@
 # 按钮交互配方 BX01–BX08
 
-这八套新增交互由 `TweenGallery.MotionButtonFeedback` 提供，与原 A01–F06 共 46 项目录独立。原 B01–B08 和 Prefab 不变；不要把 BX 编号传给 MotionPlayer.Play。完整包提供按钮工坊，Runtime 包提供同一运行组件，可绑定宿主自己的按钮。
+这八套新增交互由 `TweenGallery.MotionButtonFeedback` 提供，与原 A01–F06 共 46 项目录独立。原 B01–B08 调用键保留，实际模板外观与推荐参数已优化；不要把 BX 编号传给 MotionPlayer.Play。完整包在主展馆提供公共造型与实时操作，Runtime 包提供同一运行组件，可绑定宿主自己的按钮。
 
 | 编号 | style | 可观察差异 | 必需装饰绑定 |
 |---|---|---|---|
@@ -57,6 +57,6 @@ feedback.SetBusy(requestInFlight);
 
 ## 预览与验证
 
-Windows 展馆顶部“按钮工坊”，或启动参数 `--button-lab`。八种配方均可真实点击；工坊的“减弱动效”和“结束加载”控制用于对照。加载演示由右侧按钮结束。
+在主展馆选择 B 类效果，切换“真实操作”，点击“造型”和“操作变体”直接体验。八种反馈共享六种皮肤；加载演示由“完成 / 切换状态”结束。G01/G02 的拖动与连续接续也在主目录。“减弱动效”就地生效。详见 [主展馆流程](gallery-workflow.md)。
 
 Editor：`TweenGallery.Editor.ButtonFeedbackValidation.Run`。Player：`--button-test --test-output <folder>`，检查真实构建中的图集、八种按压、固定命中区域、原业务事件、选中及减弱动效，输出状态图和 button-report.json。事件自动化不等于真机触摸或人工手感评测。

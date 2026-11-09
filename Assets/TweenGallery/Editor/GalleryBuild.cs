@@ -11,7 +11,7 @@ namespace TweenGallery.Editor
 {
     public static class GalleryBuild
     {
-        public const string Version = "0.5.0-preview2";
+        public const string Version = "0.5.0-preview3";
         const string Root = "Assets/TweenGallery";
 
         [MenuItem("Tools/UI Motion Gallery/Prepare scene and templates")]
@@ -31,6 +31,7 @@ namespace TweenGallery.Editor
             root.AddComponent<GalleryEnhancementSelfTest>();
             root.AddComponent<ButtonStyleSelfTest>();
             root.AddComponent<LibraryReview>();
+            root.AddComponent<WorkbenchSelfTest>();
             var camera = new GameObject("Camera").AddComponent<Camera>();
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(0.045f, 0.055f, 0.11f);

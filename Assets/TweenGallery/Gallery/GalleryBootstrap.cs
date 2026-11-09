@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace TweenGallery
 {
     /// <summary>The portable exhibition UI. All motion is delegated to the reusable MotionPlayer.</summary>
-    public sealed class GalleryBootstrap : MonoBehaviour
+    public sealed partial class GalleryBootstrap : MonoBehaviour
     {
         public bool IsReady { get; private set; }
         public string CurrentEffectId { get; private set; }
@@ -52,7 +52,7 @@ namespace TweenGallery
             Build();
             IsReady = true;
             SelectEffect("A04");
-            if (Array.IndexOf(Environment.GetCommandLineArgs(), "--button-lab") >= 0) OpenButtonLab();
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "--button-lab") >= 0) { SetCategory("B"); SelectEffect("B01"); SetInteractionMode(true); }
         }
 
         void Update()
@@ -63,7 +63,9 @@ namespace TweenGallery
                 else if (easingPopup != null && easingPopup.gameObject.activeSelf) easingPopup.gameObject.SetActive(false);
                 else Application.Quit();
             }
-            if (!IsReady || players.Count == 0) return;
+            if (!IsReady) return;
+            if (interactionMode && integratedPreview != null) { if(Time.unscaledTime>statusUntil)SetTextIfChanged(status,integratedPreview.Status); return; }
+            if (players.Count == 0) return;
             SyncTimeline();
             if (Time.unscaledTime > statusUntil)
                 SetTextIfChanged(status, paused ? "已暂停 · 拖动时间轴逐帧观察，点击继续从此处播放" : players[0].IsPlaying ? "正在播放 · 展馆与模板使用相同动画逻辑" : "播放完成 · 点击重播，或拖动时间轴查看任意时刻");
@@ -95,16 +97,16 @@ namespace TweenGallery
             Label(root, "M", 30, 27, 46, 40, 27, GalleryTheme.Ink, TextAnchor.MiddleCenter, true);
             Label(root, "UI MOTION ATELIER", 91, 13, 490, 44, 27, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
             Label(root, "奶油花园动效库  /  按用途选型，按材质调手感", 92, 56, 650, 24, 15, Muted);
-            ButtonAt(root, "交互实验室", 1046, 30, 200, 42, Pink, GalleryTheme.Ink, 17, OpenInteractionLab);
-            ButtonAt(root, "按钮工坊", 1285, 30, 118, 42, Cyan, Ink, 16, OpenButtonLab);
+            autoModeButton=ButtonAt(root, "自动播放", 1046, 30, 160, 42, Pink, Ink, 17, () => SetInteractionMode(false));
+            liveModeButton=ButtonAt(root, "真实操作", 1220, 30, 160, 42, Cyan, Ink, 17, () => SetInteractionMode(true));
             Chip(root, "UNITY 6", 1417, 30, 150, Violet, GalleryTheme.Ink);
 
             ImageAt(root, "Catalog panel", 28, 104, 290, 752, Panel);
             Label(root, "动效图鉴", 48, 116, 200, 44, 24, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
             countLabel = Label(root, MotionCatalog.All.Length + " / " + MotionCatalog.All.Length, 230, 125, 65, 26, 14, Muted, TextAnchor.MiddleRight);
             MakeSearch();
-            string[] keys = { "", "A", "B", "C", "D", "E", "F" };
-            string[] labels = { "全部", "入场", "按钮", "页面", "奖励", "循环", "编排" };
+            string[] keys = { "", "A", "B", "C", "D", "E", "F", "G" };
+            string[] labels = { "全部", "入场", "按钮", "页面", "奖励", "循环", "编排", "操作" };
             for (int i = 0; i < keys.Length; i++)
             {
                 string key = keys[i];
@@ -119,6 +121,7 @@ namespace TweenGallery
             effectTitle = Label(root, "", 364, 146, 640, 49, 28, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
             effectEnglish = Label(root, "", 364, 198, 660, 27, 15, Muted);
             effectBadge = Label(root, "", 1015, 131, 169, 32, 16, Yellow, TextAnchor.MiddleRight, true);
+            BuildWorkbenchControls();
             demoHost = Rect(root, "Live motion stage", 358, 231, 836, 319);
 
             ImageAt(root, "Playback panel", 340, 586, 872, 89, Panel);
@@ -129,7 +132,7 @@ namespace TweenGallery
             compareLabel = ButtonAt(root, "相似动效对比", 810, 604, 192, 42, Cyan, Ink, 16, ToggleComparison).GetComponentInChildren<Text>();
             progressLabel = Label(root, "0%", 1040, 600, 139, 23, 15, Muted, TextAnchor.MiddleRight);
             MakeTimeline();
-            Label(root, "拖动右侧时间轴定位；继续播放不会跳回", 362, 650, 630, 19, 11, Muted);
+            timelineHint=Label(root, "拖动右侧时间轴定位；继续播放不会跳回", 362, 650, 630, 19, 11, Muted);
 
             ImageAt(root, "Notes panel", 340, 692, 872, 164, Panel);
             Label(root, "适合用在", 362, 706, 103, 24, 14, Cyan, TextAnchor.MiddleLeft, true);
@@ -214,7 +217,7 @@ namespace TweenGallery
             foreach (Transform child in listContent) { child.gameObject.SetActive(false); Destroy(child.gameObject); }
             rows.Clear(); visibleIds.Clear();
             float y = 0;
-            foreach (MotionDefinition definition in MotionCatalog.All)
+            foreach (MotionDefinition definition in BrowseDefinitions())
             {
                 if (category.Length > 0 && definition.category != category) continue;
                 string searchable = definition.id + " " + definition.name + " " + definition.english + " " + definition.legacyName;
@@ -230,7 +233,7 @@ namespace TweenGallery
             }
             listContent.sizeDelta = new Vector2(254, Mathf.Max(y, 536));
             listScroll.verticalNormalizedPosition = 1;
-            countLabel.text = visibleIds.Count + " / " + MotionCatalog.All.Length;
+            countLabel.text = visibleIds.Count + " / " + BrowseCount;
             if (visibleIds.Count == 0) Label(listContent, "没有匹配的动效\n试试 A04 或 Pop", 8, 35, 230, 100, 16, Muted, TextAnchor.MiddleCenter);
         }
 
@@ -242,6 +245,7 @@ namespace TweenGallery
             options = MotionSettings.FromDefinition(next);
             options.ease = "Preset";
             comparison = false;
+            ConfigureWorkbenchSelection(effectId);
             UpdateDefinitionText();
             SyncSliders();
             BuildDemos(new[] { effectId });
@@ -267,6 +271,8 @@ namespace TweenGallery
             foreach (var player in players) if (player != null) player.StopAndRestore();
             players.Clear();
             foreach (Transform child in demoHost) { child.gameObject.SetActive(false); Destroy(child.gameObject); }
+            integratedPreview=null;
+            if (interactionMode && !comparison) { BuildIntegratedPreview(); return; }
             float gap = ids.Length > 1 ? 12 : 0;
             float width = (836 - (ids.Length - 1) * gap) / ids.Length;
             for (int i = 0; i < ids.Length; i++)
@@ -275,6 +281,7 @@ namespace TweenGallery
                 backdrop.gameObject.AddComponent<RectMask2D>();
                 var view = Rect(backdrop.transform, "Fixture area", 0, ids.Length > 1 ? 38 : 0, width, ids.Length > 1 ? 279 : 319);
                 var player = DemoFactory.Create(ids[i], view, view.sizeDelta);
+                ApplySelectedSkin(player);
                 players.Add(player);
                 if (ids.Length > 1)
                 {
@@ -293,8 +300,9 @@ namespace TweenGallery
         {
             if (!IsReady || current == null) return;
             var valid = new List<string>();
-            foreach (string id in ids) if (FindDefinition(id) != null && valid.Count < 3) valid.Add(id);
+            foreach (string id in ids) if (FindDefinition(id) != null && !id.StartsWith("G") && valid.Count < 3) valid.Add(id);
             if (valid.Count == 0) return;
+            interactionMode=false;
             comparison = true;
             options.reverse = false;
             options.ease = "Preset";
@@ -329,9 +337,10 @@ namespace TweenGallery
         public void Replay()
         {
             if (options == null) return;
+            if (interactionMode) { BuildDemos(new[]{CurrentEffectId}); RefreshControlLabels(); return; }
             paused = false;
             foreach (MotionPlayer player in players)
-                if (player != null) player.Play(player.effectId, CloneOptions());
+                if (player != null) { if(reducedMotion){player.StopAndRestore();player.Sample(1);player.ReleaseAtCurrentState();}else player.Play(player.effectId, CloneOptions()); }
             RefreshControlLabels();
         }
 
@@ -397,6 +406,7 @@ namespace TweenGallery
             int ease = Array.IndexOf(easeValues, options.ease);
             easingLabel.text = (ease < 0 ? options.ease : easeNames[ease]) + "  ▾";
             RefreshParameterAvailability();
+            RefreshWorkbenchControls();
         }
 
         void RefreshParameterAvailability()
@@ -428,6 +438,7 @@ namespace TweenGallery
         public string CopyPrompt()
         {
             if (current == null || options == null) return "";
+            if (interactionMode) return CopyInteractionPrompt();
             var output = new StringBuilder();
             if (comparison)
             {
@@ -438,7 +449,7 @@ namespace TweenGallery
                     if (definition != null) output.AppendLine(BuildPrompt(definition));
                 }
             }
-            else output.Append(BuildPrompt(current));
+            else { output.Append(BuildPrompt(current)); if(IsSkinApplicable)output.Append(" 按钮造型使用 "+SkinNames[selectedSkin]+"；素材标识 cream-buttons/"+selectedSkin+"，原生文字和图标保持独立。"); }
             string prompt = output.ToString();
             GUIUtility.systemCopyBuffer = prompt;
             Notice(comparison ? "已复制所有对比动效与当前参数" : "已复制 " + current.id + " 和当前参数；粘贴给 Codex 即可接入");
@@ -473,14 +484,18 @@ namespace TweenGallery
             public int schemaVersion = 1;
             public string catalog = "unity-ui-tween";
             public ConfigurationEntry[] effects;
+            public string previewMode = "timeline";
+            public int skinIndex = -1;
+            public InteractionConfiguration interaction;
         }
 
         public string ExportConfigurationJson()
         {
+            if (interactionMode) return ExportInteractionJson();
             var entries = new ConfigurationEntry[players.Count];
             for (int i = 0; i < entries.Length; i++)
                 entries[i] = new ConfigurationEntry { effectId = players[i].effectId, settings = players[i].settings.Clone() };
-            return JsonUtility.ToJson(new GalleryConfiguration { effects = entries }, true);
+            return JsonUtility.ToJson(new GalleryConfiguration { effects = entries, skinIndex=IsSkinApplicable?selectedSkin:-1 }, true);
         }
 
         public string CopyConfigurationJson()
@@ -493,6 +508,7 @@ namespace TweenGallery
 
         public void SeekPreview(float normalizedTime)
         {
+            if (interactionMode) return;
             if (float.IsNaN(normalizedTime) || float.IsInfinity(normalizedTime)) return;
             foreach (var player in players)
             {
@@ -557,7 +573,7 @@ namespace TweenGallery
 
         static MotionDefinition FindDefinition(string id)
         {
-            foreach (MotionDefinition item in MotionCatalog.All) if (item.id == id) return item;
+            foreach (MotionDefinition item in BrowseDefinitions()) if (item.id == id) return item;
             return null;
         }
 
@@ -583,7 +599,7 @@ namespace TweenGallery
             handle.rectTransform.sizeDelta = new Vector2(18, 0);
             slider.fillRect = fill.rectTransform; slider.handleRect = handle.rectTransform; slider.targetGraphic = handle;
             slider.minValue = min; slider.maxValue = max;
-            slider.onValueChanged.AddListener(v => { if (suppress) return; action(v); RefreshValueLabels(); Replay(); });
+            slider.onValueChanged.AddListener(v => { if (suppress) return;if(TrySetWorkbenchParameter(title,v))return; action(v); RefreshValueLabels(); Replay(); });
             return slider;
         }
 
@@ -606,6 +622,7 @@ namespace TweenGallery
         void ToggleEasingPopup() { easingPopup.gameObject.SetActive(!easingPopup.gameObject.activeSelf); easingPopup.SetAsLastSibling(); }
         public void OpenInteractionLab()
         {
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"--upgrade-test")<0)return;
             if (interactionLab != null) return;
             foreach (var player in players) if (player != null) player.StopAndRestore();
             interactionLab = InteractionLab.Create(root, () => { interactionLab = null; Replay(); });
@@ -613,6 +630,7 @@ namespace TweenGallery
         public ButtonStyleLab CurrentButtonLab { get; private set; }
         public void OpenButtonLab()
         {
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"--button-test")<0)return;
             if (CurrentButtonLab != null) return;
             foreach (var p in players) if (p != null) p.StopAndRestore();
             CurrentButtonLab = ButtonStyleLab.Create(root, () => { Destroy(CurrentButtonLab.gameObject); CurrentButtonLab = null; Replay(); });

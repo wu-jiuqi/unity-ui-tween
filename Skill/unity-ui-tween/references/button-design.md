@@ -21,7 +21,7 @@
 | 奶油描边胶囊 | 详情、返回、次操作 | BX01、BX03、BX06 |
 | 圆角方形图标钮 | 增加、设置、背包 | BX01、BX04、BX05 |
 
-完整包包含原创生成图集 `assets/TweenGallery/Resources/ButtonArt/cream-buttons.png`；这是没有文字或图标的皮肤资源。它的导入与示范裁切由 ButtonArtImport / ButtonStyleLab 提供。Runtime 包不包含该图集，使用宿主自己的图片和字体。发布包中只有这些皮肤及八套可运行配方，不承诺包含预览原型里的完整游戏页面。
+完整包包含原创生成图集 `assets/TweenGallery/Resources/ButtonArt/cream-buttons.png`；这是没有文字或图标的皮肤资源。它的导入与示范裁切由 ButtonArtImport / GalleryTheme 提供。Runtime 包不包含该图集，使用宿主自己的图片和字体。发布包中只有这些皮肤及主展馆中的八套可运行配方，不承诺包含预览原型里的完整游戏页面。
 
 ## 素材、布局与文字
 

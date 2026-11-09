@@ -1,6 +1,6 @@
 interface:
   display_name: "Unity UI 动效与按钮设计"
   short_description: "按项目画风设计按钮，接入46项基础补间和8套按钮交互，验证状态与清理"
-  default_prompt: "使用 $unity-ui-tween，依据我的 UI 画风设计更多按钮造型和反馈，选择合适配方接入并验证按压、取消与清理。"
+  default_prompt: "使用 $unity-ui-tween，按我的 UI 画风选择效果、造型与驱动方式，接入现有界面并验证输入、打断与恢复。"
 policy:
   allow_implicit_invocation: true

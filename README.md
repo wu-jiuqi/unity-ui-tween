@@ -1,6 +1,6 @@
 # Unity UI Motion Gallery
 
-一套以 **Unity UGUI + DOTween 免费版** 实现的 46 项 UI 动效：可运行 Windows 展馆、46 个预设与示例预制体、通用 Runtime、Codex Skill 和中文文档。当前开发版 **0.5.0-preview2**；已发布稳定版为 **0.4.0**。
+一套以 **Unity UGUI + DOTween 免费版** 实现的 46 项 UI 动效：可运行 Windows 展馆、46 个预设与示例预制体、通用 Runtime、Codex Skill 和中文文档。当前开发版 **0.5.0-preview3**；已发布稳定版为 **0.4.0**。
 
 展馆统一使用暖奶油、薄荷、淡紫与暖金的柔和玩具质感 UI，并以同一份 MotionPlayer 播放实际交付的模板。A01–F06 固定编号覆盖出现消失、交互反馈、页面转场、奖励数值、循环和编排。
 
@@ -25,7 +25,7 @@
 
 另有六种原创空白按钮皮肤和 BX01–BX08 八套可运行交互：柔软按压、果冻挤压、悬浮抬升、图标回弹、中心涟漪、扫光、选中和加载。它们独立于原有 46 项目录，原 Prefab 保持兼容。以认可的原型确定画风，允许设计新造型与用途，不限定为历史游戏素材。
 
-在 Windows 展馆顶部打开 **按钮工坊**，或启动时添加 `--button-lab`。接入方式见 [按钮设计](docs/button-design.md)、[按钮交互配方](docs/button-recipes.md)。完整 Skill 包含皮肤；Runtime 包只带运行组件和接入参考，使用宿主美术。0.5.0-preview2 为本地候选，未发布到 GitHub Release。
+在同一个主展馆里切换 **自动播放 / 真实操作**，直接调整按钮造型和操作变体。G01/G02 在左侧“操作”分类提供拖拽回位与连续接续；旧实验室和工坊只保留内部诊断，不再有产品入口。详见 [统一操作与导出](docs/gallery-workflow.md)。接入方式见 [按钮设计](docs/button-design.md)、[按钮交互配方](docs/button-recipes.md)。完整 Skill 包含皮肤；Runtime 包只带运行组件和接入参考，使用宿主美术。0.5.0-preview3 为本地候选，未发布到 GitHub Release。
 
 ## 项目结构
 

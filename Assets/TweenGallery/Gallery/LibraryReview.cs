@@ -37,10 +37,10 @@ namespace TweenGallery
                     player.Sample(effects[i].id=="D09"?.35f:effects[i].id=="D07"?.8f:.68f);
                     Label(card,font,effects[i].duration.ToString("0.##")+" s  ·  强度 "+effects[i].strength.ToString("0.##"),new Vector2(0,-cellHeight*.5f+29),new Vector2(350,30),14,true);
                 }
-                yield return null;Capture(canvas,Path.Combine(folder,category+"-family.png"));Destroy(go);yield return null;
+                yield return null;CaptureCanvas(canvas,Path.Combine(folder,category+"-family.png"));Destroy(go);yield return null;
             }
             var gallery=GetComponent<GalleryBootstrap>();
-            foreach(string id in new[]{"A04","B02","D08","F06"}){gallery.SelectEffect(id);gallery.SeekPreview(id=="B02"?.18f:.68f);yield return null;Capture(gallery.GetComponentInChildren<Canvas>(),Path.Combine(folder,id+"-gallery.png"));}
+            foreach(string id in new[]{"A04","B02","D08","F06"}){gallery.SelectEffect(id);gallery.SeekPreview(id=="B02"?.18f:.68f);yield return null;CaptureCanvas(gallery.GetComponentInChildren<Canvas>(),Path.Combine(folder,id+"-gallery.png"));}
             File.WriteAllText(Path.Combine(folder,"complete.txt"),"Rendered all 46 fixtures in six families and four live gallery views. Unity "+Application.unityVersion+" / "+Application.version);
             Application.Quit(0);
         }
@@ -52,7 +52,7 @@ namespace TweenGallery
         {
             var r=Box(p,value,center,size,local);var t=r.gameObject.AddComponent<Text>();t.font=font;t.text=value;t.fontSize=points;t.color=GalleryTheme.Ink;t.alignment=TextAnchor.MiddleCenter;t.raycastTarget=false;
         }
-        static void Capture(Canvas canvas,string path)
+        public static void CaptureCanvas(Canvas canvas,string path)
         {
             var mode=canvas.renderMode;var oldCamera=canvas.worldCamera;float distance=canvas.planeDistance;
             var go=new GameObject("Review camera",typeof(Camera));var camera=go.GetComponent<Camera>();camera.enabled=false;camera.orthographic=true;camera.orthographicSize=Screen.height*.5f;camera.transform.position=new Vector3(0,0,-10);camera.nearClipPlane=.1f;camera.farClipPlane=100;

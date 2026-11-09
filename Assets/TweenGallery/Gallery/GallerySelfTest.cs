@@ -205,13 +205,13 @@ namespace TweenGallery
                 yield return null;
             }
             gallery.SetCategory("D"); yield return null;
-            Check(gallery.GetComponentsInChildren<Text>().Any(t => t.text == "10 / 46"), "Category D exposes ten catalog entries");
+            Check(gallery.GetComponentsInChildren<Text>().Any(t => t.text == "10 / " + GalleryBootstrap.BrowseCount), "Category D exposes ten catalog entries");
             gallery.SetCategory("");
             var search = gallery.GetComponentInChildren<InputField>();
             search.text = "A04"; yield return null;
-            Check(gallery.GetComponentsInChildren<Text>().Any(t => t.text == "1 / 46"), "Search A04 isolates one catalog entry");
+            Check(gallery.GetComponentsInChildren<Text>().Any(t => t.text == "1 / " + GalleryBootstrap.BrowseCount), "Search A04 isolates one catalog entry");
             search.text = "no-such-motion-xyz"; yield return null;
-            Check(gallery.GetComponentsInChildren<Text>().Any(t => t.text == "0 / 46"), "Search handles zero results");
+            Check(gallery.GetComponentsInChildren<Text>().Any(t => t.text == "0 / " + GalleryBootstrap.BrowseCount), "Search handles zero results");
             search.text = ""; yield return null;
             gallery.SelectEffect("F05"); yield return null;
             Canvas.ForceUpdateCanvases();

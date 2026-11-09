@@ -21,7 +21,8 @@ Unity UI 动效展馆
 完整解压压缩包，双击 UIMotionGallery.exe。
 请保留 UIMotionGallery_Data、MonoBleedingEdge、UnityPlayer.dll 等同级文件。
 不需要安装 Unity；展馆运行无需网络。
-左侧选择动效，中间播放/暂停/慢放/对比，右侧调参和复制 Codex 提示词。
+左侧选择效果，右上切换自动播放/真实操作，按钮可直接切换公共造型和操作变体。
+拖拽回位与连续接续位于左侧“操作”分类；右侧调参并复制含素材与驱动方式的配置。
 按 Escape 退出。详细使用方法与实际验证范围见 docs 文件夹。
 '@ | Set-Content -LiteralPath (Join-Path $win '请先阅读.txt') -Encoding utf8
 & python -X utf8 (Join-Path $PSScriptRoot 'portable_zip.py') $win (Join-Path $dist "UnityTweenGallery-$version-Windows-x64.zip") --force

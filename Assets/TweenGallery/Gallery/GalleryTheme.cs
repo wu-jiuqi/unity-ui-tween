@@ -59,13 +59,13 @@ namespace TweenGallery
             image.sprite=Skin(skin);image.color=Color.white;image.type=Image.Type.Simple;image.preserveAspect=false;
             var highlight=player.bindings.target.Find("Highlight");if(highlight!=null){var g=highlight.GetComponent<Graphic>();if(g!=null)g.color=Color.clear;}
         }
-        static Sprite Skin(int index)
+        public static Sprite Skin(int index)
         {
             if(skins.TryGetValue(index,out var value)&&value!=null)return value;
             var atlas=Resources.Load<Texture2D>("ButtonArt/cream-buttons");
             // Tight authored regions retain the original skin proportions and avoid neighboring cells.
             Rect[] rects={new Rect(28,647,465,200),new Rect(535,650,465,210),new Rect(1095,605,350,350),
-                new Rect(30,130,455,220),new Rect(535,140,470,205)};
+                new Rect(30,130,455,220),new Rect(535,140,470,205),new Rect(1120,125,310,300)};
             value=Sprite.Create(atlas,rects[index],new Vector2(.5f,.5f),100);value.name="CreamButtonSkin"+index;skins[index]=value;return value;
         }
         public static Color Hex(string h){ColorUtility.TryParseHtmlString("#"+h,out var c);return c;}

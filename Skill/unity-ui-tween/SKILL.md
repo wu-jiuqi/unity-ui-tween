@@ -19,7 +19,9 @@ description: "为 Unity UGUI 设计并接入符合项目画风的按钮反馈与
 
 已确认的原型优先决定本次视觉方向；历史项目用于兼容和接线，不限制新变体。
 
-基础效果可继续用 B01–B08；需要真实按住、图标弹起、中心涟漪、扫光、选中或加载时，阅读 [BX01–BX08 交互配方](references/button-recipes.md)。新组件 MotionButtonFeedback 与 MotionPlayer 分开绑定，BX 编号不属于 46 项目录。完整包含六种原创空白皮肤与可点击按钮工坊，Runtime 包使用宿主自己的美术。文字、图标、装饰与命中区域分层，避免将整个按钮连同业务文字一起大幅拉伸。
+基础效果可继续用 B01–B08；需要真实按住、图标弹起、中心涟漪、扫光、选中或加载时，阅读 [BX01–BX08 交互配方](references/button-recipes.md)。MotionButtonFeedback 与 MotionPlayer 分开绑定，BX 编号不是 MotionPlayer.Play 编号。六种皮肤和实时反馈都在主展馆对应效果里切换，Runtime 包使用宿主自己的美术。文字、图标、装饰与命中区域分层，避免将整个按钮连同业务文字一起大幅拉伸。
+
+预览或读取复制出的配置时，按 [主展馆流程与导出契约](references/gallery-workflow.md) 区分 timeline / interaction。G01/G02 是主目录的拖动与接续示例，不能传给 MotionPlayer.Play。schemaVersion=2 的交互配置按 driver 接线；同时保留素材选择和实际生效的频率/强度/位移等参数，不把实时输入重新降成自动时间轴。内部诊断夹具不是用户流程。
 
 ## 先检查目标项目
 
