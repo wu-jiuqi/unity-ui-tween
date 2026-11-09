@@ -34,7 +34,8 @@ def require(condition: bool, message: str) -> None:
 DOC_NAMES = ("acceptance.md", "catalog.md", "integration.md", "interaction.md",
              "mobile-performance.md", "orchestration.md", "skill-packaging.md", "runtime-package.md",
              "button-design.md", "button-recipes.md", "motion-system.md", "gallery-workflow.md",
-             "motion-profiles.md", "page-recipes.md", "responsive-layout.md")
+             "motion-profiles.md", "page-recipes.md", "responsive-layout.md",
+             "art-composition-workflow.md", "text-logo-recipes.md", "project-motion-audit.md")
 
 
 def runtime_asset(relative: str) -> bool:
@@ -96,6 +97,11 @@ def collect_files(profile: str = "full") -> dict[str, Path]:
         if path.is_file() and (profile == "full" or runtime_asset(path.relative_to(UNITY).as_posix())):
             out[(PurePosixPath("unity-ui-tween/assets/TweenGallery") / PurePosixPath(path.relative_to(UNITY).as_posix())).as_posix()] = path
     out["unity-ui-tween/assets/TweenGallery.meta"] = PROJECT / "Assets" / "TweenGallery.meta"
+    if profile == "full":
+        reference_root = PROJECT / "ArtSource" / "Composition-v061"
+        for path in sorted(reference_root.glob("*")):
+            if path.is_file() and path.suffix in {".png", ".json"}:
+                out[f"unity-ui-tween/assets/Reference/Composition-v061/{path.name}"] = path
     # The docs directory is canonical; never ship stale Skill/reference copies.
     for name in DOC_NAMES:
         document = PROJECT / "docs" / name

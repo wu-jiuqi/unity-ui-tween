@@ -4,9 +4,9 @@ namespace TweenGallery
 {
     public static class GalleryPageArt
     {
-        static Sprite panel,medal;static readonly Sprite[] icons=new Sprite[4];
+        static Sprite medal;static readonly Sprite[] icons=new Sprite[4];
         static readonly Sprite[] buttons=new Sprite[6];
-        public static Sprite Panel=>panel!=null?panel:panel=Load("cream-panel");
+        public static Sprite Panel=>GalleryCompositionArt.Panel;
         public static Sprite Medal=>medal!=null?medal:medal=Load("achievement-medal");
         static Sprite Load(string name){var s=Resources.Load<Sprite>("StyleArt/"+name);if(s==null)throw new InvalidOperationException("Missing generated StyleArt/"+name);return s;}
         public static Sprite Button(int index)

@@ -30,6 +30,7 @@ namespace TweenGallery
         void Build(MotionStyleProfile style,bool reduced)
         {
             var root=transform as RectTransform;
+            var environment=Art(root,"Responsive garden",GeneratedGalleryArt.Get("adventure-world"),new Vector2(0,-25),new Vector2(root.rect.width,root.rect.height-50));environment.preserveAspect=false;
             modeButton=Button(root,"Layout mode","布局：并排",new Vector2(-220,root.rect.height*.5f-27),new Vector2(240,38),4,()=>SetMode((Mode+1)%4));
             Button(root,"Rotate layout","旋转当前视图",new Vector2(55,root.rect.height*.5f-27),new Vector2(240,38),4,RotateCurrent);
             selectedLabel=Text(root,"Shared selection","当前：星星奖励",new Vector2(280,root.rect.height*.5f-27),new Vector2(240,38),17);
@@ -40,11 +41,15 @@ namespace TweenGallery
         }
         void BuildDevice(string name,Vector2 size,MotionStyleProfile style,bool reduced)
         {
-            var d=new Device();d.root=Rect(transform,name,Vector2.zero,size);var frame=d.root.gameObject.AddComponent<Image>();frame.sprite=GalleryPageArt.Panel;frame.type=Image.Type.Sliced;frame.pixelsPerUnitMultiplier=2;frame.raycastTarget=false;
+            var d=new Device();d.root=Rect(transform,name,Vector2.zero,size);var frame=d.root.gameObject.AddComponent<Image>();frame.sprite=GalleryPageArt.Panel;frame.type=Image.Type.Sliced;frame.pixelsPerUnitMultiplier=10;frame.raycastTarget=false;
             d.root.gameObject.AddComponent<RectMask2D>();
             d.top=Text(d.root,"Top reserved","系统区域 · 顶部预留",new Vector2(0,size.y*.5f-16),new Vector2(size.x-20,24),14);
             d.bottom=Text(d.root,"Bottom reserved","系统区域 · 底部预留",new Vector2(0,-size.y*.5f+14),new Vector2(size.x-20,22),14);
             var safe=Rect(d.root,"Safe content",Vector2.zero,size);var heading=Text(safe,"Page heading","选择奖励",Vector2.zero,new Vector2(300,56),34).rectTransform;
+            var ribbon=Art(heading,"Heading ribbon",GalleryCompositionArt.Ribbon,Vector2.zero,new Vector2(size.x-45,100));ribbon.transform.SetAsFirstSibling();
+            var headingText=heading.GetComponent<Text>();headingText.color=GalleryTheme.PlumInk;headingText.fontSize=32;
+            // The ribbon is behind, while the native label remains editable and localizable.
+            var headingCopy=Text(ribbon.transform,"Native ribbon heading","选择奖励",new Vector2(0,7),new Vector2(180,45),32);headingCopy.color=GalleryTheme.PlumInk;headingText.enabled=false;
             var viewport=Rect(safe,"Reward viewport",Vector2.zero,new Vector2(300,300));viewport.gameObject.AddComponent<Image>().color=Color.clear;viewport.gameObject.AddComponent<RectMask2D>();
             var content=Rect(viewport,"Reward content",Vector2.zero,new Vector2(300,340));var scroll=viewport.gameObject.AddComponent<ScrollRect>();scroll.viewport=viewport;scroll.content=content;scroll.horizontal=false;scroll.movementType=ScrollRect.MovementType.Clamped;scroll.scrollSensitivity=28;
             var track=Art(safe,"Scroll track",GalleryPageArt.Panel,Vector2.zero,new Vector2(7,200),true);track.pixelsPerUnitMultiplier=25;track.color=new Color(.82f,.76f,.63f,.7f);
@@ -53,13 +58,13 @@ namespace TweenGallery
             scroll.verticalScrollbar=d.scrollbar;
             var actions=Rect(safe,"Fixed actions",Vector2.zero,new Vector2(300,108));
             d.confirm=Button(actions,"Confirm choice","确认选择",Vector2.zero,new Vector2(300,48),0,()=>{ConfirmCount++;Status="确认示例选择："+RewardName(SelectedReward)+"；未发放奖励";});
-            d.back=Button(actions,"Return","返回",Vector2.zero,new Vector2(300,48),1,()=>Status="返回按钮演示：保留选择，不执行真实导航");
+            d.back=Button(actions,"Return","返回",Vector2.zero,new Vector2(300,48),4,()=>Status="返回按钮演示：保留选择，不执行真实导航");
             d.cards=new Card[3];
             for(int i=0;i<3;i++)
             {
                 int index=i;var card=new Card();card.hit=Rect(content,"Reward choice "+i,Vector2.zero,new Vector2(320,108));var hit=card.hit.gameObject.AddComponent<Image>();hit.color=Color.clear;
                 var button=card.hit.gameObject.AddComponent<Button>();button.targetGraphic=hit;button.transition=Selectable.Transition.None;button.onClick.AddListener(()=>SelectReward(index));
-                card.face=Art(card.hit,"Card surface",GalleryPageArt.Panel,Vector2.zero,new Vector2(320,108),true);card.face.pixelsPerUnitMultiplier=4;
+                card.face=Art(card.hit,"Card surface",GalleryPageArt.Panel,Vector2.zero,new Vector2(320,108),true);card.face.pixelsPerUnitMultiplier=20;
                 card.icon=Art(card.face.transform,"Reward illustration",GalleryPageArt.Icon(i),Vector2.zero,new Vector2(80,80));
                 card.title=Text(card.face.transform,"Native reward text",RewardName(i)+"\n× "+new[]{5,3,1}[i],Vector2.zero,new Vector2(180,70),25);
                 card.radio=Text(card.face.transform,"Selection indicator","○",Vector2.zero,new Vector2(35,35),29);
@@ -97,7 +102,7 @@ namespace TweenGallery
         public void SelectReward(int index)
         {
             if(index<0||index>2)return;SelectedReward=index;
-            foreach(var device in devices)for(int i=0;i<3;i++){device.cards[i].radio.text=i==index?"●":"○";device.cards[i].radio.color=i==index?GalleryTheme.Lavender:GalleryTheme.Ink;device.cards[i].face.color=i==index?new Color(1,.94f,.76f):Color.white;}
+            foreach(var device in devices)for(int i=0;i<3;i++){device.cards[i].radio.text=i==index?"●":"○";device.cards[i].radio.color=i==index?GalleryTheme.GreenInk:GalleryTheme.Muted;device.cards[i].face.color=i==index?new Color(.8f,1,.77f):Color.white;}
             if(selectedLabel!=null)selectedLabel.text="当前："+RewardName(index);Status="已选择 "+RewardName(index)+" · 三种布局同步保留";
         }
         public void SetMode(int mode)

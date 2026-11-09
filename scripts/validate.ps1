@@ -9,8 +9,8 @@ foreach($validator in @('LibraryValidation','RuntimeValidation','ButtonFeedbackV
     Write-Output "PASS $validator"
 }
 foreach($size in @(@(1600,900),@(1280,720))) {
-    foreach($mode in @('presentation','workbench','self','gallery-enhancement')) {
-        $folder=Join-Path $project ('validation-output\v060p1-'+$size[0]+'-'+$mode)
+    foreach($mode in @('typography','presentation','workbench','self','gallery-enhancement')) {
+        $folder=Join-Path $project ('validation-output\v060p2-'+$size[0]+'-'+$mode)
         New-Item -ItemType Directory -Path $folder -Force | Out-Null
         $run=Start-Process -FilePath (Join-Path $project 'Builds\Windows\UIMotionGallery.exe') -ArgumentList @('-screen-width',$size[0],'-screen-height',$size[1],'-screen-fullscreen','0',('--'+$mode+'-test'),'--test-output',('"'+$folder+'"'),'-logFile',('"'+$folder+'\player.log"')) -WindowStyle Hidden -PassThru
         $run.WaitForExit()

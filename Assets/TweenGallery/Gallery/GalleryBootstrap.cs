@@ -94,16 +94,14 @@ namespace TweenGallery
             root.anchorMin = root.anchorMax = root.pivot = new Vector2(.5f, .5f);
             root.sizeDelta = new Vector2(1600, 900);
 
-            ImageAt(root, "Brand", 30, 25, 46, 46, Violet);
-            Label(root, "M", 30, 27, 46, 40, 27, GalleryTheme.Ink, TextAnchor.MiddleCenter, true);
-            Label(root, "UI MOTION ATELIER", 91, 13, 490, 44, 27, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
-            Label(root, "奶油花园动效库  /  按用途选型，按材质调手感", 92, 56, 650, 24, 15, Muted);
+            var brand=ImageAt(root,"Crafted brand title",28,2,340,95,Color.white,false);brand.sprite=GalleryCompositionArt.Brand;brand.preserveAspect=true;
+            Label(root,"奶油花园 · 可交互动效库",401,32,570,36,19,GalleryTheme.Ink,TextAnchor.MiddleLeft,true);
             autoModeButton=ButtonAt(root, "自动播放", 1046, 30, 160, 42, Pink, Ink, 17, () => SetInteractionMode(false));
             liveModeButton=ButtonAt(root, "真实操作", 1220, 30, 160, 42, Cyan, Ink, 17, () => SetInteractionMode(true));
             Chip(root, "UNITY 6", 1417, 30, 150, Violet, GalleryTheme.Ink);
 
             ImageAt(root, "Catalog panel", 28, 104, 290, 752, Panel);
-            Label(root, "动效图鉴", 48, 116, 200, 44, 24, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
+            Label(root, "动效目录", 48, 116, 180, 44, 23, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
             countLabel = Label(root, MotionCatalog.All.Length + " / " + MotionCatalog.All.Length, 230, 125, 65, 26, 14, Muted, TextAnchor.MiddleRight);
             MakeSearch();
             string[] keys = { "", "A", "B", "C", "D", "E", "F", "G" };
@@ -118,7 +116,7 @@ namespace TweenGallery
             MakeList();
 
             ImageAt(root, "Preview panel", 340, 104, 872, 468, Panel);
-            Label(root, "THE PLAYGROUND", 364, 122, 440, 25, 13, Cyan, TextAnchor.MiddleLeft, true);
+            Label(root, "动效预览", 364, 120, 440, 25, 14, GalleryTheme.Muted, TextAnchor.MiddleLeft, true);
             effectTitle = Label(root, "", 364, 146, 640, 49, 28, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
             effectEnglish = Label(root, "", 364, 198, 660, 27, 15, Muted);
             effectBadge = Label(root, "", 1015, 131, 169, 32, 16, Yellow, TextAnchor.MiddleRight, true);
@@ -143,8 +141,8 @@ namespace TweenGallery
             dependency = Label(root, "", 362, 809, 827, 32, 12, Hex("BEC5E6"));
 
             ImageAt(root, "Parameter panel", 1234, 104, 338, 752, Panel);
-            Label(root, "调出你的手感", 1257, 122, 289, 36, 23, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
-            Label(root, "参数变化后，从初始状态重新播放", 1257, 162, 290, 32, 12, Muted);
+            Label(root, "动效配置", 1257, 122, 289, 36, 24, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
+            Label(root, "调整参数，立即预览", 1257, 162, 290, 32, 12, Muted);
             durationSlider = MakeSlider("时长", "s", 207, .15f, 3f, out durationValue, v => { if (options != null) options.duration = v; });
             strengthSlider = MakeSlider("强度", "×", 281, .2f, 2f, out strengthValue, v => { if (options != null) options.strength = v; });
             distanceSlider = MakeSlider("位移", "px", 355, 0f, 280f, out distanceValue, v => { if (options != null) options.distance = v; });
@@ -163,7 +161,9 @@ namespace TweenGallery
             Label(root, "v" + Application.version + "  ·  ESC 退出", 1262, 870, 300, 22, 11, Muted, TextAnchor.MiddleRight);
             MakeEasingPopup();
             BuildStyleControls();
+            BuildCompositionSurfaces();
             GalleryTheme.Apply(canvasObject);
+            RefreshCompositionButtons();
             RefreshList();
         }
 
@@ -209,7 +209,7 @@ namespace TweenGallery
         public void SetCategory(string value)
         {
             category = value ?? "";
-            foreach (var entry in categories) entry.Value.image.color = entry.Key == category ? Violet : Hex("303657");
+            foreach (var entry in categories) GalleryCompositionArt.SetButton(entry.Value.image,entry.Key==category?0:2);
             RefreshList();
         }
 
@@ -226,7 +226,8 @@ namespace TweenGallery
                 if (search.Length > 0 && searchable.IndexOf(search, StringComparison.OrdinalIgnoreCase) < 0) continue;
                 string id = definition.id;
                 Color accent = CategoryColor(definition.category);
-                Button button = ButtonAt(listContent, "", 0, y, 254, 59, id == CurrentEffectId ? Hex("3C2C68") : Hex("282D4B"), GalleryTheme.Ink, 14, () => SelectEffect(id));
+                Button button = ButtonAt(listContent, "", 0, y, 254, 59, Color.white, GalleryTheme.Ink, 14, () => SelectEffect(id));
+                GalleryCompositionArt.SetCard(button.image,id==CurrentEffectId);
                 ImageAt(button.transform, "Category accent", 0, 10, 3, 39, accent);
                 Label(button.transform, id, 12, 10, 39, 34, 15, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
                 Label(button.transform, definition.name, 55, 7, 190, 27, 16, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
@@ -251,7 +252,8 @@ namespace TweenGallery
             UpdateDefinitionText();
             SyncSliders();
             BuildDemos(new[] { effectId });
-            foreach (var row in rows) row.Value.color = row.Key == effectId ? Hex("3C2C68") : Hex("282D4B");
+            foreach (var row in rows) GalleryCompositionArt.SetCard(row.Value,row.Key==effectId);
+            ScrollSelectedIntoView(effectId);
             RefreshControlLabels();
             Replay();
         }
@@ -310,7 +312,7 @@ namespace TweenGallery
         {
             if (!IsReady || current == null) return;
             var valid = new List<string>();
-            foreach (string id in ids) if (FindDefinition(id) != null && !id.StartsWith("G") && !id.StartsWith("P") && valid.Count < 3) valid.Add(id);
+            foreach (string id in ids) if (MotionCatalog.Find(id) != null && valid.Count < 3) valid.Add(id);
             if (valid.Count == 0) return;
             interactionMode=false;
             comparison = true;
@@ -347,7 +349,7 @@ namespace TweenGallery
         public void Replay()
         {
             if (options == null) return;
-            if(IsRecipe){BuildDemos(new[]{CurrentEffectId});if(pagePreview!=null&&!interactionMode)pagePreview.Sequence.Play();RefreshControlLabels();return;}
+            if(IsRecipe){BuildDemos(new[]{CurrentEffectId});if(pagePreview!=null&&!interactionMode)pagePreview.Sequence.Play();if(typographyPreview!=null&&!interactionMode)typographyPreview.Sequence.Play();RefreshControlLabels();return;}
             if (interactionMode) { BuildDemos(new[]{CurrentEffectId}); RefreshControlLabels(); return; }
             paused = false;
             foreach (MotionPlayer player in players)
@@ -362,6 +364,7 @@ namespace TweenGallery
 
         public void TogglePause()
         {
+            if(typographyPreview!=null){paused=typographyPreview.Sequence.IsPlaying;if(paused)typographyPreview.Sequence.Pause();else typographyPreview.Sequence.Resume();RefreshControlLabels();return;}
             paused = !paused;
             if(pagePreview!=null){paused=pagePreview.Sequence.IsPlaying;if(paused)pagePreview.Sequence.Pause();else pagePreview.Sequence.Resume();RefreshControlLabels();return;}
             foreach (MotionPlayer player in players) { if (paused) player.Pause(); else player.Resume(); }
@@ -524,6 +527,7 @@ namespace TweenGallery
 
         public void SeekPreview(float normalizedTime)
         {
+            if(typographyPreview!=null){typographyPreview.Sequence.Seek(normalizedTime);paused=true;RefreshControlLabels();return;}
             if(pagePreview!=null){pagePreview.Sequence.Seek(normalizedTime);paused=true;RefreshControlLabels();return;}
             if (interactionMode) return;
             if (float.IsNaN(normalizedTime) || float.IsInfinity(normalizedTime)) return;
@@ -657,6 +661,7 @@ namespace TweenGallery
         Button ButtonAt(Transform parent, string title, float x, float y, float w, float h, Color color, Color textColor, int size, Action onClick)
         {
             Image image = ImageAt(parent, title.Length > 0 ? title : "Catalog entry", x, y, w, h, color);
+            if(title.Length>0)GalleryCompositionArt.SetButton(image,color==Cyan?0:color==Violet||color==Hex("343A60")?1:2);
             image.raycastTarget = true;
             var button = image.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
@@ -665,7 +670,7 @@ namespace TweenGallery
             colors.pressedColor = new Color(.9f, .87f, .83f, 1); colors.selectedColor = Color.white; colors.fadeDuration = .08f;
             button.colors = colors;
             var navigation = new Navigation { mode = Navigation.Mode.None }; button.navigation = navigation;
-            if (title.Length > 0) Label(image.transform, title, 5, 0, w - 10, h, size, textColor, TextAnchor.MiddleCenter, true);
+            if (title.Length > 0) Label(image.transform, title, 9, 0, w - 18, h, size, textColor, TextAnchor.MiddleCenter, true);
             button.onClick.AddListener(() => onClick());
             return button;
         }
@@ -680,8 +685,7 @@ namespace TweenGallery
         {
             var rect = Rect(parent, "Text " + content, x, y, width, height);
             var label = rect.gameObject.AddComponent<Text>();
-            // The bundled CJK face has generous ascenders; synthesized bold muddies small UI glyphs.
-            label.font = font; label.fontSize = size; label.fontStyle = FontStyle.Normal;
+            label.fontSize=size;GalleryTypography.Style(label,bold);
             label.text = content; label.color = color; label.alignment = alignment; label.raycastTarget = false;
             label.horizontalOverflow = HorizontalWrapMode.Wrap;
             label.verticalOverflow = alignment == TextAnchor.MiddleLeft || alignment == TextAnchor.MiddleCenter || alignment == TextAnchor.MiddleRight
@@ -694,7 +698,7 @@ namespace TweenGallery
         {
             var rect = Rect(parent, name, x, y, width, height);
             var image = rect.gameObject.AddComponent<Image>(); image.color = color; image.raycastTarget = false;
-            if(soft&&name.EndsWith("panel",StringComparison.OrdinalIgnoreCase)){image.sprite=GalleryPageArt.Panel;image.type=Image.Type.Sliced;image.pixelsPerUnitMultiplier=1.75f;image.color=Color.white;return image;}
+            if(soft&&name.EndsWith("panel",StringComparison.OrdinalIgnoreCase)){image.sprite=GalleryPageArt.Panel;image.type=Image.Type.Sliced;image.pixelsPerUnitMultiplier=12;image.color=Color.white;return image;}
             if (soft) { image.sprite = rounded; image.type = Image.Type.Sliced; }
             return image;
         }

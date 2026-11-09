@@ -1,6 +1,6 @@
 # Unity UI Motion Gallery
 
-一套以 **Unity UGUI + DOTween 免费版** 实现的 46 项 UI 动效：可运行 Windows 展馆、46 个预设与示例预制体、通用 Runtime、Codex Skill 和中文文档。当前开发版 **0.6.0-preview1**；已发布稳定版为 **0.4.0**。
+一套以 **Unity UGUI + DOTween 免费版** 实现的 UI 动效库：46个基础预设/预制体、可运行Windows展馆、交互/页面/文字配方、通用Runtime、Codex Skill和中文文档。当前开发版 **0.6.0-preview2**；已发布稳定版为 **0.4.0**。
 
 展馆统一使用暖奶油、薄荷、淡紫与暖金的柔和玩具质感 UI，并以同一份 MotionPlayer 播放实际交付的模板。A01–F06 固定编号覆盖出现消失、交互反馈、页面转场、奖励数值、循环和编排。
 
@@ -20,6 +20,14 @@
 - [第三方许可](ThirdPartyLicenses/README.md)：DOTween 与中文字体说明。
 
 ## 0.6.0 三档规则与页面配方
+
+preview2先用image gen生成两张整屏参考，再拆出8份PNG并拼装，使用独立艺术标题、空白缎带、原生动态文字和实际字体字重，统一优化旧目录与新页面的文字/底板关系。拒收中央透明的失败底板。流程已强化到Skill：[整图到美术资源](docs/art-composition-workflow.md)。完整Skill同时打包参考图、提示词和资源清单，Runtime仍不带演示美术/字体。
+
+主目录现为57项：原46项、G01/G02、P01/P02，以及T01–T07。新增短文字/逐字弹跳、逐字颤动、打字机、加载波浪、滚动提示和项目开场Logo掉落果冻；还提供离散Sprite帧与装饰彩纸/星屑的独立时钟。接入见 [文字与Logo配方](docs/text-logo-recipes.md)。扫描源项目291个脚本、复核34个UI动效候选，类型映射和宿主适配边界见 [项目动效复查](docs/project-motion-audit.md)。
+
+preview2实际画面：[整页拼装](docs/previews/v061/page-complete.png)、[响应式](docs/previews/v061/responsive-compare.png)、[Logo果冻](docs/previews/v061/logo-jelly.png)；24fps采样视频：[文字弹跳](docs/previews/v061/T02-sampled.mp4)、[Logo掉落](docs/previews/v061/T03-sampled.mp4)、[打字机](docs/previews/v061/T05-sampled.mp4)。素材提示词、来源与失败验收见 [生成记录](docs/art-generation-v061.md)。
+
+下文为preview1的页面配方基础：
 
 按确认的三张原型，将克制/标准/庆祝接入原有46项与实时反馈；新增 P01“旅程达成”整页编排、P02“奖励选择”响应式交互，均在主展馆“编排”分类。主目录共50项，没有新增独立工坊入口。页面支持阶段采样、暂停续播与减弱动效；短屏正文滚动、底部操作固定，旋转保留选择与滚动位置。
 

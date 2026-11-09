@@ -1,9 +1,15 @@
 ---
 name: unity-ui-tween
-description: "为 Unity UGUI 设计并接入符合项目画风的按钮反馈与补间动画，提供 46 项基础模板、8 套按钮交互配方、三档动效规则、整页编排和响应式布局；适用于按钮变体、弹窗、页面切换、奖励和引导。"
+description: "为 Unity UGUI 按项目画风制作并接入按钮、文字、Logo与页面动效；提供46项基础模板、按钮交互、文字弹跳/显现、果冻Logo、整页编排和响应式布局，并支持先生成整屏参考再拆美术拼装。"
 ---
 
 # Unity UI Tween
+
+## 先定整图，再拆素材还原
+
+画风重做、文字与背景不协调或要求image gen参考时，先按 [整图到素材的制作流程](references/art-composition-workflow.md) 生成含最终文字层级的完整参考，再列出底板、标题、按钮、图标和装饰清单，逐件生成并在Unity分层拼装。用实际运行画面对照文字大小、字重、颜色、内边距、材质与高光；不能只换字色或继续往旧底板贴字。一般小修改复用合适资源，不强制重新生成。
+
+固定品牌/艺术标题可生成独立带字PNG，并核对中文及保留语义文本；动态数值、按钮、说明和需本地化文字优先原生Text/TMP。逐字艺术Logo从生成阶段就拆成独立字，不能任意切共享底板。实心承字面板中央必须不透明；拒收中央透明洞、脏灰晕和错字，保留提示词、尺寸、alpha、裁切与哈希。采用实际字体字重，避免全局换肤将全部文字变成同一浅色或小字合成粗体。美术按用户要求使用真实PNG，不用SVG占位。
 
 ## 统筹设计与选型
 
@@ -16,6 +22,10 @@ description: "为 Unity UGUI 设计并接入符合项目画风的按钮反馈与
 整页请求优先读 [P01 整页编排](references/page-recipes.md)：背景、面板、主视觉、奖励、操作区有明确先后，共用可采样时间轴；先准备首帧再显示。适配短屏、长屏和横屏时读 [P02 响应式布局](references/responsive-layout.md)，保留已有控件、选择和滚动，正文可滚动而主要操作保持可见。P01/P02 位于同一主展馆，分别用 MotionPageSequence / MotionResponsiveLayout，不是 MotionPlayer.Play 编号。schemaVersion=3 使用 recipe 驱动与素材/布局字段。视觉完成与真实奖励、导航和持久化分离。
 
 按稳定编号选择动效，把展馆同源模板接入项目现有 UI。第一版基准为 Unity 6000.0.26f1、UGUI 和 DOTween 免费版；其他 Unity 版本需实际编译验证。UI Toolkit、Animator 或其他引擎需要另行适配，不能直接承诺本模板兼容。
+
+文字与Logo需求读 [T01–T07配方](references/text-logo-recipes.md)：整段弹跳、逐字错峰、Logo掉落果冻、逐字颤动、打字机、加载波浪和滚动提示。T编号使用独立驱动，不传给MotionPlayer.Play；图形字与原生文字都绑定内部visual，排版slot和命中不动。Logo须先全部落稳再进入共享果冻；采样不触发声音、奖励或跳转。离散图帧和装饰彩纸分别有MotionSpriteSequence、MotionConfettiSequence，不当成缓动曲线或业务粒子系统。
+
+需要复查项目缺项时按 [项目动效复查](references/project-motion-audit.md) 同时检查DOTween调用、自定义逐帧公式、文字顶点、图片帧和生命周期，再与现有类型映射。分清已提供驱动、组合接线和需要宿主适配的内容；不只搜索DOScale，也不把物理轨迹/QA/静态三角函数全算成UI补间。
 
 ## 从画风扩展按钮
 

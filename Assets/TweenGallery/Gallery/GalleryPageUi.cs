@@ -15,14 +15,16 @@ namespace TweenGallery
         }
         public static Text Text(Transform parent,string name,string value,Vector2 position,Vector2 size,int points)
         {
-            var r=Rect(parent,name,position,size);var text=r.gameObject.AddComponent<Text>();text.font=Resources.Load<Font>("GalleryFont");text.text=value;text.fontSize=points;text.alignment=TextAnchor.MiddleCenter;text.color=GalleryTheme.Ink;text.raycastTarget=false;text.horizontalOverflow=HorizontalWrapMode.Wrap;text.verticalOverflow=VerticalWrapMode.Overflow;return text;
+            var r=Rect(parent,name,position,size);var text=r.gameObject.AddComponent<Text>();text.text=value;text.fontSize=points;GalleryTypography.Style(text,points>=17);text.alignment=TextAnchor.MiddleCenter;text.color=GalleryTheme.Ink;text.raycastTarget=false;text.horizontalOverflow=HorizontalWrapMode.Wrap;text.verticalOverflow=VerticalWrapMode.Overflow;return text;
         }
         public static Button Button(Transform parent,string name,string label,Vector2 position,Vector2 size,int skin,UnityAction action)
         {
             var r=Rect(parent,name,position,size);var hit=r.gameObject.AddComponent<Image>();hit.color=Color.clear;
             var button=r.gameObject.AddComponent<Button>();button.targetGraphic=hit;button.transition=Selectable.Transition.None;button.onClick.AddListener(action);
-            var visual=Art(r,"Button surface",GalleryPageArt.Button(skin),Vector2.zero,size,true);visual.pixelsPerUnitMultiplier=3;
-            Text(visual.transform,"Native label",label,Vector2.zero,size-Vector2.one*8,Mathf.RoundToInt(Mathf.Min(27,size.y*.5f)));
+            int kind=skin==0?0:skin==1?1:2;
+            var visual=Art(r,"Button surface",GalleryCompositionArt.Action(kind),Vector2.zero,size,true);visual.pixelsPerUnitMultiplier=10;
+            var caption=Text(visual.transform,"Native label",label,new Vector2(0,1),size-new Vector2(24,8),Mathf.RoundToInt(Mathf.Min(27,size.y*.47f)));
+            GalleryTypography.Style(caption,true);caption.color=kind==0?GalleryTheme.GreenInk:kind==1?GalleryTheme.PlumInk:GalleryTheme.Ink;
             var feedback=r.gameObject.AddComponent<MotionButtonFeedback>();feedback.surface=visual.rectTransform;feedback.CaptureBaseline();return button;
         }
         public static CanvasGroup Group(RectTransform rect){return rect.gameObject.AddComponent<CanvasGroup>();}

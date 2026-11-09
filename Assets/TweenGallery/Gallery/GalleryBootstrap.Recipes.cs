@@ -9,6 +9,7 @@ namespace TweenGallery
         MotionStyleKind styleKind=MotionStyleKind.Standard;
         Button[] styleButtons;
         GalleryPagePreview pagePreview;GalleryResponsivePreview responsivePreview;
+        GalleryTypographyPreview typographyPreview;
         readonly Dictionary<RectTransform,Vector2> playbackPositions=new Dictionary<RectTransform,Vector2>();
         readonly List<GameObject> noteObjects=new List<GameObject>();
         int responsiveChoice,responsiveMode;
@@ -16,7 +17,9 @@ namespace TweenGallery
         public MotionStyleKind StyleKind=>styleKind;
         public GalleryPagePreview PagePreview=>pagePreview;
         public GalleryResponsivePreview ResponsivePreview=>responsivePreview;
-        bool IsRecipe=>CurrentEffectId=="P01"||CurrentEffectId=="P02";
+        public GalleryTypographyPreview TypographyPreview=>typographyPreview;
+        bool IsTypography=>!string.IsNullOrEmpty(CurrentEffectId)&&CurrentEffectId.StartsWith("T");
+        bool IsRecipe=>CurrentEffectId=="P01"||CurrentEffectId=="P02"||IsTypography;
         MotionSettings StyledSettings(MotionDefinition definition)=>MotionStyleProfile.Get(styleKind).Apply(MotionSettings.FromDefinition(definition));
         void BuildStyleControls()
         {
@@ -48,7 +51,7 @@ namespace TweenGallery
                 var layouts=responsivePreview.Layouts;responsiveSizes=Array.ConvertAll(layouts,l=>(l.transform as RectTransform).rect.size);
                 responsiveScroll=Array.ConvertAll(layouts,l=>l.IsScrollable?l.scroll.verticalNormalizedPosition:l.SavedScroll);
             }
-            pagePreview=null;responsivePreview=null;
+            pagePreview=null;responsivePreview=null;typographyPreview=null;
             bool expanded=IsRecipe&&!comparison;
             var panel=root.Find("Preview panel") as RectTransform;if(panel!=null)panel.sizeDelta=new Vector2(872,expanded?648:468);
             demoHost.sizeDelta=new Vector2(836,expanded?518:319);
@@ -57,6 +60,7 @@ namespace TweenGallery
         }
         void BuildRecipe()
         {
+            if(IsTypography){typographyPreview=GalleryTypographyPreview.Create(demoHost,CurrentEffectId,options,MotionStyleProfile.Get(styleKind),reducedMotion);return;}
             if(CurrentEffectId=="P01")pagePreview=GalleryPagePreview.Create(demoHost,options,MotionStyleProfile.Get(styleKind),reducedMotion,interactionMode);
             else
             {
@@ -67,6 +71,11 @@ namespace TweenGallery
         }
         bool UpdateRecipe()
         {
+            if(typographyPreview!=null)
+            {
+                var clip=typographyPreview.Sequence;paused=!clip.IsPlaying;SetTextIfChanged(playLabel,paused?"继续":"暂停");timelineSlider.SetValueWithoutNotify(clip.Progress);progressLabel.text=Mathf.RoundToInt(clip.Progress*100)+"%";
+                if(Time.unscaledTime>statusUntil)SetTextIfChanged(status,typographyPreview.Status);return true;
+            }
             if(pagePreview!=null)
             {
                 paused=!pagePreview.Sequence.IsPlaying;SetTextIfChanged(playLabel,paused?"继续":"暂停");
@@ -78,9 +87,9 @@ namespace TweenGallery
         }
         void RefreshRecipeControls()
         {
-            if(styleButtons!=null)for(int i=0;i<styleButtons.Length;i++)styleButtons[i].image.color=i==(int)styleKind?Cyan:Hex("343A60");
+            if(styleButtons!=null)for(int i=0;i<styleButtons.Length;i++)GalleryCompositionArt.SetButton(styleButtons[i].image,i==(int)styleKind?0:1);
             if(!IsRecipe)return;
-            bool page=CurrentEffectId=="P01";
+            bool page=CurrentEffectId=="P01"||IsTypography;
             autoModeButton.interactable=page;effectEnglish.gameObject.SetActive(false);variantButton.gameObject.SetActive(false);skinButton.gameObject.SetActive(false);stateButton.gameObject.SetActive(false);
             timelineSlider.interactable=page;playLabel.GetComponentInParent<Button>().interactable=page&&!reducedMotion;
             slowLabel.GetComponentInParent<Button>().interactable=page&&!reducedMotion;loopLabel.GetComponentInParent<Button>().interactable=false;compareLabel.GetComponentInParent<Button>().interactable=false;
@@ -90,6 +99,13 @@ namespace TweenGallery
             distanceValue.text=page?options.distance.ToString("0")+" px":"随布局";staggerValue.text=page?options.stagger.ToString("0.00")+" s":"不适用";
             timelineHint.text=page?"时间轴可采样整页；阶段按钮直接定位，采样不提交任何业务":"短屏滚动正文，操作区固定；点击布局切换或旋转当前视图";
             if(!page)progressLabel.text="布局驱动";
+            if(IsTypography)
+            {
+                durationSlider.maxValue=CurrentEffectId=="T03"?10:CurrentEffectId=="T07"?12:3;durationSlider.SetValueWithoutNotify(options.duration);
+                distanceSlider.maxValue=CurrentEffectId=="T03"?680:280;distanceSlider.SetValueWithoutNotify(options.distance);
+                bool visual=CurrentEffectId!="T05"&&CurrentEffectId!="T07";strengthSlider.interactable=visual;distanceSlider.interactable=visual;staggerSlider.interactable=CurrentEffectId!="T01"&&visual;
+                reverseLabel.text="文字与Logo独立时间轴";timelineHint.text="固定排版占位，时间轴只采样视觉；不触发奖励、任务完成或提示音";
+            }
         }
         [Serializable] public sealed class RecipeConfiguration
         {
@@ -102,14 +118,20 @@ namespace TweenGallery
             public int displayMode;
             public bool reducedMotion;
             public float cardIntensity,buttonIntensity,springFrequency,springDamping,accentDuration;
+            public string titleAsset,textContent,textMode;
+            public string[] actionAssets;
+            public float totalDuration;
         }
         string ExportRecipeJson()
         {
             var config=new RecipeConfiguration{id=CurrentEffectId,driver=CurrentEffectId=="P01"?"MotionPageSequence":"MotionResponsiveLayout",panelAsset="StyleArt/cream-panel",emblemAsset="StyleArt/achievement-medal",iconAtlas="StyleArt/reward-icons",settings=options.Clone(),profile=MotionStyleProfile.Get(styleKind),reducedMotion=reducedMotion};
             config.cardIntensity=.6f*config.profile.strengthScale;config.buttonIntensity=config.profile.strengthScale;config.springFrequency=config.profile.springFrequency;config.springDamping=config.profile.springDamping;config.accentDuration=.55f*config.profile.timeScale;
+            config.panelAsset="CompositionArt/cream-action";config.titleAsset=CurrentEffectId=="P01"?"CompositionArt/achievement-title":"CompositionArt/blank-ribbon";
+            config.actionAssets=new[]{"CompositionArt/mint-action","CompositionArt/lavender-action","CompositionArt/cream-action"};
+            if(typographyPreview!=null){config.driver=typographyPreview.Sequence.GetType().Name;config.textContent=typographyPreview.Content;config.textMode=typographyPreview.Sequence is MotionTextSequence textClip?textClip.kind.ToString():config.driver;config.totalDuration=typographyPreview.Sequence.TotalDuration;config.titleAsset=CurrentEffectId=="T03"?"CompositionArt/logo-glyphs":null;}
             if(pagePreview!=null)config.milestones=new[]{0,.25f/1.1f,.65f/1.1f,1};
             if(responsivePreview!=null){var layouts=responsivePreview.Layouts;config.referenceSizes=Array.ConvertAll(layouts,l=>(l.transform as RectTransform).rect.size);config.safeInsets=Array.ConvertAll(layouts,l=>l.insets);config.displayMode=responsivePreview.Mode;}
-            return JsonUtility.ToJson(new GalleryConfiguration{schemaVersion=3,previewMode=CurrentEffectId=="P01"?"page":"responsive",styleProfile=styleKind.ToString(),recipe=config,effects=Array.Empty<ConfigurationEntry>()},true);
+            return JsonUtility.ToJson(new GalleryConfiguration{schemaVersion=3,previewMode=IsTypography?"typography":CurrentEffectId=="P01"?"page":"responsive",styleProfile=styleKind.ToString(),recipe=config,effects=Array.Empty<ConfigurationEntry>()},true);
         }
         string CopyRecipePrompt()
         {

@@ -7,7 +7,8 @@ namespace TweenGallery
     /// <summary>One visual system for legacy fixtures, serialized templates and all gallery surfaces.</summary>
     public static class GalleryTheme
     {
-        public static readonly Color Ink=Hex("77574C"), Muted=Hex("927B6A"), Cream=Hex("FFF9EF"), Background=Hex("F6EDDD");
+        public static readonly Color Ink=Hex("4B2C20"), Muted=Hex("76513E"), Cream=Hex("FFF8E9"), Background=Hex("F8EEDC");
+        public static readonly Color GreenInk=Hex("234B2B"),PlumInk=Hex("502C4D");
         public static readonly Color Mint=Hex("A6DCC1"), Lavender=Hex("CBADE5"), Gold=Hex("E9C36F"), Coral=Hex("F0ACA1");
         static readonly Dictionary<string,string> colors=new Dictionary<string,string>{
             {"171B38","77574C"},{"11142B","F6EDDD"},{"202442","FFF9EF"},{"AEB5D5","927B6A"},
@@ -37,8 +38,8 @@ namespace TweenGallery
             {
                 if(graphic is Text text)
                 {
-                    float alpha=text.color.a;var c=text.fontSize<=17?Muted:Ink;c.a=alpha;text.color=c;
-                    text.fontStyle=FontStyle.Normal;
+                    float alpha=text.color.a;var c=text.fontSize<=12?Muted:Ink;c.a=alpha;text.color=c;
+                    GalleryTypography.Style(text,text.fontStyle==FontStyle.Bold||text.fontSize>=18);
                 }
                 else graphic.color=Surface(graphic.color);
             }

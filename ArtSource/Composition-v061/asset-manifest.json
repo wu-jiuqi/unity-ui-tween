@@ -1,0 +1,117 @@
+{
+  "passed": true,
+  "assets": [
+    {
+      "path": "Assets/TweenGallery/Resources/CompositionArt/achievement-title.png",
+      "size": [
+        2172,
+        724
+      ],
+      "sha256": "060db7a2bc99db1c790731ff55783b2591333ba2ec9c0082aec44e9b833021d2",
+      "center_rgba": [
+        239,
+        186,
+        238,
+        253
+      ]
+    },
+    {
+      "path": "Assets/TweenGallery/Resources/CompositionArt/blank-ribbon.png",
+      "size": [
+        2172,
+        724
+      ],
+      "sha256": "72e5d6da499b1c9d628d039d5434944c5ab747f0eeac2401d0e83ae3b7c7f6db",
+      "center_rgba": [
+        252,
+        238,
+        222,
+        253
+      ]
+    },
+    {
+      "path": "Assets/TweenGallery/Resources/CompositionArt/brand-title.png",
+      "size": [
+        2172,
+        724
+      ],
+      "sha256": "3727f33cd2f993d709621811082d78dcdcfb7ddb6bd14850056e4fcaf31b6249",
+      "center_rgba": [
+        252,
+        231,
+        203,
+        253
+      ]
+    },
+    {
+      "path": "Assets/TweenGallery/Resources/CompositionArt/cream-action.png",
+      "size": [
+        2172,
+        724
+      ],
+      "sha256": "70afb4a04ef14bf82e580d62fa093d099f9e8b0b0b8acc2aacf8343420f12dd0",
+      "center_rgba": [
+        253,
+        240,
+        219,
+        253
+      ]
+    },
+    {
+      "path": "Assets/TweenGallery/Resources/CompositionArt/ivory-panel.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "35ec1c9a3c976b4746efaed9adeb59a82680abea35b0ff37ecf52b3aae315fe2",
+      "center_rgba": [
+        254,
+        246,
+        232,
+        255
+      ]
+    },
+    {
+      "path": "Assets/TweenGallery/Resources/CompositionArt/lavender-action.png",
+      "size": [
+        2172,
+        724
+      ],
+      "sha256": "67324f8bffd12b3c861d5db4c6f64b7d25732fdb89f5ed949097e6121a4385a8",
+      "center_rgba": [
+        233,
+        211,
+        239,
+        253
+      ]
+    },
+    {
+      "path": "Assets/TweenGallery/Resources/CompositionArt/logo-glyphs.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ded68d33c2954a7ed075395522bcfd00ab8c61cbf48dfdba848cbd80d5295834",
+      "center_rgba": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "Assets/TweenGallery/Resources/CompositionArt/mint-action.png",
+      "size": [
+        2172,
+        724
+      ],
+      "sha256": "852c47023c85b12551d83988985976a72c2e8ab139924e62fec04c70f3a05e26",
+      "center_rgba": [
+        160,
+        227,
+        164,
+        252
+      ]
+    }
+  ]
+}

@@ -15,6 +15,8 @@
 
 ## JSON 驱动契约
 
+0.6.0-preview2主目录为57项，增加T01–T07文字/Logo配方；T编号使用recipe.driver与previewMode=typography，不传给MotionPlayer.Play。导出含textContent、textMode、实际totalDuration以及新CompositionArt素材路径。整屏参考与资源拆分见art-composition-workflow.md；文字与Logo时钟见text-logo-recipes.md。以下50项说明为preview1起点。
+
 当前主目录共有50个选项：46个基础时间轴、G01/G02操作、P01/P02页面配方。P01/P02仍在主展馆“编排”分类。右侧克制/标准/庆祝应用到已有条目和页面配方，详见 motion-profiles.md；P01分层时间轴见 page-recipes.md，P02多尺寸交互见 responsive-layout.md。复制配置中的 styleProfile 保留档位来源，所有数值已生效，不重复乘档位。页面配方使用 schemaVersion=3、recipe 和明确 driver，effects 为空。
 
 时间轴仍使用 `effects[]` 中的真实 MotionCatalog 编号、MotionSettings；新增 `previewMode="timeline"` 与 `skinIndex`，原消费者可以忽略可选字段。

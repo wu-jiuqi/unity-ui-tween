@@ -59,7 +59,7 @@ namespace TweenGallery
             sequence.Restore();sequence.actionsGroup.interactable=true;sequence.actionsGroup.blocksRaycasts=true;sequence.CaptureBaseline();sequence.Seek(1);
             var config=JsonUtility.FromJson<GalleryBootstrap.GalleryConfiguration>(gallery.ExportConfigurationJson());
             Check(config.schemaVersion==3&&config.recipe.driver=="MotionPageSequence"&&config.effects.Length==0,"Page export uses schema 3 and an explicit recipe driver");
-            Check(config.recipe.panelAsset=="StyleArt/cream-panel"&&config.recipe.milestones.Length==4,"Page export includes raster resource paths and stage marks");
+            Check(config.recipe.panelAsset=="CompositionArt/cream-action"&&config.recipe.milestones.Length==4,"Page export includes raster resource paths and stage marks");
             gallery.SelectEffect("P02");yield return null;var view=gallery.ResponsivePreview;var layouts=view.Layouts;
             Check(layouts.Length==3&&layouts[0].IsScrollable&&!layouts[1].IsScrollable&&!layouts[2].IsScrollable,"Short screen scrolls; tall and landscape fit their content");
             Check(layouts[2].IsLandscape,"Landscape uses the horizontal card layout");

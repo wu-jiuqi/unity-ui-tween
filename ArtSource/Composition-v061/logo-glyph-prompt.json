@@ -1,0 +1,5 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: stylized-concept. Production transparent PNG GAME LOGO GLYPH ATLAS, based on supplied master cream-garden app's chunky embossed Chinese display type. Square1024x1024, exactly 2x2 equal square cells, four independently drawn Chinese glyphs centered in respective cells with generous empty transparent gutters. Top-left '动', top-right '效', bottom-left '图', bottom-right '鉴'. Correct Chinese characters, ONE glyph per cell, no other text. Letters are individually readable rounded heavy espresso/chocolate 3D toy lettering, subtle lighter caramel side bevel, very thin ivory outline and small soft shadow, top-left lighting. The face of each glyph is dark espresso, never white or transparent. Each glyph fits fully within central380x380 of its512x512 cell; no touching neighbors, no shared plaque or ribbon, no background, no panel. This atlas will be split into four independent sprites for staggered falling/squashing jelly logo animation. Clean real alpha outside glyphs. No entire flattened assembled logo, no flowers/leaves/medals, no extra symbols or watermark.",
+  "reference": "01-achievement-reference.png"
+}

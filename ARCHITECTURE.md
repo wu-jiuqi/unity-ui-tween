@@ -4,6 +4,8 @@ Unity 6000.0.26f1, UGUI, DOTween free, built-in render pipeline. Namespace `Twee
 
 ## 0.6 presentation layer
 
+Preview2 adds reference-first composition and 7 text/logo recipes (57 browse options total). GalleryCompositionArt assembles independent generated PNG title art, blank controls, ribbons and glyph sprites. GalleryTypography uses the real Regular/Medium/Bold font files with FontStyle.Normal, preserving deliberate hierarchy. MotionVisualSequence owns scoped clocks for MotionTextSequence, MotionLogoDrop, MotionMarquee, MotionSpriteSequence and MotionConfettiSequence. MotionJellyGraphic supplies the logo's small mesh deformation. See docs/art-composition-workflow.md, text-logo-recipes.md and project-motion-audit.md. T IDs are recipe IDs, never MotionCatalog IDs.
+
 The main catalog presents 50 choices: 46 stable MotionCatalog IDs, G01/G02 input recipes, and P01/P02 page recipes. G/P IDs are gallery definitions, never passed to MotionPlayer.Play. All controls remain in the main gallery. Legacy lab/workshop fixtures are enabled only by explicit test flags.
 
 MotionStyleProfile clones canonical MotionSettings into restrained/standard/celebratory variants. Exported values are effective; profile metadata must not be applied a second time. MotionPageSequence owns a deterministic staged visual clock, silent Seek/Sample, pause/resume, exact baseline restore and a visual-only completion event. It never grants rewards. MotionResponsiveLayout repositions existing controls within host-supplied safe insets, retains scroll state and leaves selection/business state with the host. See docs/motion-profiles.md, page-recipes.md and responsive-layout.md.

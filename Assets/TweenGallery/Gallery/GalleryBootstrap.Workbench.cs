@@ -13,7 +13,14 @@ namespace TweenGallery
             new MotionDefinition{id="G01",name="拖拽与弹性回位",english="Drag and spring return",category="G",kind="真实操作",duration=.65f,strength=1,distance=55,description="按住物体拖动，松开后按当前速度弹性回位。",useCase="拖动反馈、弹性卡片",difference="固定命中区域与内部视觉分开，松开是弹簧回位。",dependencies="MotionDragInput + MotionJellyDrag；visual 是独立子层。"},
             new MotionDefinition{id="G02",name="连续操作与姿态接续",english="Interrupt and continue",category="G",kind="真实操作",duration=.65f,strength=1,distance=130,description="连续点击左、右，从当前可见姿态接续到新的目标。",useCase="可打断的选择、焦点交接",difference="固定时长接续保持位置连续；需要速度连续时使用弹簧。",dependencies="MotionPlayer.ContinueTo + 稳定基线；业务状态由宿主管理。"},
             new MotionDefinition{id="P01",name="旅程达成 · 整页编排",english="Staged achievement page",category="F",kind="页面配方",duration=1.1f,strength=1,distance=24,stagger=.08f,description="背景、面板、徽章、奖励与操作按层次进入。",useCase="成就、胜利、奖励页面",difference="一条确定性页面时间轴；采样不提交业务，结束只发视觉通知。",dependencies="MotionPageSequence + 独立图层；宿主负责奖励与导航。"},
-            new MotionDefinition{id="P02",name="奖励选择 · 响应式",english="Responsive reward selection",category="F",kind="页面配方",duration=.3f,strength=1,distance=0,description="短屏、长屏和横屏使用同一选择状态，自适应重排控件。",useCase="奖励选择、弹窗、不同屏幕比例",difference="短屏滚正文，操作区固定；重排不重建选择数据。",dependencies="MotionResponsiveLayout + ScrollRect；安全区由宿主传入。"}
+            new MotionDefinition{id="P02",name="奖励选择 · 响应式",english="Responsive reward selection",category="F",kind="页面配方",duration=.3f,strength=1,distance=0,description="短屏、长屏和横屏使用同一选择状态，自适应重排控件。",useCase="奖励选择、弹窗、不同屏幕比例",difference="短屏滚正文，操作区固定；重排不重建选择数据。",dependencies="MotionResponsiveLayout + ScrollRect；安全区由宿主传入。"},
+            new MotionDefinition{id="T01",name="短文字整体弹跳",english="Whole label bounce",category="F",kind="文字配方",duration=.55f,strength=1,distance=22,description="奖励数值或短标题整体蓄力、轻跳并稳定。",dependencies="MotionTextSequence / Bounce；独立文字视觉层。"},
+            new MotionDefinition{id="T02",name="逐字错峰弹跳",english="Staggered glyph bounce",category="F",kind="文字配方",duration=.52f,strength=1,distance=24,stagger=.07f,description="字素按阅读顺序错峰跳起，外层排版保持固定。",dependencies="MotionTextSequence / Bounce；逐字视觉层。"},
+            new MotionDefinition{id="T03",name="Logo掉落与果冻回弹",english="Staggered jelly logo drop",category="F",kind="Logo配方",duration=6.8f,strength=1,distance=440,stagger=.105f,description="逐字下落、落地压扁拉伸，全部落稳后共享果冻衰减。",dependencies="MotionLogoDrop + MotionJellyGraphic；图形和字形分别绑定。"},
+            new MotionDefinition{id="T04",name="逐字颤动强调",english="Traveling wordmark shiver",category="F",kind="文字配方",duration=.48f,strength=1,distance=3.2f,stagger=.09f,description="短促颤动沿文字传播，适合有静置间隔的低频提示。",dependencies="MotionTextSequence / Shiver；宿主管理静置间隔。"},
+            new MotionDefinition{id="T05",name="打字机显现",english="Grapheme reveal",category="F",kind="文字配方",duration=1.2f,strength=1,distance=0,description="固定完整排版，按字素逐个显现，不重排后续文字。",dependencies="MotionTextSequence / Reveal；独立字素CanvasGroup。"},
+            new MotionDefinition{id="T06",name="加载文字波浪",english="Loading text wave",category="F",kind="文字配方",duration=.6f,strength=1,distance=16,stagger=.13f,description="温和的逐字波浪，加载完成由宿主真实任务状态决定。",dependencies="MotionTextSequence / Wave；与任务进度独立。"},
+            new MotionDefinition{id="T07",name="横向滚动提示",english="Clipped announcement marquee",category="F",kind="文字配方",duration=6,strength=1,distance=0,description="文字完整穿过固定裁切区，提示队列由宿主管理。",dependencies="MotionMarquee + RectMask2D；居中视觉包装层。"}
         };
         public static int BrowseCount => MotionCatalog.All.Length+interactiveDefinitions.Length;
         static IEnumerable<MotionDefinition> BrowseDefinitions(){foreach(var d in MotionCatalog.All)yield return d;foreach(var d in interactiveDefinitions)yield return d;}
@@ -103,7 +110,7 @@ namespace TweenGallery
         void RefreshWorkbenchControls()
         {
             if(autoModeButton==null)return;
-            autoModeButton.image.color=interactionMode?Hex("343A60"):Violet;liveModeButton.image.color=interactionMode?Cyan:Hex("343A60");
+            GalleryCompositionArt.SetButton(autoModeButton.image,interactionMode?2:0);GalleryCompositionArt.SetButton(liveModeButton.image,interactionMode?0:2);
             autoModeButton.interactable=!CurrentEffectId.StartsWith("G");
             bool show=IsButtonFamily&&!comparison;
             skinButton.gameObject.SetActive(show&&IsSkinApplicable);variantButton.gameObject.SetActive(show);
