@@ -52,6 +52,7 @@ namespace TweenGallery
             Build();
             IsReady = true;
             SelectEffect("A04");
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "--button-lab") >= 0) OpenButtonLab();
         }
 
         void Update()
@@ -95,7 +96,7 @@ namespace TweenGallery
             Label(root, "UI MOTION LAB", 91, 13, 490, 44, 27, Color.white, TextAnchor.MiddleLeft, true);
             Label(root, "Unity UI 动效展馆  /  看见差别，带走手感", 92, 56, 650, 24, 15, Muted);
             ButtonAt(root, "交互实验室", 1046, 30, 200, 42, Pink, Color.white, 17, OpenInteractionLab);
-            Chip(root, MotionCatalog.All.Length + " 项动效", 1285, 30, 118, Cyan, Ink);
+            ButtonAt(root, "按钮工坊", 1285, 30, 118, 42, Cyan, Ink, 16, OpenButtonLab);
             Chip(root, "UNITY 6", 1417, 30, 150, Violet, Color.white);
 
             ImageAt(root, "Catalog panel", 28, 104, 290, 752, Panel);
@@ -607,6 +608,13 @@ namespace TweenGallery
             if (interactionLab != null) return;
             foreach (var player in players) if (player != null) player.StopAndRestore();
             interactionLab = InteractionLab.Create(root, () => { interactionLab = null; Replay(); });
+        }
+        public ButtonStyleLab CurrentButtonLab { get; private set; }
+        public void OpenButtonLab()
+        {
+            if (CurrentButtonLab != null) return;
+            foreach (var p in players) if (p != null) p.StopAndRestore();
+            CurrentButtonLab = ButtonStyleLab.Create(root, () => { Destroy(CurrentButtonLab.gameObject); CurrentButtonLab = null; Replay(); });
         }
         void Notice(string message) { if (status == null) return; status.text = message; statusUntil = Time.unscaledTime + 4; }
 

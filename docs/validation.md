@@ -1,5 +1,16 @@
 # 验证记录
 
+## 0.5.0-preview1 按钮设计升级
+
+2026-11-09，本机 Unity 6000.0.26f1 / Windows x64 Mono。新增 MotionButtonFeedback、六种原创新皮肤和八种可运行交互；原 A01–F06 共 46 项及其 Prefab 不变。Editor 按钮回归 112 项通过，覆盖固定命中区域、非单位基线、拖动/移出/多指竞争、Submit、禁用、busy、减弱动效和失焦取消；RuntimeValidation 原有 39 项通过。Python 打包测试 9 项通过，Skill 结构校验通过。
+
+Player 的 1600×900 与 1280×720 按钮工坊各 24 项通过。原有 46 项案例 + 29 项通用检查、25 项展馆增强检查及 24 项升级检查在 1280×720 回归通过，errors 为空。PNG 来自同一实际 Canvas 的离屏渲染，非系统屏幕截图。报告在 validation-output/v050-final-*，Editor 记录在 evidence/button-feedback-validation.txt 和 runtime-validation.txt。
+
+视觉复查发现并修正非二次幂图集被导入器缩放造成的裁切错位；Player 额外核对图集实际为 1536×1024。加载只旋转独立图标，文字保持稳定；涟漪/扫光使用图形遮罩。构建结果为 Succeeded，0 错误、0 警告。
+
+本次没有移动端、真实触摸、真人手感评测或第二台干净设备验证；自动输入事件不等同于这些测试。完整包和 Runtime 包独立生成并校验，Runtime 不含新皮肤。候选版本仅本地交付，未修改已发布的 v0.4.0 Release。
+
+
 ## 0.4.0 正式版发布验证
 
 2026-11-09，在仓库提交 ed39140 的代码基础上统一正式版版本号，使用 Unity 6000.0.26f1 重新构建 Windows x64 Mono，结果 Succeeded，0 错误、0 警告。Editor RuntimeValidation 39 项通过；9 项 Python 打包回归通过。

@@ -1,5 +1,7 @@
 # Release 使用与发布指南
 
+开发候选 **0.5.0-preview1** 为本地交付，新增按钮工坊。完整 Skill、Runtime Skill 和 Windows 展馆可从本地 dist 使用；尚未发布该版本 Release。下方 0.4.0 表格保留为已发布稳定版说明。
+
 版本 0.4.0，以正式 Release 分发。下列为配套打包文件，实际可下载资产以 GitHub Release 为准。
 
 | 资产 | 用途 |
