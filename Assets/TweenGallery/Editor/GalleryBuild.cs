@@ -11,7 +11,7 @@ namespace TweenGallery.Editor
 {
     public static class GalleryBuild
     {
-        public const string Version = "0.4.0-preview1";
+        public const string Version = "0.4.0";
         const string Root = "Assets/TweenGallery";
 
         [MenuItem("Tools/UI Motion Gallery/Prepare scene and templates")]
