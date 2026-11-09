@@ -1,0 +1,127 @@
+{
+  "date_utc": "2026-11-09",
+  "tested_source_commit": "5a1107cefdf13af43186204da8623db258ced052",
+  "unity": "6000.0.26f1",
+  "platform": "Windows x64 Mono",
+  "workspace": "Fresh isolated clone and separate empty Runtime-only import project",
+  "editor_runtime": {
+    "passed": true,
+    "checks": 39,
+    "log": "evidence/runtime-current.log"
+  },
+  "editor_orchestration": {
+    "passed": true,
+    "log": "evidence/orchestration-current.log"
+  },
+  "runtime_import": {
+    "passed": true,
+    "playmode_assertions": 190,
+    "preset_identities": 46,
+    "archive_entries": 147,
+    "archive_sha256": "e38f1569f6d00fa541092ecaca3a541eede81960bc717a9d996f446911102a84",
+    "asset_files_byte_matched": 135,
+    "mismatches": [],
+    "scope": "Actual Editor Play Mode, UGUI Text, no Gallery or MotionArt; not standalone Player or visual verification"
+  },
+  "build": {
+    "unity": "6000.0.26f1",
+    "version": "0.4.0",
+    "result": "Succeeded",
+    "bytes": "110256496",
+    "errors": 0,
+    "warnings": 0
+  },
+  "player_runs": [
+    {
+      "run": "current-base-1280",
+      "passed": true,
+      "cases": 46,
+      "checks": 29,
+      "errors": [],
+      "report_sha256": "0f0e45b05963053ec1bcd86a9c15e52d2415bf40a712007211be24723f889b76",
+      "exit_code": 0,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "run": "current-base-1600",
+      "passed": true,
+      "cases": 46,
+      "checks": 29,
+      "errors": [],
+      "report_sha256": "f26264953672c1c98e6b74e28601c1a049359c0ed490ef56e65cefaa83518a9a",
+      "exit_code": 0,
+      "width": 1600,
+      "height": 900
+    },
+    {
+      "run": "current-gallery-1280",
+      "passed": true,
+      "cases": 0,
+      "checks": 25,
+      "errors": [],
+      "report_sha256": "9bdff30aa0ad05c03bd3aae52da0f11aaeb857fd6acb12e599bba215210696a7",
+      "exit_code": 0
+    },
+    {
+      "run": "current-gallery-1600",
+      "passed": true,
+      "cases": 0,
+      "checks": 25,
+      "errors": [],
+      "report_sha256": "9bdff30aa0ad05c03bd3aae52da0f11aaeb857fd6acb12e599bba215210696a7",
+      "exit_code": 0
+    },
+    {
+      "run": "current-upgrade-1600",
+      "passed": true,
+      "cases": 0,
+      "checks": 24,
+      "errors": [],
+      "report_sha256": "3c46edddf0975995e2abfa0cb8f29a5a3b049b337c0ca8971869a2d5eeca75a5",
+      "exit_code": 0,
+      "sample": {
+        "sampleActors": 100,
+        "sampleIterations": 60,
+        "sampleCpuMs": 15.5408,
+        "sampleManagedBytes": 0
+      }
+    }
+  ],
+  "offscreen_images": {
+    "automated_nonempty_each_resolution": 8,
+    "resolutions": [
+      [
+        1600,
+        900
+      ],
+      [
+        1280,
+        720
+      ]
+    ],
+    "reviewed": [
+      "1600x900/A04",
+      "1600x900/D02",
+      "1280x720/A08",
+      "1280x720/F06"
+    ],
+    "capture": "Live Canvas rendered through Camera/RenderTexture; not OS screenshots"
+  },
+  "python": {
+    "packaging_tests": 12,
+    "portable_zip_tests": 2,
+    "passed": true,
+    "canonical_docs_sync_passed": true
+  },
+  "not_tested": [
+    "Android/iOS",
+    "Physical touch or real OS focus/background transitions",
+    "Mobile safe area and Profiler",
+    "Second device",
+    "Other Unity versions",
+    "Optional TMP define path",
+    "End-to-end Bounce-specific aggregation/list/frame/mesh adapters"
+  ],
+  "publication": "Validation documentation only; no Runtime/asset changes and no new or replaced Release"
+}

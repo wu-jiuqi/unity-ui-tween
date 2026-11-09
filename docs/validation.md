@@ -1,5 +1,22 @@
 # 验证记录
 
+## 2026-11-09：本机 Unity 补测（源码 `5a1107c`）
+
+在 Windows 上新建独立 clone，并使用已安装的 Unity 6000.0.26f1 补做前一轮缺少的实际运行验证。没有使用或改写现有业务工程。结果摘要另存于 [本轮机器可读记录](validation-local-20261109.json)。
+
+- Editor：`TweenGallery.Editor.RuntimeValidation.Run` 39 项通过；`OrchestrationValidation.Run` 通过播放/对象池版本、声音跨越/循环/暂停/Seek/Skip、减弱动效决策检查。
+- Runtime-only 导入：从本次源码生成 147 条目 ZIP，导入新建的空白工程，仅补齐已有 DOTween 和 UGUI 依赖，不带 Gallery 或 MotionArt。46 个预设身份全部核对通过，135 个导入资源与 ZIP 原文逐字节一致。真实 Editor Play Mode 190 项断言通过，覆盖 46 效果的往返采样一致性、有限数值、RectTransform/CanvasGroup/Image/Text 所测字段的停止与停用恢复，以及 D02 真实续播、宿主 Sample 时钟不自行推进、释放所有权后保留必要终态。此项不是独立 Player 或视觉测试。
+- Windows x64 Mono：重新构建成功，BuildReport 为 0 错误、0 警告。1600×900 与 1280×720 各运行 46 个效果案例、29 项通用检查、25 项展馆增强检查，全部通过；另运行 24 项交互/编排升级检查，全部通过。五份 Player 报告的 errors 均为空，进程退出码均为 0。
+- 图像：两种分辨率各生成 8 张同一运行中 Canvas 的 Camera/RenderTexture 离屏实渲染图，自动非空检查通过；查看并核对本轮 A04/D02（1600×900）、A08/F06（1280×720）。D02 在 50% 时间处显示 49%，符合 8%→90% 的配置。没有把隐藏窗口的系统截屏当作有效视觉证据，也未逐帧验收全部 46 种动画。
+- 性能范围：Editor 的 C04/D02 各 1000 次热采样记录当前线程分配 0 字节；Windows Player 的 100 个 D03 对象 × 60 次 Sample，记录当前线程累计 CPU 15.5408 ms、托管分配 0 字节。只是本次受控采样路径结果，不代表整体帧率、GPU、完整 UI 重建或移动性能。
+- Python：在 Windows 上重新运行打包 12 项、便携 ZIP 2 项测试及规范文档同步检查，全部通过。
+
+本轮 Runtime ZIP SHA-256：`e38f1569f6d00fa541092ecaca3a541eede81960bc717a9d996f446911102a84`。这是 Windows checkout 的精确测试输入，不要求与其他操作系统的换行转换后打包哈希相同。原始本地记录位于验证 checkout 的 `evidence/runtime-current.log`、`evidence/runtime-validation.txt`、`evidence/orchestration-current.log`、`evidence/build-result.json` 和 `validation-output/current-*/`；相邻隔离工程的 `evidence/` 保存导入、Play Mode 和源文件比对报告。
+
+未测试：Android/iOS（本机仅发现 Windows 构建支持）、实体触摸/真实系统切后台、安全区、移动 Profiler、第二台设备、其他 Unity 版本及可选 TMP define 路径。自动 EventSystem 输入与焦点/后台回调模拟不等同于真人触控或操作系统切换。没有将 Bounce 的业务聚合、列表重排、Sprite 帧、TMP 网格适配配方误写为已实现或已集成测试。
+
+未发现需修改 Runtime 的回归问题。本次仅提交验证记录；构建过程产生的临时场景/设置重序列化已从独立 clone 还原，原有资产、预设、Prefab 与 GUID/fileID 没有提交变更。未创建或替换 Release，未修改 Bounce-Garden。
+
 ## 2026-11-09：生产配方与 Skill 打包改进（0.4.0 后续源码）
 
 基于本库 `8ecfafa`，静态对照 Bounce-Garden `78c069dac18a3af087b3d04ac0ff78460d641a8c` 主工程实际 C# 实现，补生产配方及来源矩阵。新文档清楚区分现有 Runtime API 与需目标工程适配的聚合、列表、Sprite 帧和网格能力。独立前向使用审阅覆盖“同步加载后入场 + 帧动画 + 持续加分 + 滚动列表重排 + Skip”，并据此补清自管时钟必须逐帧 Sample、不能仍让 Play 自主推进。

@@ -5,7 +5,8 @@
 - 对照 Bounce-Garden 固定提交的实际动效实现，补齐生产编排配方与来源矩阵：阶段/跳过/取消、表现时钟、高频合并、稳定 ID 列表、Sprite 帧、顶点形变、空闲教学与坐标映射。
 - 现有 Runtime、46 个 Prefab/预设及 GUID/fileID 均未改动；新增内容是 Skill 指南，不是新增运行组件。
 - 打包检查相对 Markdown 文件链接，完整包与 Runtime 包都包含新参考。Python 回归共 14 项通过，文档同步、Skill 校验与两种包的重复构建检查通过，详见 docs/validation.md。
-- 本轮环境未运行 Unity、Player 或移动端；没有创建/覆盖 Release，也没有修改 Bounce-Garden。
+- 第一轮完成文档与打包后，已按要求在本机 Unity 6000.0.26f1 新建隔离副本补测：Editor 39 项、Runtime-only 实际 Play Mode 190 项、Windows 双分辨率各 46 案例/29 通用/25 展馆检查及 24 项交互检查全部通过；详情和未测范围见 docs/validation.md。
+- 本轮仅补验证记录，无需修改 Runtime。移动端、真实触控/系统切后台和可选 TMP 路径未复测；没有创建/覆盖 Release，也没有修改 Bounce-Garden。
 
 ## 0.4.0 正式版基线
 
