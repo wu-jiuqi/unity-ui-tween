@@ -2,7 +2,7 @@
 
 0.5.0-preview2 更新：全部 46 项的推荐参数及实际 Prefab 已统筹优化。新增 `MotionSettings.overshoot`（默认 1.1）控制 OutBack 超调；`inactiveColor`、`activeColor` 控制状态色。B02 和 SetPressed 松开默认使用柔和单次 OutBack。序列化的用户配置不会被自动替换，迁移范围见 [统一选型](motion-system.md)。
 
-版本 0.3.0。基线为 Unity 6000.0.26f1、UGUI 2.0.0、DOTween 免费版 1.3.045、Built-in 渲染管线。实际验证结果见随发布包提供的验收记录；版本信息不代表所有平台与管线均已验证。
+当前复查基线为0.6.0-preview2，依赖基线为 Unity 6000.0.26f1、UGUI 2.0.0、DOTween 免费版 1.3.045、Built-in 渲染管线。上文0.5.0-preview2是参数迁移记录，不是当前包版本。实际验证结果见随发布包提供的验收记录；版本信息不代表所有平台与管线均已验证。本次源码复用补充仍待验收，不沿用旧发布记录替新改动背书。
 
 ## 三种接入方式
 
@@ -12,7 +12,13 @@
 
 Skill 的完整资产位于 `assets/TweenGallery/`，导入后对应 Unity 项目的 `Assets/TweenGallery/`；内部 Runtime、Shaders、Resources、Prefabs、Presets、GeneratedArt、Gallery、Scenes 等目录保持原相对结构。示例依赖字体和图形，复制时保留 `.meta` 文件；只为现有 UI 接入效果时可选择 Runtime、catalog、相应预设和必要 Shader。
 
-先检查目标项目已有 DOTween 版本，避免导入第二份插件。模板 unitypackage 和 Skill 资源只包含 TweenGallery，目标项目需自行具备 DOTween 免费版；完整源工程包含已核对的原版依赖。包内模板不构成替换现有依赖的授权。若有同名脚本或不同版本的 TweenGallery，先在备份或分支中核对差异。数字和文字绑定使用 `UnityEngine.UI.Text`；TMP 需要增加适配层，不能直接把 TMP_Text 填入 Text 字段。
+先检查目标项目已有 DOTween 版本，避免导入第二份插件。模板 unitypackage 和 Skill 资源只包含 TweenGallery，目标项目需自行具备 DOTween 免费版；完整源工程包含已核对的原版依赖。包内模板不构成替换现有依赖的授权。若有同名脚本或不同版本的 TweenGallery，先在备份或分支中核对差异。MotionBindings的数字和文字字段使用 `UnityEngine.UI.Text`，不能直接把 TMP_Text 填入 Text 字段。已有可选 `Assets/TweenGallery/Optional/TMP/TmpMotionAdapter.cs`，提供整数、整数百分比及保留原字符串的Reveal；不必重复实现这些适配。
+
+TMP接入先读同目录README：确认已有兼容TMP/DOTween，再按目标平台启用`TWEEN_GALLERY_TMP`；使用asmdef的工程显式引用所需程序集。调用Bind后选择PlayInteger、PlayPercent或Reveal；文本/业务数值变更前先停止旧播放，数值终态用SetBusinessInteger提交。它不提供逐字顶点波浪；Loading式TMP网格变形仍需宿主维护原排版、材质子网格和顶点基线。T01整段变换可用独立TMP包装层；T02–T06分字/顶点的边界见[文字配方](text-logo-recipes.md)，不要为了波浪每帧substring或重建布局。
+
+## 先选对驱动入口
+
+当前展馆57个选项不等于57个MotionPlayer编号：46个基础目录效果使用MotionPlayer；T01–T07使用文字/Logo/滚动独立驱动，P01使用MotionPageSequence，P02使用MotionResponsiveLayout，G01/G02使用各自交互驱动。BX配方、MotionSpriteSequence、MotionConfettiSequence、MotionSoundTimeline与租约/播放条件是额外复用能力，不机械加入57计数。布局P02不是时间轴，G类不是自动时间轴，不能将它们传给MotionPlayer.Play。按[扩展验收](acceptance.md)检查实际使用的驱动，不以46个基础效果通过替代全部能力验收。
 
 ## 最小 A04 接入
 

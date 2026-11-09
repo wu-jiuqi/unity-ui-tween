@@ -11,7 +11,7 @@ namespace TweenGallery
         public TextMotionKind kind;
         public float duration=.55f,stagger=.07f,height=22,strength=1;
         Vector2[] positions;Vector3[] scales;Quaternion[] rotations;float[] alpha;
-        public override float TotalDuration=>Mathf.Max(.05f,duration)+(kind==TextMotionKind.Reveal?0:Mathf.Max(0,stagger)*Mathf.Max(0,visuals.Length-1));
+        public override float TotalDuration=>SafeDuration(duration)+(kind==TextMotionKind.Reveal?0:Mathf.Max(0,FiniteOr(stagger,0))*Mathf.Max(0,visuals.Length-1));
         protected override void Capture()
         {
             if(visuals==null||visuals.Length==0)throw new InvalidOperationException("Bind independent text or glyph visuals.");
@@ -30,7 +30,7 @@ namespace TweenGallery
             float seconds=p*TotalDuration,amount=Mathf.Clamp(strength,0,2);
             for(int i=0;i<visuals.Length;i++)
             {
-                if(visuals[i]==null)continue;float u=Mathf.Clamp01((seconds-i*Mathf.Max(0,stagger))/Mathf.Max(.05f,duration));
+                if(visuals[i]==null)continue;float u=Mathf.Clamp01((seconds-i*Mathf.Max(0,FiniteOr(stagger,0)))/SafeDuration(duration));
                 Vector2 offset=Vector2.zero;Vector3 scale=Vector3.one;float angle=0;
                 if(kind==TextMotionKind.Reveal){if(Group(i)!=null)Group(i).alpha=p>=(i+1f)/visuals.Length?alpha[i]:0;}
                 else if(u>0&&u<1)

@@ -1,20 +1,42 @@
-﻿$ErrorActionPreference = 'Stop'
+﻿param([switch]$ValidateOnly, [string]$Python = 'python')
+$ErrorActionPreference = 'Stop'
 $project = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $version = (Get-Content -LiteralPath (Join-Path $project 'VERSION') -Raw).Trim()
-$dist = Join-Path $project 'dist'
-$staging = Join-Path $project ('packaging-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
-New-Item -ItemType Directory -Path $dist,$staging -Force | Out-Null
 $build = Join-Path $project 'Builds\Windows'
-foreach ($required in @('UIMotionGallery.exe','UnityPlayer.dll','UIMotionGallery_Data','MonoBleedingEdge')) {
-    if (-not (Test-Path -LiteralPath (Join-Path $build $required))) { throw "Incomplete Windows build: $required" }
+foreach ($required in @('UIMotionGallery.exe','UnityPlayer.dll')) {
+    if (-not (Test-Path -LiteralPath (Join-Path $build $required) -PathType Leaf)) { throw "Incomplete Windows build: $required" }
 }
+foreach ($required in @('UIMotionGallery_Data','MonoBleedingEdge')) {
+    if (-not (Test-Path -LiteralPath (Join-Path $build $required) -PathType Container)) { throw "Incomplete Windows build: $required" }
+}
+# BuildWindows writes the canonical report; ignored root BUILD_INFO.json may be stale.
+# This report records build results, not proof of source/binary identity or a Git commit.
+$buildReport = Join-Path $project 'evidence\build-result.json'
+if (-not (Test-Path -LiteralPath $buildReport -PathType Leaf)) {
+    throw 'Missing build report: run scripts/build.ps1 or the Unity Build Windows menu first.'
+}
+try { $result = Get-Content -LiteralPath $buildReport -Raw -Encoding utf8 | ConvertFrom-Json }
+catch { throw 'Invalid build report JSON: evidence/build-result.json' }
+if ($result.result -cne 'Succeeded' -or $null -eq $result.errors -or $result.errors -isnot [ValueType] -or $result.errors -is [bool] -or $result.errors -ne 0) {
+    throw 'Build report does not describe a successful build with zero errors.'
+}
+if ($result.version -cne $version -or $result.unity -isnot [string] -or [string]::IsNullOrWhiteSpace($result.unity)) {
+    throw 'Build report version does not match VERSION, or Unity version is missing. Rebuild before packaging.'
+}
+if ($ValidateOnly) {
+    Write-Output "Package prerequisites valid: version $version, Unity $($result.unity)"
+    return
+}
+$dist = Join-Path $project 'dist'
+$staging = Join-Path $project ('packaging-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $dist,$staging -Force | Out-Null
 $win = Join-Path $staging 'Windows'
 New-Item -ItemType Directory -Path $win -Force | Out-Null
 Copy-Item -Path (Join-Path $build '*') -Destination $win -Recurse
 Copy-Item -LiteralPath (Join-Path $project 'ThirdPartyLicenses') -Destination $win -Recurse
 Copy-Item -LiteralPath (Join-Path $project 'docs') -Destination $win -Recurse
 Copy-Item -LiteralPath (Join-Path $project 'VERSION') -Destination $win
-Copy-Item -LiteralPath (Join-Path $project 'BUILD_INFO.json') -Destination $win
+Copy-Item -LiteralPath $buildReport -Destination (Join-Path $win 'BUILD_INFO.json')
 @'
 Unity UI 动效展馆
 
@@ -27,22 +49,23 @@ Unity UI 动效展馆
 同一分类的 T01–T07 提供文字弹跳、Logo掉落果冻、逐字颤动、打字机、加载波浪和滚动提示；可拖动时间轴与暂停续播。
 按 Escape 退出。详细使用方法与实际验证范围见 docs 文件夹。
 '@ | Set-Content -LiteralPath (Join-Path $win '请先阅读.txt') -Encoding utf8
-& python -X utf8 (Join-Path $PSScriptRoot 'portable_zip.py') $win (Join-Path $dist "UnityTweenGallery-$version-Windows-x64.zip") --force
+& $Python -X utf8 (Join-Path $PSScriptRoot 'portable_zip.py') $win (Join-Path $dist "UnityTweenGallery-$version-Windows-x64.zip") --force
 if ($LASTEXITCODE -ne 0) { throw 'Windows ZIP verification failed' }
 
 $skillZip = Join-Path $dist "unity-ui-tween-$version.zip"
-& python -X utf8 (Join-Path $PSScriptRoot 'package_skill.py') --output $skillZip --force
+& $Python -X utf8 (Join-Path $PSScriptRoot 'package_skill.py') --output $skillZip --force
 if ($LASTEXITCODE -ne 0) { throw 'Skill ZIP verification failed' }
-& python -X utf8 (Join-Path $PSScriptRoot 'package_skill.py') --profile runtime --output (Join-Path $dist "unity-ui-tween-$version-runtime.zip") --force
+& $Python -X utf8 (Join-Path $PSScriptRoot 'package_skill.py') --profile runtime --output (Join-Path $dist "unity-ui-tween-$version-runtime.zip") --force
 if ($LASTEXITCODE -ne 0) { throw 'Runtime Skill ZIP verification failed' }
 $skillStage = Join-Path $staging 'SkillPackage'
 Expand-Archive -LiteralPath $skillZip -DestinationPath $skillStage
 
 $source = Join-Path $staging 'UnityTweenGallery'
 New-Item -ItemType Directory -Path $source -Force | Out-Null
-foreach ($name in @('Assets','ArtSource','Packages','ProjectSettings','docs','ThirdPartyLicenses','README.md','VERSION','BUILD_INFO.json','.gitignore','.gitattributes','ARCHITECTURE.md','PROGRESS.md')) {
+foreach ($name in @('Assets','ArtSource','Packages','ProjectSettings','docs','ThirdPartyLicenses','README.md','VERSION','.gitignore','.gitattributes','ARCHITECTURE.md','PROGRESS.md')) {
     Copy-Item -LiteralPath (Join-Path $project $name) -Destination $source -Recurse
 }
+Copy-Item -LiteralPath $buildReport -Destination (Join-Path $source 'BUILD_INFO.json')
 # Copy authored scripts only; Python caches vary by interpreter and are not source.
 $scriptDestination = Join-Path $source 'scripts'
 New-Item -ItemType Directory -Path $scriptDestination -Force | Out-Null
@@ -56,7 +79,7 @@ Get-ChildItem -LiteralPath $PSScriptRoot -File -Recurse | Where-Object {
 }
 New-Item -ItemType Directory -Path (Join-Path $source 'Skill') -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $skillStage 'unity-ui-tween') -Destination (Join-Path $source 'Skill') -Recurse
-& python -X utf8 (Join-Path $PSScriptRoot 'portable_zip.py') $source (Join-Path $dist "UnityTweenGallery-$version-Source.zip") --include-root --force
+& $Python -X utf8 (Join-Path $PSScriptRoot 'portable_zip.py') $source (Join-Path $dist "UnityTweenGallery-$version-Source.zip") --include-root --force
 if ($LASTEXITCODE -ne 0) { throw 'Source ZIP verification failed' }
 $hashes = Get-ChildItem -LiteralPath $dist -File | Where-Object { $_.Extension -in '.zip','.unitypackage' -and $_.Name.Contains($version) } | ForEach-Object {
     $hash = Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256

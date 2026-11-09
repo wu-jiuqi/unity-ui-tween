@@ -8,7 +8,7 @@ namespace TweenGallery
         public RectTransform visual,viewport;
         public float duration=6,padding=12;
         Vector2 position;
-        public override float TotalDuration=>Mathf.Max(.05f,duration);
+        public override float TotalDuration=>SafeDuration(duration);
         protected override void Capture(){if(visual==null||viewport==null||visual.parent!=viewport||visual.anchorMin!=Vector2.one*.5f||visual.anchorMax!=Vector2.one*.5f||visual.pivot!=Vector2.one*.5f)throw new InvalidOperationException("Marquee requires a centered visual directly inside its clipped viewport.");position=visual.anchoredPosition;}
         protected override void Evaluate(float p)
         {

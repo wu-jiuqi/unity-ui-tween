@@ -1,3 +1,7 @@
+# Task2 v0.6.0-preview3
+
+The accepted task2 fixes are prepared for release from codex/button-style-skill-v050, based on 20931a5 (v0.6.0-preview2). See docs/task2-v060-review.md for code/Skill changes, acceptance validation and untested scope. Release assets carry RELEASE_INFO.json with the exact published commit and final build/test evidence. Older version records below are historical.
+
 # 当前进度
 
 - 0.6.0-preview2：整屏参考→资源拆分→Unity拼装，8份新PNG与真实字体字重，艺术标题/动态文字分开；修复失效透明底板的验收。扫描291脚本、复核34个UI候选，补齐T01–T07、Sprite图帧和彩纸/星屑，主目录57项；强化Skill的美术流程、文字/Logo接线和项目类型审计。

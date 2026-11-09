@@ -6,7 +6,7 @@ namespace TweenGallery
     public sealed class MotionJellyGraphic : BaseMeshEffect
     {
         float deformation;
-        public void SetDeformation(float value){if(Mathf.Approximately(deformation,value))return;deformation=value;if(graphic!=null)graphic.SetVerticesDirty();}
+        public void SetDeformation(float value){if(float.IsNaN(value)||float.IsInfinity(value))return;if(Mathf.Approximately(deformation,value))return;deformation=value;if(graphic!=null)graphic.SetVerticesDirty();}
         public override void ModifyMesh(VertexHelper mesh)
         {
             if(!IsActive()||Mathf.Abs(deformation)<.001f)return;

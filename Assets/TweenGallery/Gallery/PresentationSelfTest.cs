@@ -48,6 +48,8 @@ namespace TweenGallery
             Check(Near(sequence.Progress,.5f)&&!sequence.IsPlaying,"Gallery pause control resumes from a stage seek and then pauses");
             sequence.Play();sequence.Step(sequence.duration*2);sequence.Step(1);
             Check(completed==1&&!sequence.IsPlaying,"Actual playback emits visual completion once");
+            sequence.Seek(.5f);sequence.Resume();sequence.Step(sequence.duration*2);
+            Check(completed==1,"Page resumed replay does not duplicate visual completion");
             sequence.reducedMotion=true;sequence.Play();Check(completed==2&&Near(sequence.Progress,1)&&!sequence.IsPlaying,"Reduced motion reaches the final pose and completes once");sequence.reducedMotion=false;
             Check(page.PreviewActionCount==0,"Sampling and playback do not invoke action or business callbacks");
             NativeClick(page.GetComponentsInChildren<Button>().First(b=>b.name=="Continue"));

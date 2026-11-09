@@ -9,7 +9,7 @@ namespace TweenGallery
         public RectTransform[] items=Array.Empty<RectTransform>();public CanvasGroup[] groups=Array.Empty<CanvasGroup>();
         public ConfettiMotionKind kind;public float duration=2.4f,travel=360,spread=140,strength=1;public int seed=7;
         Vector2[] positions;Vector3[] scales;Quaternion[] rotations;float[] alpha;
-        public override float TotalDuration=>Mathf.Max(.05f,duration);
+        public override float TotalDuration=>SafeDuration(duration);
         protected override void Capture()
         {
             if(items==null||items.Length==0||groups==null||groups.Length!=items.Length)throw new InvalidOperationException("Confetti needs preallocated art visuals and matching groups.");

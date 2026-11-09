@@ -33,14 +33,14 @@ namespace TweenGallery
         }
         public void Play(){Ensure();unchecked{PlayVersion++;}completed=false;Progress=0;IsPlaying=true;if(reducedMotion)Finish();else SampleVisual(0);}
         public void Pause(){IsPlaying=false;}
-        public void Resume(){Ensure();if(Progress<1){IsPlaying=true;completed=false;}}
-        public void Seek(float normalized){Ensure();if(!Finite(normalized))return;IsPlaying=false;Progress=Mathf.Clamp01(normalized);completed=Progress>=1;SampleVisual(Progress);}
+        public void Resume(){Ensure();if(Progress<1){IsPlaying=true;}}
+        public void Seek(float normalized){Ensure();if(!Finite(normalized))return;IsPlaying=false;Progress=Mathf.Clamp01(normalized);SampleVisual(Progress);}
         public void Sample(float normalized){Seek(normalized);}
         public void Step(float seconds)
         {
             if(!IsPlaying||!focused||paused||!Finite(seconds)||seconds<=0)return;
             if(reducedMotion){Finish();return;}
-            Progress=Mathf.Clamp01(Progress+seconds*Mathf.Clamp(speed,.05f,4)/Mathf.Max(.05f,duration));SampleVisual(Progress);if(Progress>=1)Finish();
+            Progress=Mathf.Clamp01(Progress+seconds*Mathf.Clamp(FiniteOr(speed,1),.05f,4)/SafeDuration);SampleVisual(Progress);if(Progress>=1)Finish();
         }
         void Update(){Step(unscaledTime?Time.unscaledDeltaTime:Time.deltaTime);}
         void Finish(){Progress=1;SampleVisual(1);IsPlaying=false;if(completed)return;completed=true;onVisualComplete.Invoke();}
@@ -51,13 +51,16 @@ namespace TweenGallery
             Set(backdrop,groupAlpha[0]*Smooth(Phase(t,0,.18f)));Set(panelGroup,groupAlpha[1]*Smooth(enter));Set(emblemGroup,groupAlpha[2]*Smooth(hero));Set(rewardsGroup,groupAlpha[3]*Smooth(reward));Set(actionsGroup,groupAlpha[4]*Smooth(actions));
             panel.localScale=panelScale*Mathf.LerpUnclamped(Mathf.Clamp(1-.06f*strength,.5f,1),1,Back(enter,overshoot));panel.anchoredPosition=panelPosition+Vector2.down*travel*.5f*strength*(1-Smooth(enter));
             emblem.localScale=emblemScale*Mathf.LerpUnclamped(Mathf.Clamp(1-.18f*strength,.3f,1),1,Back(hero,overshoot));emblem.anchoredPosition=emblemPosition+Vector2.left*travel*strength*(1-Smooth(hero));
-            float delay=Mathf.Clamp(stagger/Mathf.Max(.05f,duration),0,.2f);
+            float delay=Mathf.Clamp(FiniteOr(stagger,0)/SafeDuration,0,.2f);
             if(rewardA!=null)rewardA.anchoredPosition=rewardAPosition+Vector2.down*travel*.75f*strength*(1-Smooth(Phase(t,.45f,.72f)));
             if(rewardB!=null)rewardB.anchoredPosition=rewardBPosition+Vector2.right*travel*.9f*strength*(1-Smooth(Phase(t,.45f+delay,.74f+delay)));
             if(actionsGroup!=null){actionsGroup.interactable=originalInteractable&&t>=.999f;actionsGroup.blocksRaycasts=originalRaycasts&&t>=.999f;}
             for(int i=0;i<coins.Length;i++)
             {
-                var coin=coins[i];if(coin==null)continue;float local=Phase(t,.48f+i*.045f,.78f+i*.045f);
+                var coin=coins[i];if(coin==null)continue;
+                // Keep every coin within the owned clock, preserving the original small-array cadence.
+                float spacing=coins.Length>1?Mathf.Min(.045f,.22f/(coins.Length-1)):0;
+                float local=t>=1?1:Phase(t,.48f+i*spacing,.78f+i*spacing);
                 Vector2 end=coinPositions[i];if(walletTarget!=null&&coin.parent is RectTransform parent)
                 {
                     Vector2 anchor=coin.anchorMin+Vector2.Scale(coin.anchorMax-coin.anchorMin,coin.pivot);
@@ -85,6 +88,9 @@ namespace TweenGallery
         static float Phase(float t,float a,float b)=>Mathf.Clamp01((t-a)/(b-a));
         static float Smooth(float t)=>t*t*(3-2*t);
         static float Back(float t,float amount){float x=t-1;return 1+(Mathf.Clamp(amount,0,3)+1)*x*x*x+Mathf.Clamp(amount,0,3)*x*x;}
+        // Only Play starts a new completion round; seeking and resuming retain its latch.
+        float SafeDuration=>Mathf.Max(.05f,FiniteOr(duration,.05f));
+        static float FiniteOr(float value,float fallback)=>Finite(value)?value:fallback;
         static bool Finite(float n)=>!float.IsNaN(n)&&!float.IsInfinity(n);
     }
 }

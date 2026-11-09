@@ -1,6 +1,6 @@
 # Release 使用与发布指南
 
-开发候选 **0.5.0-preview3** 为本地交付，统一主展馆自动播放、真实操作、公共素材及配置导出。完整 Skill、Runtime Skill 和 Windows 展馆可从本地 dist 使用；尚未发布该版本 Release。下方 0.4.0 表格保留为已发布稳定版说明。
+Development release: **v0.6.0-preview3**, containing the accepted task2 fixes based on 20931a5 / v0.6.0-preview2. See [acceptance scope](task2-v060-review.md). Release assets include the exact published commit in RELEASE_INFO.json. Existing preview2 and stable v0.4.0 assets remain unchanged; the v0.4.0 table below is historical.
 
 版本 0.4.0，以正式 Release 分发。下列为配套打包文件，实际可下载资产以 GitHub Release 为准。
 

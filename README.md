@@ -1,6 +1,6 @@
 # Unity UI Motion Gallery
 
-一套以 **Unity UGUI + DOTween 免费版** 实现的 UI 动效库：46个基础预设/预制体、可运行Windows展馆、交互/页面/文字配方、通用Runtime、Codex Skill和中文文档。当前开发版 **0.6.0-preview2**；已发布稳定版为 **0.4.0**。
+一套以 **Unity UGUI + DOTween 免费版** 实现的 UI 动效库：46个基础预设/预制体、可运行Windows展馆、交互/页面/文字配方、通用Runtime、Codex Skill和中文文档。当前开发版 **0.6.0-preview3**；已发布稳定版为 **0.4.0**。
 
 展馆统一使用暖奶油、薄荷、淡紫与暖金的柔和玩具质感 UI，并以同一份 MotionPlayer 播放实际交付的模板。A01–F06 固定编号覆盖出现消失、交互反馈、页面转场、奖励数值、循环和编排。
 

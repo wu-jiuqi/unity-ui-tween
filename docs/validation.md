@@ -1,5 +1,10 @@
 # 验证记录
 
+## 0.6 task2 local review
+
+2026-11-09: see [current acceptance and evidence](task2-v060-review.md). Base 20931a5, local changes only. Editor 138/39/112/266/44 checks plus orchestration passed; Windows at both resolutions: 107/47/183 checks, 46 cases +29 checks, 25 enhancement checks. Build succeeded with zero errors and warnings. Historical records below are not new test results.
+
+
 ## 0.6.0-preview2 整屏美术、文字与项目类型复查
 
 2026-11-09，Unity6000.0.26f1 / Windows x64 Mono最终构建成功，0错误、0警告。按两张image_gen整图拆成8份PNG，固定艺术字与原生动态文字分开，实际Regular/Medium/Bold字重替代合成粗体；拒收中央透明的失败底板。主目录57项，原46项模板同步使用清晰字色与字体，Prefab GUID/既有fileID保留。

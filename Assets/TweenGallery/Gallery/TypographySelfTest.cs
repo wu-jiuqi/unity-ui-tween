@@ -27,6 +27,7 @@ namespace TweenGallery
                 Check(view.GetComponentsInChildren<RectMask2D>().Any(m=>m.name=="Motion viewport"),id+" moving art is clipped away from application headings and controls");
                 clip.Seek(0);clip.Seek(.5f);clip.Seek(1);Check(completions==0&&!clip.IsPlaying,id+" timeline sampling is silent");
                 clip.Play();clip.Step(clip.TotalDuration*2);clip.Step(1);Check(completions==1&&Near(clip.Progress,1),id+" playback completes once");
+                clip.Seek(.5f);clip.Resume();clip.Step(clip.TotalDuration*2);Check(completions==1,id+" resumed replay retains completion latch");
                 clip.Seek(.3f);gallery.TogglePause();clip.Step(clip.TotalDuration*.1f);gallery.TogglePause();Check(Near(clip.Progress,.4f)&&!clip.IsPlaying,id+" pause control resumes the sampled clock");
                 clip.reducedMotion=true;clip.Play();Check(completions==2&&Near(clip.Progress,1)&&!clip.IsPlaying,id+" reduced motion reaches necessary final state");clip.reducedMotion=false;
                 clip.Restore();var anchors=view.GetComponentsInChildren<RectTransform>().Where(r=>r.name.StartsWith("Fixed slot")||r.name=="Fixed glyph layout").ToArray();var positions=anchors.Select(r=>r.anchoredPosition).ToArray();
@@ -56,14 +57,20 @@ namespace TweenGallery
                     string framesFolder=Path.Combine(folder,id+"-frames");Directory.CreateDirectory(framesFolder);int count=Mathf.CeilToInt(clip.TotalDuration*24);
                     for(int frame=0;frame<=count;frame++){clip.Seek(frame/(float)count);yield return null;LibraryReview.CaptureCanvas(gallery.GetComponentInChildren<Canvas>(),Path.Combine(framesFolder,frame.ToString("D4")+".png"));}
                 }
-                clip.Restore();view.gameObject.SetActive(false);
-                Check(!clip.IsPlaying,id+" disable cancels owned playback");
+                clip.Play();clip.Step(clip.TotalDuration*.3f);view.gameObject.SetActive(false);
+                Check(!clip.IsPlaying&&Near(clip.Progress,0),id+" actual mid-play disable restores the owned clock");
             }
             var root=new GameObject("Frame sequence validation",typeof(RectTransform),typeof(Image));var image=root.GetComponent<Image>();image.sprite=GalleryPageArt.Icon(0);var frames=root.AddComponent<MotionSpriteSequence>();frames.image=image;frames.frames=new[]{GalleryPageArt.Icon(1),GalleryPageArt.Icon(2),GalleryPageArt.Icon(3)};frames.framesPerSecond=10;frames.CaptureBaseline();frames.Seek(.5f);
-            Check(frames.CurrentFrame==1&&image.sprite==frames.frames[1]&&Near(frames.TotalDuration,.3f),"Sprite frame clock samples the expected discrete frame");frames.Seek(1);Check(frames.CurrentFrame==2,"Sprite final sample stays on last frame");frames.Restore();Check(image.sprite==GalleryPageArt.Icon(0),"Sprite sequence restores original art");Destroy(root);
+            Check(frames.CurrentFrame==1&&image.sprite==frames.frames[1]&&Near(frames.TotalDuration,.3f),"Sprite frame clock samples the expected discrete frame");frames.Seek(1);Check(frames.CurrentFrame==2,"Sprite final sample stays on last frame");frames.Restore();Check(image.sprite==GalleryPageArt.Icon(0),"Sprite sequence restores original art");
+            frames.frameDurations=new[]{1.8f,.55f,4.35f};frames.CaptureBaseline();frames.Seek(1.8f/6.7f);
+            Check(frames.CurrentFrame==1&&Near(frames.TotalDuration,6.7f),"Unequal sprite dwells preserve source cadence");
+            frames.Play();frames.Step(2);root.SetActive(false);
+            Check(!frames.IsPlaying&&image.sprite==GalleryPageArt.Icon(0),"Actual mid-play sprite disable restores original art");Destroy(root);
             var confettiRoot=new GameObject("Confetti validation",typeof(RectTransform));var confetti=confettiRoot.AddComponent<MotionConfettiSequence>();var part=new GameObject("Preallocated paper",typeof(RectTransform),typeof(CanvasGroup));part.transform.SetParent(confettiRoot.transform,false);confetti.items=new[]{part.GetComponent<RectTransform>()};confetti.groups=new[]{part.GetComponent<CanvasGroup>()};confetti.items[0].anchoredPosition=new Vector2(4,30);confetti.CaptureBaseline();
             foreach(var kind in new[]{ConfettiMotionKind.Falling,ConfettiMotionKind.Burst}){confetti.kind=kind;confetti.Seek(.5f);var pose=confetti.items[0].anchoredPosition;confetti.Seek(.2f);confetti.Seek(.5f);Check(Vector2.Distance(pose,confetti.items[0].anchoredPosition)<.001f,"Confetti deterministic sampling: "+kind);confetti.Seek(1);Check(Near(confetti.groups[0].alpha,0),"Confetti final frame clears decorative art: "+kind);}
-            confetti.Restore();Check(Vector2.Distance(confetti.items[0].anchoredPosition,new Vector2(4,30))<.001f&&Near(confetti.groups[0].alpha,1),"Confetti restores original position and visibility");Destroy(confettiRoot);
+            confetti.Restore();Check(Vector2.Distance(confetti.items[0].anchoredPosition,new Vector2(4,30))<.001f&&Near(confetti.groups[0].alpha,1),"Confetti restores original position and visibility");
+            confetti.Play();confetti.Step(.6f);confettiRoot.SetActive(false);
+            Check(!confetti.IsPlaying&&Vector2.Distance(confetti.items[0].anchoredPosition,new Vector2(4,30))<.001f&&Near(confetti.groups[0].alpha,1),"Actual mid-play confetti disable restores original pose");Destroy(confettiRoot);
             gallery.SelectEffect("P01");gallery.SeekPreview(1);yield return null;var page=gallery.PagePreview;
             Check(page.GetComponentsInChildren<Image>().Any(i=>i.sprite==GalleryCompositionArt.AchievementTitle),"Page uses separately generated crafted title art");
             Check(page.GetComponentsInChildren<Text>().Any(t=>t.name=="Reward amount"&&t.text=="+120"),"Dynamic reward amount stays native text");
