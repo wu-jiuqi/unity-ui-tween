@@ -23,6 +23,7 @@ Unity UI 动效展馆
 不需要安装 Unity；展馆运行无需网络。
 左侧选择效果，右上切换自动播放/真实操作，按钮可直接切换公共造型和操作变体。
 拖拽回位与连续接续位于左侧“操作”分类；右侧调参并复制含素材与驱动方式的配置。
+右侧克制/标准/庆祝统一调节已有与新效果；“编排”分类的 P01 为整页时间轴，P02 为短屏/长屏/横屏响应式对照。
 按 Escape 退出。详细使用方法与实际验证范围见 docs 文件夹。
 '@ | Set-Content -LiteralPath (Join-Path $win '请先阅读.txt') -Encoding utf8
 & python -X utf8 (Join-Path $PSScriptRoot 'portable_zip.py') $win (Join-Path $dist "UnityTweenGallery-$version-Windows-x64.zip") --force
@@ -38,7 +39,7 @@ Expand-Archive -LiteralPath $skillZip -DestinationPath $skillStage
 
 $source = Join-Path $staging 'UnityTweenGallery'
 New-Item -ItemType Directory -Path $source -Force | Out-Null
-foreach ($name in @('Assets','Packages','ProjectSettings','docs','ThirdPartyLicenses','README.md','VERSION','BUILD_INFO.json','.gitignore','.gitattributes','ARCHITECTURE.md','PROGRESS.md')) {
+foreach ($name in @('Assets','ArtSource','Packages','ProjectSettings','docs','ThirdPartyLicenses','README.md','VERSION','BUILD_INFO.json','.gitignore','.gitattributes','ARCHITECTURE.md','PROGRESS.md')) {
     Copy-Item -LiteralPath (Join-Path $project $name) -Destination $source -Recurse
 }
 # Copy authored scripts only; Python caches vary by interpreter and are not source.

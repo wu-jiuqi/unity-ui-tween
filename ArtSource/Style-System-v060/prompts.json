@@ -1,0 +1,18 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "Approved Skill-Next-Concepts-v1 boards",
+  "assets": [
+    {
+      "key": "cream-panel",
+      "prompt": "Production game UI raster asset, not mockup. Use the supplied approved prototype images only as style references. ONE square blank cream panel surface, orthographic straight-on, soft toy painted 3D material, subtle ivory inner gradient, softly rounded corners, delicate warm cream/honey-gold double beveled rim, tiny restrained shadow. For Unity nine-slicing: all visible border/corner detail must fit within 90 pixels from each outer edge of a 1024x1024 canvas; panel extends from x=18 to1006 and y=18 to1006; central 800x800 region flat warm cream, no objects or texture crossing it. Border straight on all sides except rounded corners. Truly transparent outside the silhouette. NO text, labels, icons, ribbons, flowers, paws, cats, diagrams, background scene, perspective, watermark, or colored glow. Match soft cream/mint/lavender/honey-gold prototypes; this asset is just the blank reusable panel. 1024x1024 square."
+    },
+    {
+      "key": "achievement-medal",
+      "prompt": "Production game UI transparent PNG asset based on the supplied approved page-choreography prototype's central achievement emblem. ONE original circular honey-gold achievement medallion with a plump mint two-leaf sprout embossed in center, soft lavender scalloped backing, small ivory/mint leaves on lower sides, modest lavender ribbon and one small gold star at bottom. Front-on orthographic softly painted 3D toy material, restrained soft shadows, consistent top-left warm light. Symmetrical clean silhouette, centered in square canvas with generous transparent margins, fills about76%. Should read clearly at 100 pixels. No words, letters, numbers, paw, cat, labels, reward cards or surrounding UI; no background or sparkly cloud. Cream garden palette, match prototype texture and gentle bevel. Truly transparent background, 1024x1024 square."
+    },
+    {
+      "key": "reward-icons",
+      "prompt": "Production game UI transparent PNG sprite atlas in approved cream garden soft painted 3D toy style, not a presentation board. EXACTLY four independent icons arranged on a 2-column by 2-row grid with equal cells and generous transparent margins. TOP LEFT: plump rounded honey-gold five-point star. TOP RIGHT: two soft mint-green sprout leaves on small smooth warm brown soil base. BOTTOM LEFT: rounded softly faceted pink/lavender jewel orb, delicate cream highlights. BOTTOM RIGHT: circular honey-gold coin with simple embossed star center, modest raised rim. Each icon centered within its own cell, occupying about70% of cell width/height, consistent orthographic front view and warm top-left light, soft tactile 3D material. Transparent entire background and inter-cell gaps, no scene, no grid lines, no text, letters, numerals, captions, panels, watermark, paw motifs, extra icons or decorative particles. 1024x1024 square RGBA atlas. Input images are art style references only."
+    }
+  ]
+}

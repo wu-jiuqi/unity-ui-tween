@@ -15,11 +15,13 @@
 
 ## JSON 驱动契约
 
+当前主目录共有50个选项：46个基础时间轴、G01/G02操作、P01/P02页面配方。P01/P02仍在主展馆“编排”分类。右侧克制/标准/庆祝应用到已有条目和页面配方，详见 motion-profiles.md；P01分层时间轴见 page-recipes.md，P02多尺寸交互见 responsive-layout.md。复制配置中的 styleProfile 保留档位来源，所有数值已生效，不重复乘档位。页面配方使用 schemaVersion=3、recipe 和明确 driver，effects 为空。
+
 时间轴仍使用 `effects[]` 中的真实 MotionCatalog 编号、MotionSettings；新增 `previewMode="timeline"` 与 `skinIndex`，原消费者可以忽略可选字段。
 
 真实操作使用 schemaVersion=2、previewMode="interaction"。不要只读取 effects[] 就当成时间轴：
 
-- `interaction.driver="MotionButtonFeedback"`：variant 是 ButtonMotionStyle，使用导出的 intensity、frequency、damping、reducedMotion、unscaledTime。duration=0 表示弹簧不承诺固定结束时长；accentDuration=.55 是图标/涟漪/扫光的一次装饰长度。
+- `interaction.driver="MotionButtonFeedback"`：variant 是 ButtonMotionStyle，使用导出的 intensity、frequency、damping、reducedMotion、unscaledTime。duration=0 表示弹簧不承诺固定结束时长；accentDuration 是图标/涟漪/扫光的一次装饰长度，标准档为 .55 秒。
 - `interaction.driver="MotionDragInput + MotionJellyDrag"`：用独立固定命中层和 visual，导出 dragRange、axisRange、maxDisplacement、stretch、maxRotation、frequency、damping。G01 的 effects[] 为空，不调用 MotionPlayer.Play("G01")。
 - driver=MotionPlayer、variant=ContinueTo：G02 的 effects[] 为空，按 duration、distance、leftScale、rightScale、tiltDegrees、ease 从稳定基线建立目标姿态，使用 ContinueTo 接续。减弱动效时直接应用目标姿态。
 - driver=MotionPlayer、variant=trigger 或 toggle：使用 effects[] 中的合法编号；toggle 由宿主状态决定方向，并在打断时从相反时间点接续。

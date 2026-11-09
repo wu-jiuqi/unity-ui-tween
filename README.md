@@ -1,6 +1,6 @@
 # Unity UI Motion Gallery
 
-一套以 **Unity UGUI + DOTween 免费版** 实现的 46 项 UI 动效：可运行 Windows 展馆、46 个预设与示例预制体、通用 Runtime、Codex Skill 和中文文档。当前开发版 **0.5.0-preview3**；已发布稳定版为 **0.4.0**。
+一套以 **Unity UGUI + DOTween 免费版** 实现的 46 项 UI 动效：可运行 Windows 展馆、46 个预设与示例预制体、通用 Runtime、Codex Skill 和中文文档。当前开发版 **0.6.0-preview1**；已发布稳定版为 **0.4.0**。
 
 展馆统一使用暖奶油、薄荷、淡紫与暖金的柔和玩具质感 UI，并以同一份 MotionPlayer 播放实际交付的模板。A01–F06 固定编号覆盖出现消失、交互反馈、页面转场、奖励数值、循环和编排。
 
@@ -18,6 +18,14 @@
 - [实际验证记录](docs/validation.md)：以日志和实测为准。
 - [发布使用指南](docs/release-guide.md)：完整解压、资产核对和已知范围。
 - [第三方许可](ThirdPartyLicenses/README.md)：DOTween 与中文字体说明。
+
+## 0.6.0 三档规则与页面配方
+
+按确认的三张原型，将克制/标准/庆祝接入原有46项与实时反馈；新增 P01“旅程达成”整页编排、P02“奖励选择”响应式交互，均在主展馆“编排”分类。主目录共50项，没有新增独立工坊入口。页面支持阶段采样、暂停续播与减弱动效；短屏正文滚动、底部操作固定，旋转保留选择与滚动位置。
+
+新生成的透明 PNG 面板、徽章和奖励图集已用于实际页面，按钮与花园插画沿用公共美术，没有 SVG 占位。文字为原生 UGUI Text。Skill 同步加入 [三档规则](docs/motion-profiles.md)、[整页接线](docs/page-recipes.md)、[响应式与首帧](docs/responsive-layout.md)；schemaVersion=3 明确页面驱动和实际参数，视觉预览不发放业务奖励。完整包含美术，Runtime 包只带组件与接入文档。新候选推送开发分支，不更改既有 Release。
+
+实际 Player 画面：[整页完成](docs/previews/v060/page-complete.png)、[三尺寸对照](docs/previews/v060/responsive-compare.png)、[横屏选择](docs/previews/v060/responsive-landscape.png)。PNG生成记录见 [美术来源](docs/art-generation-v060.md)，运行报告与限制见 [验证记录](docs/validation.md)。
 
 ## 0.5.0 全量动效优化
 

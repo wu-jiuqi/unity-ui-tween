@@ -64,6 +64,7 @@ namespace TweenGallery
                 else Application.Quit();
             }
             if (!IsReady) return;
+            if(UpdateRecipe())return;
             if (interactionMode && integratedPreview != null) { if(Time.unscaledTime>statusUntil)SetTextIfChanged(status,integratedPreview.Status); return; }
             if (players.Count == 0) return;
             SyncTimeline();
@@ -161,6 +162,7 @@ namespace TweenGallery
             status = Label(root, "准备完成", 341, 870, 870, 22, 12, Muted);
             Label(root, "v" + Application.version + "  ·  ESC 退出", 1262, 870, 300, 22, 11, Muted, TextAnchor.MiddleRight);
             MakeEasingPopup();
+            BuildStyleControls();
             GalleryTheme.Apply(canvasObject);
             RefreshList();
         }
@@ -242,7 +244,7 @@ namespace TweenGallery
             MotionDefinition next = FindDefinition(effectId);
             if (next == null) { Notice("找不到动效：" + effectId); return; }
             current = next; CurrentEffectId = effectId;
-            options = MotionSettings.FromDefinition(next);
+            options = StyledSettings(next);
             options.ease = "Preset";
             comparison = false;
             ConfigureWorkbenchSelection(effectId);
@@ -268,10 +270,12 @@ namespace TweenGallery
 
         void BuildDemos(string[] ids)
         {
+            PrepareRecipeRebuild();
             foreach (var player in players) if (player != null) player.StopAndRestore();
             players.Clear();
             foreach (Transform child in demoHost) { child.gameObject.SetActive(false); Destroy(child.gameObject); }
             integratedPreview=null;
+            if(IsRecipe&&!comparison){BuildRecipe();return;}
             if (interactionMode && !comparison) { BuildIntegratedPreview(); return; }
             float gap = ids.Length > 1 ? 12 : 0;
             float width = (836 - (ids.Length - 1) * gap) / ids.Length;
@@ -306,7 +310,7 @@ namespace TweenGallery
         {
             if (!IsReady || current == null) return;
             var valid = new List<string>();
-            foreach (string id in ids) if (FindDefinition(id) != null && !id.StartsWith("G") && valid.Count < 3) valid.Add(id);
+            foreach (string id in ids) if (FindDefinition(id) != null && !id.StartsWith("G") && !id.StartsWith("P") && valid.Count < 3) valid.Add(id);
             if (valid.Count == 0) return;
             interactionMode=false;
             comparison = true;
@@ -343,6 +347,7 @@ namespace TweenGallery
         public void Replay()
         {
             if (options == null) return;
+            if(IsRecipe){BuildDemos(new[]{CurrentEffectId});if(pagePreview!=null&&!interactionMode)pagePreview.Sequence.Play();RefreshControlLabels();return;}
             if (interactionMode) { BuildDemos(new[]{CurrentEffectId}); RefreshControlLabels(); return; }
             paused = false;
             foreach (MotionPlayer player in players)
@@ -358,6 +363,7 @@ namespace TweenGallery
         public void TogglePause()
         {
             paused = !paused;
+            if(pagePreview!=null){paused=pagePreview.Sequence.IsPlaying;if(paused)pagePreview.Sequence.Pause();else pagePreview.Sequence.Resume();RefreshControlLabels();return;}
             foreach (MotionPlayer player in players) { if (paused) player.Pause(); else player.Resume(); }
             RefreshControlLabels();
         }
@@ -372,7 +378,7 @@ namespace TweenGallery
         void ResetParameters()
         {
             if (current == null) return;
-            options = MotionSettings.FromDefinition(current); options.ease = "Preset";
+            options = StyledSettings(current); options.ease = "Preset";
             SyncSliders(); RefreshControlLabels(); Replay();
             Notice("已恢复 " + current.id + " 的推荐参数");
         }
@@ -444,6 +450,7 @@ namespace TweenGallery
         public string CopyPrompt()
         {
             if (current == null || options == null) return "";
+            if(IsRecipe)return CopyRecipePrompt();
             if (interactionMode) return CopyInteractionPrompt();
             var output = new StringBuilder();
             if (comparison)
@@ -493,15 +500,18 @@ namespace TweenGallery
             public string previewMode = "timeline";
             public int skinIndex = -1;
             public InteractionConfiguration interaction;
+            public string styleProfile="Standard";
+            public RecipeConfiguration recipe;
         }
 
         public string ExportConfigurationJson()
         {
+            if(IsRecipe)return ExportRecipeJson();
             if (interactionMode) return ExportInteractionJson();
             var entries = new ConfigurationEntry[players.Count];
             for (int i = 0; i < entries.Length; i++)
                 entries[i] = new ConfigurationEntry { effectId = players[i].effectId, settings = players[i].settings.Clone() };
-            return JsonUtility.ToJson(new GalleryConfiguration { effects = entries, skinIndex=IsSkinApplicable?selectedSkin:-1 }, true);
+            return JsonUtility.ToJson(new GalleryConfiguration { effects = entries,styleProfile=styleKind.ToString(), skinIndex=IsSkinApplicable?selectedSkin:-1 }, true);
         }
 
         public string CopyConfigurationJson()
@@ -514,6 +524,7 @@ namespace TweenGallery
 
         public void SeekPreview(float normalizedTime)
         {
+            if(pagePreview!=null){pagePreview.Sequence.Seek(normalizedTime);paused=true;RefreshControlLabels();return;}
             if (interactionMode) return;
             if (float.IsNaN(normalizedTime) || float.IsInfinity(normalizedTime)) return;
             foreach (var player in players)
@@ -683,6 +694,7 @@ namespace TweenGallery
         {
             var rect = Rect(parent, name, x, y, width, height);
             var image = rect.gameObject.AddComponent<Image>(); image.color = color; image.raycastTarget = false;
+            if(soft&&name.EndsWith("panel",StringComparison.OrdinalIgnoreCase)){image.sprite=GalleryPageArt.Panel;image.type=Image.Type.Sliced;image.pixelsPerUnitMultiplier=1.75f;image.color=Color.white;return image;}
             if (soft) { image.sprite = rounded; image.type = Image.Type.Sliced; }
             return image;
         }

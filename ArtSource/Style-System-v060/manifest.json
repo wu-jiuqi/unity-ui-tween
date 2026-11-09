@@ -1,0 +1,33 @@
+{
+  "generator": "OpenAI image_gen",
+  "format": "transparent PNG; no SVG placeholders",
+  "assets": [
+    {
+      "path": "Assets/TweenGallery/Resources/StyleArt/achievement-medal.png",
+      "sha256": "e5755e43519365ac9b2312b7710069df956eba0969811b4943789a7b4de9be2b",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "Assets/TweenGallery/Resources/StyleArt/cream-panel.png",
+      "sha256": "4fa6645691fa67a75d117710f2fa3cb7f991b2bbb0c27073e996d3a068f05d46",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "Assets/TweenGallery/Resources/StyleArt/reward-icons.png",
+      "sha256": "846f9eeb7fc2c41a1b97b1fd9fc1cc9fdb0527d4f3f014ff7b50e1ae31c82001",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA"
+    }
+  ]
+}

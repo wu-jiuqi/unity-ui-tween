@@ -19,6 +19,7 @@ namespace TweenGallery
         public bool unscaledTime = true, reducedMotion;
         [Range(0, 2)] public float intensity = 1;
         public float frequency = 7, damping = .64f;
+        [Min(.05f)] public float accentDuration=.55f;
         public bool IsBusy { get; private set; }
         public bool IsSelected { get; private set; }
         public bool IsPressed => pointer != int.MinValue && inside && !dragged;
@@ -86,7 +87,7 @@ namespace TweenGallery
             else { press.Step(dt, frequency, damping); hover.Step(dt, frequency, .85f); chosen.Step(dt, frequency, .85f); }
             press.Settle(.0001f,.001f); hover.Settle(.0001f,.001f); chosen.Settle(.0001f,.001f);
             clock = Mathf.Repeat(clock + dt, 3600);
-            if (pulse >= 0) { pulse += dt / .55f; if (pulse >= 1) pulse = -1; }
+            if (pulse >= 0) { pulse += dt / Mathf.Max(.05f,accentDuration); if (pulse >= 1) pulse = -1; }
             Apply();
         }
         void Apply()

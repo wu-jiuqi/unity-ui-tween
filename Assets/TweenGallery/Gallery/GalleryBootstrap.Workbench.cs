@@ -11,7 +11,9 @@ namespace TweenGallery
         public static readonly string[] FeedbackNames={"柔软按压","果冻挤压","悬浮抬升","图标回弹","点击涟漪","柔光扫过","选中反馈","加载反馈"};
         static readonly MotionDefinition[] interactiveDefinitions={
             new MotionDefinition{id="G01",name="拖拽与弹性回位",english="Drag and spring return",category="G",kind="真实操作",duration=.65f,strength=1,distance=55,description="按住物体拖动，松开后按当前速度弹性回位。",useCase="拖动反馈、弹性卡片",difference="固定命中区域与内部视觉分开，松开是弹簧回位。",dependencies="MotionDragInput + MotionJellyDrag；visual 是独立子层。"},
-            new MotionDefinition{id="G02",name="连续操作与姿态接续",english="Interrupt and continue",category="G",kind="真实操作",duration=.65f,strength=1,distance=130,description="连续点击左、右，从当前可见姿态接续到新的目标。",useCase="可打断的选择、焦点交接",difference="固定时长接续保持位置连续；需要速度连续时使用弹簧。",dependencies="MotionPlayer.ContinueTo + 稳定基线；业务状态由宿主管理。"}
+            new MotionDefinition{id="G02",name="连续操作与姿态接续",english="Interrupt and continue",category="G",kind="真实操作",duration=.65f,strength=1,distance=130,description="连续点击左、右，从当前可见姿态接续到新的目标。",useCase="可打断的选择、焦点交接",difference="固定时长接续保持位置连续；需要速度连续时使用弹簧。",dependencies="MotionPlayer.ContinueTo + 稳定基线；业务状态由宿主管理。"},
+            new MotionDefinition{id="P01",name="旅程达成 · 整页编排",english="Staged achievement page",category="F",kind="页面配方",duration=1.1f,strength=1,distance=24,stagger=.08f,description="背景、面板、徽章、奖励与操作按层次进入。",useCase="成就、胜利、奖励页面",difference="一条确定性页面时间轴；采样不提交业务，结束只发视觉通知。",dependencies="MotionPageSequence + 独立图层；宿主负责奖励与导航。"},
+            new MotionDefinition{id="P02",name="奖励选择 · 响应式",english="Responsive reward selection",category="F",kind="页面配方",duration=.3f,strength=1,distance=0,description="短屏、长屏和横屏使用同一选择状态，自适应重排控件。",useCase="奖励选择、弹窗、不同屏幕比例",difference="短屏滚正文，操作区固定；重排不重建选择数据。",dependencies="MotionResponsiveLayout + ScrollRect；安全区由宿主传入。"}
         };
         public static int BrowseCount => MotionCatalog.All.Length+interactiveDefinitions.Length;
         static IEnumerable<MotionDefinition> BrowseDefinitions(){foreach(var d in MotionCatalog.All)yield return d;foreach(var d in interactiveDefinitions)yield return d;}
@@ -42,7 +44,7 @@ namespace TweenGallery
         public void SetInteractionMode(bool enabled)
         {
             if(current==null)return;
-            if(CurrentEffectId.StartsWith("G")&&!enabled){Notice("该效果由真实操作驱动：请直接拖动或点击方向。");return;}
+            if((CurrentEffectId.StartsWith("G")||CurrentEffectId=="P02")&&!enabled){Notice("该效果由真实操作驱动，请直接操作预览。");return;}
             interactionMode=enabled;comparison=false;BuildDemos(new[]{CurrentEffectId});UpdateDefinitionText();RefreshControlLabels();
             if(!enabled)Replay();
         }
@@ -66,7 +68,7 @@ namespace TweenGallery
         {
             if(CurrentEffectId=="G01")integratedPreview=GalleryInteractionPreview.CreateDrag(demoHost,selectedSkin,options,reducedMotion);
             else if(CurrentEffectId=="G02")integratedPreview=GalleryInteractionPreview.CreateContinuation(demoHost,options,reducedMotion);
-            else if(IsButtonFamily&&feedbackVariant>=0){integratedPreview=GalleryInteractionPreview.CreateButton(demoHost,selectedSkin,(ButtonMotionStyle)feedbackVariant,options,reducedMotion);integratedPreview.Feedback.frequency=feedbackFrequency;}
+            else if(IsButtonFamily&&feedbackVariant>=0){integratedPreview=GalleryInteractionPreview.CreateButton(demoHost,selectedSkin,(ButtonMotionStyle)feedbackVariant,options,reducedMotion);integratedPreview.Feedback.frequency=feedbackFrequency;integratedPreview.Feedback.damping=MotionStyleProfile.Get(styleKind).springDamping;integratedPreview.Feedback.accentDuration=.55f*MotionStyleProfile.Get(styleKind).timeScale;}
             else
             {
                 integratedPreview=GalleryInteractionPreview.CreateTrigger(demoHost,CurrentEffectId,options,reducedMotion);
@@ -140,6 +142,7 @@ namespace TweenGallery
             bool previousSuppress=suppress;suppress=true;durationSlider.minValue=liveButton?3:.15f;durationSlider.maxValue=liveButton?12:3;
             durationSlider.SetValueWithoutNotify(liveButton?feedbackFrequency:options.duration);suppress=previousSuppress;
             durationValue.text=liveButton?feedbackFrequency.ToString("0.0")+" Hz":interactionMode&&CurrentEffectId=="G01"?"输入驱动":options.duration.ToString("0.00")+" s";
+            RefreshRecipeControls();
         }
         bool TrySetWorkbenchParameter(string title,float value)
         {
@@ -159,13 +162,13 @@ namespace TweenGallery
             var config=new InteractionConfiguration{definitionId=CurrentEffectId,driver="MotionPlayer",variant="trigger",duration=options.duration,reducedMotion=reducedMotion,unscaledTime=options.unscaledTime};
             if(integratedPreview!=null)
             {
-                if(integratedPreview.Feedback!=null){var b=integratedPreview.Feedback;config.driver="MotionButtonFeedback";config.variant=b.style.ToString();config.intensity=b.intensity;config.frequency=b.frequency;config.damping=b.damping;config.duration=0;config.accentDuration=.55f;}
+                if(integratedPreview.Feedback!=null){var b=integratedPreview.Feedback;config.driver="MotionButtonFeedback";config.variant=b.style.ToString();config.intensity=b.intensity;config.frequency=b.frequency;config.damping=b.damping;config.duration=0;config.accentDuration=b.accentDuration;}
                 else if(integratedPreview.Jelly!=null){var j=integratedPreview.Jelly;config.driver="MotionDragInput + MotionJellyDrag";config.variant="drag-return";config.frequency=j.frequency;config.damping=j.damping;config.maxDisplacement=j.maxDisplacement;config.dragRange=j.dragRange;config.stretch=j.stretch;config.maxRotation=j.maxRotation;config.axisRange=j.axisRange;config.duration=0;}
                 else if(CurrentEffectId=="G02"){config.variant="ContinueTo";config.distance=options.distance;config.leftScale=.94f;config.rightScale=1.08f;config.tiltDegrees=6;config.ease=options.ease=="Preset"?"OutCubic":options.ease;}
                 else if(CurrentEffectId=="B07"||CurrentEffectId=="B08")config.variant="toggle";
             }
             var entries=CurrentEffectId.StartsWith("G")?Array.Empty<ConfigurationEntry>():new[]{new ConfigurationEntry{effectId=CurrentEffectId,settings=options.Clone()}};
-            return JsonUtility.ToJson(new GalleryConfiguration{schemaVersion=2,previewMode="interaction",skinIndex=CurrentEffectId=="G01"?5:CurrentEffectId=="G02"?1:IsSkinApplicable?selectedSkin:-1,effects=entries,interaction=config},true);
+            return JsonUtility.ToJson(new GalleryConfiguration{schemaVersion=2,previewMode="interaction",styleProfile=styleKind.ToString(),skinIndex=CurrentEffectId=="G01"?5:CurrentEffectId=="G02"?1:IsSkinApplicable?selectedSkin:-1,effects=entries,interaction=config},true);
         }
         string CopyInteractionPrompt()
         {
