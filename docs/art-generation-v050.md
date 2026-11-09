@@ -11,3 +11,10 @@ Use case: product-mockup / game UI asset atlas. Generate a production-ready tran
 ```
 
 模型输出有柔和半透明边缘与阴影，实际形状范围以生成图和 ButtonStyleLab 中的裁切 Rect 为准，不把提示词期望尺寸当成像素测量结果。Unity 导入显式设置 NPOTScale.None、2048 上限、无 mipmap、无压缩；Player 检查实际纹理为 1536×1024，防止自动缩放后错用裁切坐标。该资源的烘焙边缘不适合直接任意拉伸或当成九宫格。
+
+
+## preview2 全库美术统一
+
+2026-11-09 使用内置 image_gen，依据同一已认可原型，重新生成 reward-chest、energy-crystal、adventure-world 三张示范美术。替换现有 MotionArt PNG，保留 Unity .meta GUID。宝箱与晶石为真实 RGBA 透明图，场景为不透明图；同时用于旧 A/B/D/E/F 示例，不只用于新按钮工坊。
+
+提示词方向分别为：奶油木质、蜂蜜金边、薄荷缎带的柔软玩具宝箱；淡紫到薄荷渐变、圆润切面、暖金底环的晶石；有留白、奶油小路、薄荷灌木和淡紫花朵的晴天花园。共同约束为柔和左上光、无文字/图标/商标、原生文字另叠，避免霓虹、尖锐写实金属和高饱和科幻质感。宝箱/晶石模型输出 1280×1280，场景输出 1536×1024，Unity 按现有导入器生成运行资源；提示词中的期望大小不当作实际输出尺寸。

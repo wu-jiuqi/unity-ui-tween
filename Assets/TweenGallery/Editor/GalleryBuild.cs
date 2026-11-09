@@ -11,7 +11,7 @@ namespace TweenGallery.Editor
 {
     public static class GalleryBuild
     {
-        public const string Version = "0.5.0-preview1";
+        public const string Version = "0.5.0-preview2";
         const string Root = "Assets/TweenGallery";
 
         [MenuItem("Tools/UI Motion Gallery/Prepare scene and templates")]
@@ -30,6 +30,7 @@ namespace TweenGallery.Editor
             root.AddComponent<UpgradeSelfTest>();
             root.AddComponent<GalleryEnhancementSelfTest>();
             root.AddComponent<ButtonStyleSelfTest>();
+            root.AddComponent<LibraryReview>();
             var camera = new GameObject("Camera").AddComponent<Camera>();
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(0.045f, 0.055f, 0.11f);
@@ -50,7 +51,20 @@ namespace TweenGallery.Editor
                 // Existing base prefabs are part of the public API: preserve their
                 // serialized child fileIDs so downstream overrides remain valid.
                 string prefabPath = Root + "/Prefabs/" + effect.id + ".prefab";
-                if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null) continue;
+                if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null)
+                {
+                    var contents=PrefabUtility.LoadPrefabContents(prefabPath);
+                    try
+                    {
+                        GalleryTheme.Apply(contents);
+                        var existingPlayer=contents.GetComponentInChildren<MotionPlayer>(true);
+                        if(existingPlayer!=null){existingPlayer.settings=MotionSettings.FromDefinition(effect);GalleryTheme.StylePrimaryButton(existingPlayer);}
+                        PersistArt(contents,effect.id);
+                        PrefabUtility.SaveAsPrefabAsset(contents,prefabPath);
+                    }
+                    finally { PrefabUtility.UnloadPrefabContents(contents); }
+                    continue;
+                }
                 var player = DemoFactory.Create(effect.id, preview.transform, new Vector2(600, 420));
                 var prefabRoot = player.transform;
                 while (prefabRoot.parent != preview.transform && prefabRoot.parent != null) prefabRoot = prefabRoot.parent;

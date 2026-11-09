@@ -21,7 +21,7 @@ namespace TweenGallery
         Text gateLabel, status;
         MotionPose poseA, poseB;
 
-        static readonly Color Ink = Hex("11142B"), Panel = new Color(.075f,.095f,.18f,.94f), White = Color.white;
+        static readonly Color Ink = Hex("11142B"), Panel = new Color(.075f,.095f,.18f,.94f), White = GalleryTheme.Ink;
         static readonly Color Purple=Hex("9254FF"), Pink=Hex("FF4EAF"), Cyan=Hex("19D9FF"), Yellow=Hex("FFE14A"), Mint=Hex("65EA75"), Orange=Hex("FF8A22");
 
         public static InteractionLab Create(Transform parent, Action closed)
@@ -65,6 +65,7 @@ namespace TweenGallery
             PanelAt("Reduced motion card",805,468,750,330);
             Header("04", "减弱动态效果", "必要过渡直接抵达终态，不改变游戏暂停状态",835,489,Mint);
             MakeGate();
+            GalleryTheme.Apply(gameObject);
             status=Label(transform,"拖动请在右上实验卡中进行；返回后继续查看 46 项动效。",48,832,1400,35,15,White,TextAnchor.MiddleLeft);
         }
         void Header(string num,string title,string description,float x,float y,Color accent)
@@ -163,7 +164,7 @@ namespace TweenGallery
         {
             var r=new GameObject(name,typeof(RectTransform)).GetComponent<RectTransform>();r.SetParent(parent,false);r.anchorMin=r.anchorMax=r.pivot=new Vector2(0,1);r.anchoredPosition=new Vector2(x,-y);r.sizeDelta=new Vector2(w,h);return r;
         }
-        static Color Hex(string s) { ColorUtility.TryParseHtmlString("#"+s,out var color);return color; }
+        static Color Hex(string s) { ColorUtility.TryParseHtmlString("#"+s,out var color);return GalleryTheme.Surface(color); }
         void OnDestroy() { if(bgSprite!=null) Destroy(bgSprite); }
     }
 }

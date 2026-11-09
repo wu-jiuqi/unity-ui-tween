@@ -1,8 +1,8 @@
 # Unity UI Motion Gallery
 
-一套以 **Unity UGUI + DOTween 免费版** 实现的 46 项 UI 动效：可运行 Windows 展馆、46 个预设与示例预制体、通用 Runtime、Codex Skill 和中文文档。当前开发版 **0.5.0-preview1**；已发布稳定版为 **0.4.0**。
+一套以 **Unity UGUI + DOTween 免费版** 实现的 46 项 UI 动效：可运行 Windows 展馆、46 个预设与示例预制体、通用 Runtime、Codex Skill 和中文文档。当前开发版 **0.5.0-preview2**；已发布稳定版为 **0.4.0**。
 
-展馆使用鲜艳、高饱和度的休闲游戏 UI，并以同一份 MotionPlayer 播放实际交付的模板。A01–F06 固定编号覆盖出现消失、交互反馈、页面转场、奖励数值、循环和编排。
+展馆统一使用暖奶油、薄荷、淡紫与暖金的柔和玩具质感 UI，并以同一份 MotionPlayer 播放实际交付的模板。A01–F06 固定编号覆盖出现消失、交互反馈、页面转场、奖励数值、循环和编排。
 
 0.4.0 新增可拖动时间轴、参数 JSON 导出和 image gen 美术，优化数值文本与共享元素采样，并提供可重复打包及轻量 Runtime 包。保留全部 46 个现有 Prefab 的 GUID 与内部 fileID。
 
@@ -19,11 +19,13 @@
 - [发布使用指南](docs/release-guide.md)：完整解压、资产核对和已知范围。
 - [第三方许可](ThirdPartyLicenses/README.md)：DOTween 与中文字体说明。
 
-## 0.5.0 按钮设计升级
+## 0.5.0 全量动效优化
 
-新增六种原创空白按钮皮肤和 BX01–BX08 八套可运行交互：柔软按压、果冻挤压、悬浮抬升、图标回弹、中心涟漪、扫光、选中和加载。它们独立于原有 46 项目录，原 Prefab 保持兼容。以认可的原型确定画风，允许设计新造型与用途，不限定为历史游戏素材。
+原有 46 项的推荐节奏、强度、位移、预设、实际 Prefab 和展馆视觉已全部更新，采用统一奶油花园风格；宝箱、晶石、场景插画同步重做。GUID 与既有对象 fileID 保留，默认表现有意调整。统一选型见 [动效系统](docs/motion-system.md)。
 
-在 Windows 展馆顶部打开 **按钮工坊**，或启动时添加 `--button-lab`。接入方式见 [按钮设计](docs/button-design.md)、[按钮交互配方](docs/button-recipes.md)。完整 Skill 包含皮肤；Runtime 包只带运行组件和接入参考，使用宿主美术。0.5.0-preview1 为本地候选，未发布到 GitHub Release。
+另有六种原创空白按钮皮肤和 BX01–BX08 八套可运行交互：柔软按压、果冻挤压、悬浮抬升、图标回弹、中心涟漪、扫光、选中和加载。它们独立于原有 46 项目录，原 Prefab 保持兼容。以认可的原型确定画风，允许设计新造型与用途，不限定为历史游戏素材。
+
+在 Windows 展馆顶部打开 **按钮工坊**，或启动时添加 `--button-lab`。接入方式见 [按钮设计](docs/button-design.md)、[按钮交互配方](docs/button-recipes.md)。完整 Skill 包含皮肤；Runtime 包只带运行组件和接入参考，使用宿主美术。0.5.0-preview2 为本地候选，未发布到 GitHub Release。
 
 ## 项目结构
 

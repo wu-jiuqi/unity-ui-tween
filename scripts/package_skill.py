@@ -33,7 +33,7 @@ def require(condition: bool, message: str) -> None:
 
 DOC_NAMES = ("acceptance.md", "catalog.md", "integration.md", "interaction.md",
              "mobile-performance.md", "orchestration.md", "skill-packaging.md", "runtime-package.md",
-             "button-design.md", "button-recipes.md")
+             "button-design.md", "button-recipes.md", "motion-system.md")
 
 
 def runtime_asset(relative: str) -> bool:

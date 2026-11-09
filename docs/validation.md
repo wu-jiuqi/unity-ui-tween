@@ -1,5 +1,16 @@
 # 验证记录
 
+## 0.5.0-preview2 全量优化验证
+
+2026-11-09，Unity 6000.0.26f1 / Windows x64 Mono 构建成功，0 错误、0 警告。本轮实际更新全部 46 个旧 Prefab、46 个预设、目录默认参数与提示词、完整展馆和交互实验室；另有三张重做的示范美术。不是只增加按钮工坊。
+
+Editor LibraryValidation 共 138 项通过：每项检查真实 Prefab / 预设 / 目录参数一致、暖色深字和实际采样后恢复。原 RuntimeValidation 39 项及按钮 112 项通过。比对 preview1 确认全部旧 Prefab GUID 和既有对象/组件 fileID 保留，新增描边组件拥有新 fileID；默认表现有意调整。
+
+1600×900 和 1280×720 均通过原有 46 项案例与 29 项通用检查、25 项展馆增强检查、24 项按钮工坊检查；另有 24 项升级检查通过，报告 errors 为空。Python 打包测试 9 项和 Skill 结构校验通过。六张家族总览覆盖全部 46 个动态示例，另有四张完整展馆画面；均为实际 Player 中同一 Canvas 的离屏渲染，不是系统截图。报告/画面位于 validation-output/v050p2-final-*，模板回归在 evidence/library-validation.txt。
+
+新版本仍为本地候选，未修改已发布 Release。没有移动端、真实触屏、独立干净设备、人工手感或完整业务集成验证；默认参数改变后应检查宿主保存配置与 Prefab overrides。Runtime 包不包含展馆皮肤或美术。
+
+
 ## 0.5.0-preview1 按钮设计升级
 
 2026-11-09，本机 Unity 6000.0.26f1 / Windows x64 Mono。新增 MotionButtonFeedback、六种原创新皮肤和八种可运行交互；原 A01–F06 共 46 项及其 Prefab 不变。Editor 按钮回归 112 项通过，覆盖固定命中区域、非单位基线、拖动/移出/多指竞争、Submit、禁用、busy、减弱动效和失焦取消；RuntimeValidation 原有 39 项通过。Python 打包测试 9 项通过，Skill 结构校验通过。

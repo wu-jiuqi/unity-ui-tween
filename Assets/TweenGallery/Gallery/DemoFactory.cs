@@ -113,6 +113,8 @@ namespace TweenGallery
             if (b.items == null) b.items = new RectTransform[0];
             if (b.labels == null) b.labels = new Text[0];
             if (b.itemGroups == null) b.itemGroups = new CanvasGroup[0];
+            GalleryTheme.Apply(root.gameObject);
+            GalleryTheme.StylePrimaryButton(player);
             player.CaptureBaseline();
             return player;
         }
@@ -450,13 +452,13 @@ namespace TweenGallery
         // Original graphic fixtures: their staged motion is provided solely by MotionPlayer.
         static void Holographic(Transform root,MotionBindings b)
         {
-            Text("Eyebrow",root,"SIGNAL / 01",16,new Vector2(400,30),new Vector2(0,150),Cyan);
+            Text("Eyebrow",root,"珍藏揭晓 / 01",16,new Vector2(400,30),new Vector2(0,150),Cyan);
             var card=Panel("Holographic reward card",root,new Vector2(380,240),Vector2.zero,Hex("26325B"));
             card.gameObject.AddComponent<RectMask2D>();
             Picture("Header accent",card,new Vector2(380,12),new Vector2(0,111),Pink);
             Gem(card,new Vector2(-100,0),100,Cyan);
             Text("Title",card,"棱镜珍藏",30,new Vector2(225,44),new Vector2(66,47),Color.white);
-            Text("Serial",card,"PRISM / 003",16,new Vector2(225,26),new Vector2(66,11),Yellow);
+            Text("Serial",card,"限定外观 / 003",16,new Vector2(225,26),new Vector2(66,11),Yellow);
             Text("Description",card,"已解锁 · 限定外观",17,new Vector2(235,32),new Vector2(66,-30),Muted);
             var shine=Picture("Scanning beam",card,new Vector2(72,300),Vector2.zero,new Color(.40f,1f,1f,.48f));
             shine.rectTransform.localEulerAngles=new Vector3(0,0,-16);
@@ -467,7 +469,7 @@ namespace TweenGallery
         }
         static void Constellation(Transform root,MotionBindings b)
         {
-            Text("Eyebrow",root,"CONSTELLATION / UNLOCK",17,new Vector2(500,34),new Vector2(0,145),Cyan);
+            Text("Eyebrow",root,"星轨徽章 / 解锁",17,new Vector2(500,34),new Vector2(0,145),Cyan);
             var ring=Picture("Orbit ring",root,new Vector2(235,235),Vector2.zero,Purple,GalleryShapes.Get("ring")).rectTransform;
             Picture("Ring interior",root,new Vector2(164,164),Vector2.zero,Hex("252D5C"),GalleryShapes.Get("circle"));
             var items=new List<RectTransform>();var groups=new List<CanvasGroup>();
@@ -514,7 +516,7 @@ namespace TweenGallery
         }
         static void FocusCarousel(Transform root,MotionBindings b)
         {
-            Text("Carousel heading",root,"SELECT YOUR ROUTE",17,new Vector2(500,36),new Vector2(0,145),Cyan);
+            Text("Carousel heading",root,"选择新的旅程",17,new Vector2(500,36),new Vector2(0,145),Cyan);
             var left=Panel("Previous focus",root,new Vector2(150,190),new Vector2(-160,-8),Purple);Text("Previous",left,"01\n云端",23,new Vector2(140,85),Vector2.zero,Color.white);
             var right=Rect("Next focus",root,new Vector2(150,190));right.anchoredPosition=new Vector2(0,8);
             var hit=right.gameObject.AddComponent<Image>();hit.color=new Color(1,1,1,.001f);hit.raycastTarget=true;
@@ -534,7 +536,7 @@ namespace TweenGallery
         }
         static void PortalReveal(Transform root,MotionBindings b)
         {
-            Text("Portal heading",root,"PORTAL / REWARD",16,new Vector2(460,32),new Vector2(0,145),Cyan);
+            Text("Portal heading",root,"花园秘境 / 奖励",16,new Vector2(460,32),new Vector2(0,145),Cyan);
             // This is a broad portal aperture and vertical energy column, deliberately
             // distinct from the round, star-studded constellation above.
             Picture("Vertical beam",root,new Vector2(120,260),Vector2.zero,new Color(.05f,.9f,1f,.12f));
@@ -549,8 +551,8 @@ namespace TweenGallery
                 float x=(i-2)*22;
                 Picture("Beam ray "+i,root,new Vector2(2,148-Mathf.Abs(i-2)*22),new Vector2(x,15),new Color(.2f,1f,1f,.42f)).transform.SetAsFirstSibling();
             }
-            Text("Portal coordinate left",root,"X: 018",13,new Vector2(90,25),new Vector2(-226,-69),Cyan);
-            Text("Portal coordinate right",root,"Y: 047",13,new Vector2(90,25),new Vector2(226,-69),Cyan);
+            Text("Portal coordinate left",root,"星光汇聚",13,new Vector2(90,25),new Vector2(-226,-69),Cyan);
+            Text("Portal coordinate right",root,"奖励揭晓",13,new Vector2(90,25),new Vector2(226,-69),Cyan);
             var footer=Text("Portal footer",root,"超稀有 · 曙光晶石",22,new Vector2(420,40),new Vector2(0,-145),Color.white);b.labels=new[]{footer};
         }
 

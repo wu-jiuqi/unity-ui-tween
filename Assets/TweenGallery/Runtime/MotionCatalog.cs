@@ -9,8 +9,10 @@ namespace TweenGallery
     {
         public string id, name, english, category, kind, description, useCase, difference, dependencies, binding, ease, prompt;
         public string sourceUrl, sourceTitle, transformation;
+        public string legacyName;
         public float duration = .7f, strength = 1f, distance = 120f, stagger = .1f;
         public float startValue = 100f, endValue = 1250f, fillFrom = .08f, fillTo = .9f;
+        public float overshoot = 1.1f;
     }
 
     public static class MotionCatalog
@@ -57,6 +59,9 @@ namespace TweenGallery
         public bool reverse, loop;
         public bool unscaledTime = true;
         [Range(.05f, 4f)] public float speed = 1f;
+        [Range(0f, 3f)] public float overshoot = 1.1f;
+        public Color inactiveColor = new Color(.83f,.79f,.73f,1);
+        public Color activeColor = new Color(.65f,.86f,.76f,1);
         public float startValue = 100f, endValue = 1250f;
         [Range(0f, 1f)] public float fillFrom = .08f, fillTo = .9f;
 
@@ -68,7 +73,7 @@ namespace TweenGallery
                 distance = definition.distance, stagger = definition.stagger,
                 ease = string.IsNullOrEmpty(definition.ease) ? "Preset" : definition.ease,
                 startValue = definition.startValue, endValue = definition.endValue,
-                fillFrom = definition.fillFrom, fillTo = definition.fillTo };
+                fillFrom = definition.fillFrom, fillTo = definition.fillTo, overshoot = definition.overshoot };
         }
     }
 }

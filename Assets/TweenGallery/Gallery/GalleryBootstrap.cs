@@ -16,7 +16,7 @@ namespace TweenGallery
         public MotionPlayer CurrentPlayer { get { return players.Count > 0 ? players[0] : null; } }
         public MotionPlayer[] ActivePlayers { get { return players.ToArray(); } }
 
-        static readonly Color Ink = Hex("11142B"), Panel = Hex("202442"), Muted = Hex("AEB5D5");
+        static readonly Color Ink = GalleryTheme.Ink, Panel = GalleryTheme.Cream, Muted = GalleryTheme.Muted;
         static readonly Color Violet = Hex("9254FF"), Cyan = Hex("19D9FF"), Yellow = Hex("FFE14A"), Pink = Hex("FF4EAF");
         const string StrengthIds = "A03 A04 A06 A08 B01 B02 B03 B04 B05 B06 B07 D03 D04 D05 D06 D08 D09 D10 F01 F02 F03 F04 F05 F06 E01 E03 E04 E05 E06 E07";
         const string DistanceIds = "A02 A05 B04 B07 C01 C02 C05 D03 D04 D08 D09 E01 E03 E05 E06 E07 F01 F02 F03 F04 F05 F06";
@@ -84,7 +84,7 @@ namespace TweenGallery
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1600, 900);
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
-            Image background = ImageAt(canvasObject.transform, "Background", 0, 0, 1600, 900, Ink, false);
+            Image background = ImageAt(canvasObject.transform, "Background", 0, 0, 1600, 900, GalleryTheme.Background, false);
             Stretch(background.rectTransform);
             root = new GameObject("Centered 1600 x 900 Layout", typeof(RectTransform)).GetComponent<RectTransform>();
             root.SetParent(canvasObject.transform, false);
@@ -92,40 +92,40 @@ namespace TweenGallery
             root.sizeDelta = new Vector2(1600, 900);
 
             ImageAt(root, "Brand", 30, 25, 46, 46, Violet);
-            Label(root, "M", 30, 27, 46, 40, 27, Color.white, TextAnchor.MiddleCenter, true);
-            Label(root, "UI MOTION LAB", 91, 13, 490, 44, 27, Color.white, TextAnchor.MiddleLeft, true);
-            Label(root, "Unity UI 动效展馆  /  看见差别，带走手感", 92, 56, 650, 24, 15, Muted);
-            ButtonAt(root, "交互实验室", 1046, 30, 200, 42, Pink, Color.white, 17, OpenInteractionLab);
+            Label(root, "M", 30, 27, 46, 40, 27, GalleryTheme.Ink, TextAnchor.MiddleCenter, true);
+            Label(root, "UI MOTION ATELIER", 91, 13, 490, 44, 27, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
+            Label(root, "奶油花园动效库  /  按用途选型，按材质调手感", 92, 56, 650, 24, 15, Muted);
+            ButtonAt(root, "交互实验室", 1046, 30, 200, 42, Pink, GalleryTheme.Ink, 17, OpenInteractionLab);
             ButtonAt(root, "按钮工坊", 1285, 30, 118, 42, Cyan, Ink, 16, OpenButtonLab);
-            Chip(root, "UNITY 6", 1417, 30, 150, Violet, Color.white);
+            Chip(root, "UNITY 6", 1417, 30, 150, Violet, GalleryTheme.Ink);
 
             ImageAt(root, "Catalog panel", 28, 104, 290, 752, Panel);
-            Label(root, "动效图鉴", 48, 116, 200, 44, 24, Color.white, TextAnchor.MiddleLeft, true);
+            Label(root, "动效图鉴", 48, 116, 200, 44, 24, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
             countLabel = Label(root, MotionCatalog.All.Length + " / " + MotionCatalog.All.Length, 230, 125, 65, 26, 14, Muted, TextAnchor.MiddleRight);
             MakeSearch();
             string[] keys = { "", "A", "B", "C", "D", "E", "F" };
-            string[] labels = { "全部", "出现", "交互", "转场", "奖励", "引导", "进阶" };
+            string[] labels = { "全部", "入场", "按钮", "页面", "奖励", "循环", "编排" };
             for (int i = 0; i < keys.Length; i++)
             {
                 string key = keys[i];
                 Button button = ButtonAt(root, labels[i], 45 + i % 4 * 64, 218 + i / 4 * 36, 60, 29,
-                    key == "" ? Violet : Hex("303657"), Color.white, 14, () => SetCategory(key));
+                    key == "" ? Violet : Hex("303657"), GalleryTheme.Ink, 14, () => SetCategory(key));
                 categories.Add(key, button);
             }
             MakeList();
 
             ImageAt(root, "Preview panel", 340, 104, 872, 468, Panel);
             Label(root, "THE PLAYGROUND", 364, 122, 440, 25, 13, Cyan, TextAnchor.MiddleLeft, true);
-            effectTitle = Label(root, "", 364, 146, 640, 49, 28, Color.white, TextAnchor.MiddleLeft, true);
+            effectTitle = Label(root, "", 364, 146, 640, 49, 28, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
             effectEnglish = Label(root, "", 364, 198, 660, 27, 15, Muted);
             effectBadge = Label(root, "", 1015, 131, 169, 32, 16, Yellow, TextAnchor.MiddleRight, true);
             demoHost = Rect(root, "Live motion stage", 358, 231, 836, 319);
 
             ImageAt(root, "Playback panel", 340, 586, 872, 89, Panel);
-            ButtonAt(root, "重播", 358, 604, 103, 42, Violet, Color.white, 17, Replay);
-            playLabel = ButtonAt(root, "暂停", 470, 604, 93, 42, Hex("343A60"), Color.white, 17, TogglePause).GetComponentInChildren<Text>();
-            slowLabel = ButtonAt(root, "1× 速度", 573, 604, 113, 42, Hex("343A60"), Color.white, 15, () => SetSpeed(options != null && options.speed < .9f ? 1 : .25f)).GetComponentInChildren<Text>();
-            loopLabel = ButtonAt(root, "循环 关", 696, 604, 103, 42, Hex("343A60"), Color.white, 15, () => { if (options == null) return; options.loop = !options.loop; RefreshControlLabels(); Replay(); }).GetComponentInChildren<Text>();
+            ButtonAt(root, "重播", 358, 604, 103, 42, Violet, GalleryTheme.Ink, 17, Replay);
+            playLabel = ButtonAt(root, "暂停", 470, 604, 93, 42, Hex("343A60"), GalleryTheme.Ink, 17, TogglePause).GetComponentInChildren<Text>();
+            slowLabel = ButtonAt(root, "1× 速度", 573, 604, 113, 42, Hex("343A60"), GalleryTheme.Ink, 15, () => SetSpeed(options != null && options.speed < .9f ? 1 : .25f)).GetComponentInChildren<Text>();
+            loopLabel = ButtonAt(root, "循环 关", 696, 604, 103, 42, Hex("343A60"), GalleryTheme.Ink, 15, () => { if (options == null) return; options.loop = !options.loop; RefreshControlLabels(); Replay(); }).GetComponentInChildren<Text>();
             compareLabel = ButtonAt(root, "相似动效对比", 810, 604, 192, 42, Cyan, Ink, 16, ToggleComparison).GetComponentInChildren<Text>();
             progressLabel = Label(root, "0%", 1040, 600, 139, 23, 15, Muted, TextAnchor.MiddleRight);
             MakeTimeline();
@@ -133,24 +133,24 @@ namespace TweenGallery
 
             ImageAt(root, "Notes panel", 340, 692, 872, 164, Panel);
             Label(root, "适合用在", 362, 706, 103, 24, 14, Cyan, TextAnchor.MiddleLeft, true);
-            useCase = Label(root, "", 476, 704, 711, 43, 16, Color.white);
+            useCase = Label(root, "", 476, 704, 711, 43, 16, GalleryTheme.Ink);
             Label(root, "观察差别", 362, 753, 103, 24, 14, Pink, TextAnchor.MiddleLeft, true);
             distinction = Label(root, "", 476, 749, 711, 48, 15, Muted);
             dependency = Label(root, "", 362, 809, 827, 32, 12, Hex("BEC5E6"));
 
             ImageAt(root, "Parameter panel", 1234, 104, 338, 752, Panel);
-            Label(root, "调出你的手感", 1257, 122, 289, 36, 23, Color.white, TextAnchor.MiddleLeft, true);
+            Label(root, "调出你的手感", 1257, 122, 289, 36, 23, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
             Label(root, "参数变化后，从初始状态重新播放", 1257, 162, 290, 32, 12, Muted);
             durationSlider = MakeSlider("时长", "s", 207, .15f, 3f, out durationValue, v => { if (options != null) options.duration = v; });
             strengthSlider = MakeSlider("强度", "×", 281, .2f, 2f, out strengthValue, v => { if (options != null) options.strength = v; });
             distanceSlider = MakeSlider("位移", "px", 355, 0f, 280f, out distanceValue, v => { if (options != null) options.distance = v; });
             staggerSlider = MakeSlider("错开间隔", "s", 429, 0f, .24f, out staggerValue, v => { if (options != null) options.stagger = v; });
             Label(root, "缓动曲线", 1258, 505, 286, 25, 15, Muted);
-            easingButton = ButtonAt(root, "Preset · 推荐曲线  ▾", 1257, 539, 292, 43, Hex("343A60"), Color.white, 15, ToggleEasingPopup);
+            easingButton = ButtonAt(root, "Preset · 推荐曲线  ▾", 1257, 539, 292, 43, Hex("343A60"), GalleryTheme.Ink, 15, ToggleEasingPopup);
             easingLabel = easingButton.GetComponentInChildren<Text>();
-            reverseButton = ButtonAt(root, "方向：进入 / 正向", 1257, 598, 292, 40, Hex("343A60"), Color.white, 14, () => { if (options == null) return; options.reverse = !options.reverse; RefreshControlLabels(); Replay(); });
+            reverseButton = ButtonAt(root, "方向：进入 / 正向", 1257, 598, 292, 40, Hex("343A60"), GalleryTheme.Ink, 14, () => { if (options == null) return; options.reverse = !options.reverse; RefreshControlLabels(); Replay(); });
             reverseLabel = reverseButton.GetComponentInChildren<Text>();
-            ButtonAt(root, "恢复推荐参数", 1257, 653, 292, 41, Hex("343A60"), Color.white, 15, ResetParameters);
+            ButtonAt(root, "恢复推荐参数", 1257, 653, 292, 41, Hex("343A60"), GalleryTheme.Ink, 15, ResetParameters);
             ButtonAt(root, "复制 Codex 提示词", 1257, 710, 292, 45, Yellow, Ink, 16, () => CopyPrompt());
             ButtonAt(root, "复制参数 JSON", 1257, 768, 292, 40, Cyan, Ink, 15, () => CopyConfigurationJson());
             Label(root, "含编号、全部参数及对比项目", 1257, 816, 292, 25, 11, Muted, TextAnchor.UpperCenter);
@@ -158,6 +158,7 @@ namespace TweenGallery
             status = Label(root, "准备完成", 341, 870, 870, 22, 12, Muted);
             Label(root, "v" + Application.version + "  ·  ESC 退出", 1262, 870, 300, 22, 11, Muted, TextAnchor.MiddleRight);
             MakeEasingPopup();
+            GalleryTheme.Apply(canvasObject);
             RefreshList();
         }
 
@@ -166,7 +167,7 @@ namespace TweenGallery
             var background = ImageAt(root, "Search", 45, 168, 255, 38, Hex("111630"));
             background.raycastTarget = true;
             var field = background.gameObject.AddComponent<InputField>();
-            Text input = Label(background.transform, "", 12, 5, 229, 29, 15, Color.white);
+            Text input = Label(background.transform, "", 12, 5, 229, 29, 15, GalleryTheme.Ink);
             Text placeholder = Label(background.transform, "搜索编号 / 名称 / English", 12, 5, 229, 29, 12, Muted);
             field.textComponent = input;
             field.placeholder = placeholder;
@@ -216,14 +217,14 @@ namespace TweenGallery
             foreach (MotionDefinition definition in MotionCatalog.All)
             {
                 if (category.Length > 0 && definition.category != category) continue;
-                string searchable = definition.id + " " + definition.name + " " + definition.english;
+                string searchable = definition.id + " " + definition.name + " " + definition.english + " " + definition.legacyName;
                 if (search.Length > 0 && searchable.IndexOf(search, StringComparison.OrdinalIgnoreCase) < 0) continue;
                 string id = definition.id;
                 Color accent = CategoryColor(definition.category);
-                Button button = ButtonAt(listContent, "", 0, y, 254, 59, id == CurrentEffectId ? Hex("3C2C68") : Hex("282D4B"), Color.white, 14, () => SelectEffect(id));
+                Button button = ButtonAt(listContent, "", 0, y, 254, 59, id == CurrentEffectId ? Hex("3C2C68") : Hex("282D4B"), GalleryTheme.Ink, 14, () => SelectEffect(id));
                 ImageAt(button.transform, "Category accent", 0, 10, 3, 39, accent);
-                Label(button.transform, id, 12, 10, 39, 34, 15, accent, TextAnchor.MiddleLeft, true);
-                Label(button.transform, definition.name, 55, 7, 190, 27, 16, Color.white, TextAnchor.MiddleLeft, true);
+                Label(button.transform, id, 12, 10, 39, 34, 15, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
+                Label(button.transform, definition.name, 55, 7, 190, 27, 16, GalleryTheme.Ink, TextAnchor.MiddleLeft, true);
                 Label(button.transform, definition.english, 55, 32, 190, 18, 10, Muted);
                 rows.Add(id, button.image); visibleIds.Add(id); y += 66;
             }
@@ -385,9 +386,9 @@ namespace TweenGallery
             if (options == null) return;
             playLabel.text = paused ? "继续" : "暂停";
             slowLabel.text = options.speed < .9f ? "¼× 慢放" : "1× 速度";
-            slowLabel.color = options.speed < .9f ? Cyan : Color.white;
+            slowLabel.color = GalleryTheme.Ink;
             loopLabel.text = options.loop ? "循环 开" : "循环 关";
-            loopLabel.color = options.loop ? Cyan : Color.white;
+            loopLabel.color = GalleryTheme.Ink;
             compareLabel.text = comparison ? "返回单项预览" : "相似动效对比";
             reverseLabel.text = options.reverse ? "方向：退出 / 反向" : "方向：进入 / 正向";
             bool reversible = CurrentEffectId == "A01" || CurrentEffectId == "A02" || CurrentEffectId == "A03" || CurrentEffectId == "A07" || CurrentEffectId == "C02" || CurrentEffectId == "C03" || CurrentEffectId == "C04" || CurrentEffectId == "D01" || CurrentEffectId == "D02";
@@ -410,9 +411,9 @@ namespace TweenGallery
             if (!strength) strengthValue.text = "不适用";
             if (!distance) distanceValue.text = "不适用";
             if (!stagger) staggerValue.text = "不适用";
-            strengthValue.color = strength ? Cyan : Muted;
-            distanceValue.color = distance ? Cyan : Muted;
-            staggerValue.color = stagger ? Cyan : Muted;
+            strengthValue.color = strength ? GalleryTheme.Ink : Muted;
+            distanceValue.color = distance ? GalleryTheme.Ink : Muted;
+            staggerValue.color = stagger ? GalleryTheme.Ink : Muted;
             easingButton.interactable = true;
         }
 
@@ -562,7 +563,7 @@ namespace TweenGallery
 
         Slider MakeSlider(string title, string units, float y, float min, float max, out Text valueLabel, Action<float> action)
         {
-            Label(root, title, 1258, y, 155, 28, 16, Color.white);
+            Label(root, title, 1258, y, 155, 28, 16, GalleryTheme.Ink);
             valueLabel = Label(root, "", 1411, y, 137, 28, 15, Cyan, TextAnchor.MiddleRight, true);
             var control = Rect(root, title + " slider", 1258, y + 35, 290, 24);
             var hitArea = control.gameObject.AddComponent<Image>();
@@ -593,7 +594,7 @@ namespace TweenGallery
             for (int i = 0; i < easeValues.Length; i++)
             {
                 int index = i;
-                ButtonAt(easingPopup, easeNames[i], 7, 7 + i * 39, 293, 35, Hex("303657"), Color.white, 14, () =>
+                ButtonAt(easingPopup, easeNames[i], 7, 7 + i * 39, 293, 35, Hex("303657"), GalleryTheme.Ink, 14, () =>
                 {
                     if (options == null) return;
                     options.ease = easeValues[index]; easingPopup.gameObject.SetActive(false); RefreshControlLabels(); Replay();
@@ -625,8 +626,8 @@ namespace TweenGallery
             var button = image.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
             ColorBlock colors = button.colors;
-            colors.normalColor = Color.white; colors.highlightedColor = new Color(1.12f, 1.12f, 1.12f, 1);
-            colors.pressedColor = new Color(.76f, .76f, .86f, 1); colors.selectedColor = Color.white; colors.fadeDuration = .08f;
+            colors.normalColor = Color.white; colors.highlightedColor = new Color(1.04f, 1.04f, 1.04f, 1);
+            colors.pressedColor = new Color(.9f, .87f, .83f, 1); colors.selectedColor = Color.white; colors.fadeDuration = .08f;
             button.colors = colors;
             var navigation = new Navigation { mode = Navigation.Mode.None }; button.navigation = navigation;
             if (title.Length > 0) Label(image.transform, title, 5, 0, w - 10, h, size, textColor, TextAnchor.MiddleCenter, true);
@@ -674,7 +675,7 @@ namespace TweenGallery
             rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one; rect.offsetMin = rect.offsetMax = Vector2.zero;
         }
 
-        static Color Hex(string value) { ColorUtility.TryParseHtmlString("#" + value, out Color color); return color; }
+        static Color Hex(string value) { ColorUtility.TryParseHtmlString("#" + value, out Color color); return GalleryTheme.Surface(color); }
         static Color CategoryColor(string group)
         {
             switch (group) { case "A": return Violet; case "B": return Pink; case "C": return Cyan; case "D": return Yellow; case "F": return Hex("FF8A22"); default: return Hex("65EA75"); }

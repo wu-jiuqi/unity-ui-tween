@@ -11,18 +11,21 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd533701d940da54eae8b67f2faf3541, type: 3}
   m_Name: E02
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   effectId: E02
   settings:
-    duration: 2.5
+    duration: 2.8
     strength: 1
-    distance: 100
-    stagger: 0.1
+    distance: 0
+    stagger: 0
     ease: Preset
     reverse: 0
     loop: 0
     unscaledTime: 1
     speed: 1
+    overshoot: 1.1
+    inactiveColor: {r: 0.83, g: 0.79, b: 0.73, a: 1}
+    activeColor: {r: 0.65, g: 0.86, b: 0.76, a: 1}
     startValue: 100
     endValue: 1250
     fillFrom: 0.08

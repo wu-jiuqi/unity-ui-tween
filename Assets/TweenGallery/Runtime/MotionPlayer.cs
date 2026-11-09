@@ -147,7 +147,7 @@ namespace TweenGallery
             float phase = 0f;
             ownedTween = DOTween.To(() => phase, value => { phase = value; if (bindings.target != null) bindings.target.localScale = Vector3.LerpUnclamped(fromScale,toScale,value); }, 1f,
                     pressed ? Mathf.Min(.15f, Mathf.Max(.05f, settings.duration * .25f)) : Mathf.Max(.1f, settings.duration * .6f))
-                .SetEase(pressed ? Ease.OutQuad : rebound ? Ease.OutElastic : Ease.OutQuad)
+                .SetEase(pressed ? Ease.OutQuad : rebound ? Ease.OutBack : Ease.OutQuad, Mathf.Clamp(settings.overshoot,0,3))
                 .SetUpdate(settings.unscaledTime).SetAutoKill(false);
             ownedTween.timeScale = Mathf.Clamp(settings.speed, .05f, 4f);
         }
@@ -284,7 +284,7 @@ namespace TweenGallery
                 cachedEaseName = settings.ease;
                 hasCustomEase = !string.IsNullOrEmpty(cachedEaseName) && cachedEaseName != "Preset" && Enum.TryParse(cachedEaseName, out cachedEase);
             }
-            return EaseManager.Evaluate(hasCustomEase ? cachedEase : preset, null, Mathf.Clamp01(t), 1f, 1.70158f, 0f);
+            return EaseManager.Evaluate(hasCustomEase ? cachedEase : preset, null, Mathf.Clamp01(t), 1f, Mathf.Clamp(settings.overshoot,0,3), 0f);
         }
         private float Phase(float t, float begin, float end) { return Mathf.Clamp01((t - begin) / Mathf.Max(.001f, end - begin)); }
         private Vector2 P(RectTransform target) { return baseline.Position(target); }
@@ -339,7 +339,7 @@ namespace TweenGallery
                 case "A04":
                     q = E(t, Ease.OutBack); Scale(target, Mathf.LerpUnclamped(Mathf.Clamp(1f - .8f * a, .05f, 1f), 1f, q)); Alpha(bindings.group, Phase(t, 0f, .45f)); break;
                 case "B02":
-                    q = t < .3f ? Mathf.Lerp(1f, 1f - .16f * a, E(t / .3f, Ease.OutQuad)) : Mathf.LerpUnclamped(1f - .16f * a, 1f, E(Phase(t, .3f, 1f), Ease.OutElastic));
+                    q = t < .3f ? Mathf.Lerp(1f, 1f - .16f * a, E(t / .3f, Ease.OutQuad)) : Mathf.LerpUnclamped(1f - .16f * a, 1f, E(Phase(t, .3f, 1f), Ease.OutBack));
                     Scale(target, q); break;
                 case "D03":
                     q = E(t, Ease.InOutSine); Vector2 flight = ToDestination(target);
@@ -365,12 +365,12 @@ namespace TweenGallery
                 case "B06": float punchTime=Mathf.Clamp01(E(t,Ease.Linear)); q = Mathf.Sin(punchTime * Mathf.PI * 5f) * Mathf.Pow(1f - punchTime, 2f) * .32f * a; ScaleXY(target, 1f + q, 1f - q * .45f); break;
                 case "B07":
                     q = E(t); Move(target, Vector2.up * d * .25f * q); Scale(target, 1f + .12f * a * q);
-                    Scale(bindings.secondary, 1.12f - .12f * q); Move(bindings.secondary, Vector2.up * d * .25f * (1f - q));
-                    if (bindings.image != null) bindings.image.color = Color.Lerp(baseline.Color(bindings.image) * new Color(.5f,.5f,.5f,1f), baseline.Color(bindings.image), q);
-                    if (bindings.secondaryImage != null) bindings.secondaryImage.color = Color.Lerp(baseline.Color(bindings.secondaryImage), baseline.Color(bindings.secondaryImage) * new Color(.5f,.5f,.5f,1f), q); break;
+                    Scale(bindings.secondary, 1f + .12f * a * (1f-q)); Move(bindings.secondary, Vector2.up * d * .25f * (1f - q));
+                    if (bindings.image != null) bindings.image.color = Color.Lerp(Color.Lerp(baseline.Color(bindings.image),settings.inactiveColor,.45f),baseline.Color(bindings.image),q);
+                    if (bindings.secondaryImage != null) bindings.secondaryImage.color = Color.Lerp(baseline.Color(bindings.secondaryImage),Color.Lerp(baseline.Color(bindings.secondaryImage),settings.inactiveColor,.45f),q); break;
                 case "B08":
                     q = E(t, Ease.InOutCubic); Move(target, (bindings.destination != null ? ToDestination(target) : Vector2.right * d) * q);
-                    if (bindings.image != null) bindings.image.color = Color.Lerp(new Color(.25f,.3f,.48f,1f), new Color(.25f,.95f,.49f,1f), q); break;
+                    if (bindings.image != null) bindings.image.color = Color.Lerp(settings.inactiveColor,settings.activeColor,q); break;
                 case "C01": Move(target, Vector2.up * d * (1f - E(t, Ease.OutBack))); Alpha(bindings.group, Phase(t, 0f, .3f)); break;
                 case "C02": Move(target, Vector2.left * d * (1f - E(t))); Alpha(bindings.secondaryGroup, .7f * E(t, Ease.OutQuad)); break;
                 case "C03": if (bindings.mask != null) bindings.mask.sizeDelta = new Vector2(baseline.Size(bindings.mask).x, baseline.Size(bindings.mask).y * Mathf.Clamp01(E(t))); break;
@@ -401,7 +401,7 @@ namespace TweenGallery
                 case "D04": EvaluateBurst(t,a,d); break;
                 case "D05": EvaluateSettlement(t,a); break;
                 case "D06":
-                    for(int i=0;i<bindings.items.Length;i++) { q=StaggerPhase(t,i,bindings.items.Length); Scale(bindings.items[i],Mathf.LerpUnclamped(Mathf.Clamp(1f-.65f*a,.05f,1f),1f,E(q,Ease.OutBack))); ItemAlpha(i,Mathf.Lerp(.15f,1f,Phase(q,0f,.3f))); Image star=baseline.PrimaryImage(bindings.items[i]); if(star!=null) star.color=Color.Lerp(new Color(.24f,.27f,.39f,1f),baseline.Color(star),Phase(q,0f,.25f)); } break;
+                    for(int i=0;i<bindings.items.Length;i++) { q=StaggerPhase(t,i,bindings.items.Length); Scale(bindings.items[i],Mathf.LerpUnclamped(Mathf.Clamp(1f-.65f*a,.05f,1f),1f,E(q,Ease.OutBack))); ItemAlpha(i,Mathf.Lerp(.15f,1f,Phase(q,0f,.3f))); Image star=baseline.PrimaryImage(bindings.items[i]); if(star!=null) star.color=Color.Lerp(settings.inactiveColor,baseline.Color(star),Phase(q,0f,.25f)); } break;
                 case "D07":
                     q=E(t,Ease.InOutSine); Rotate(target,new Vector3(0f,q<.5f?q*180f:(q-1f)*180f,0f));
                     GraphicAlpha(bindings.image,q<.5f?1f:0f); GraphicAlpha(bindings.secondaryImage,q>=.5f?1f:0f); Alpha(bindings.group,q<.5f?1f:0f); Alpha(bindings.secondaryGroup,q>=.5f?1f:0f); break;

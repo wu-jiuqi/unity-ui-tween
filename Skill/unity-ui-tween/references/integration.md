@@ -1,5 +1,7 @@
 # Unity 模板与参数接入手册
 
+0.5.0-preview2 更新：全部 46 项的推荐参数及实际 Prefab 已统筹优化。新增 `MotionSettings.overshoot`（默认 1.1）控制 OutBack 超调；`inactiveColor`、`activeColor` 控制状态色。B02 和 SetPressed 松开默认使用柔和单次 OutBack。序列化的用户配置不会被自动替换，迁移范围见 [统一选型](motion-system.md)。
+
 版本 0.3.0。基线为 Unity 6000.0.26f1、UGUI 2.0.0、DOTween 免费版 1.3.045、Built-in 渲染管线。实际验证结果见随发布包提供的验收记录；版本信息不代表所有平台与管线均已验证。
 
 ## 三种接入方式
