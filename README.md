@@ -1,24 +1,32 @@
-# Unity UI Motion Gallery
+# Unity UI Recipe Gallery
 
-一套以 **Unity UGUI + DOTween 免费版** 实现的 UI 动效库：46个基础预设/预制体、可运行Windows展馆、交互/页面/文字配方、通用Runtime、Codex Skill和中文文档。当前开发版 **0.6.0-preview3**；已发布稳定版为 **0.4.0**。
+当前开发版 **0.7.0-dev**：以 **12 个层级 × 每层 8 条，共 96 条场景配方**重新设计的 Unity UI 动效展馆。每条都有真实操作、状态变化、推荐参数、边界验收与减弱动态表达。已发布稳定版仍为 0.4.0，本分支不覆盖既有 Release。
 
-展馆统一使用暖奶油、薄荷、淡紫与暖金的柔和玩具质感 UI，并以同一份 MotionPlayer 播放实际交付的模板。A01–F06 固定编号覆盖出现消失、交互反馈、页面转场、奖励数值、循环和编排。
+默认页严格以用户指定的卡牌与拖放原型为视觉基准，采用金属灰工作台、三张大卡牌、中央青色选中轮廓、下方拖拽/背包及右侧检查器。支持名称/状态/素材搜索、层级与状态筛选、直接操作、引导操作、暂停/慢放、表现时间轴和参数导出。重播表现不会重新提交业务，重置场景才恢复初始数据。
 
-0.4.0 新增可拖动时间轴、参数 JSON 导出和 image gen 美术，优化数值文本与共享元素采样，并提供可重复打包及轻量 Runtime 包。保留全部 46 个现有 Prefab 的 GUID 与内部 fileID。
+美术全部按 **imagegen 整页原型 → 分层资源 → Unity Sprite 拆分 → 重新拼装**制作：4 张原型（其中卡牌与拖放已由用户指定为定稿）、10 张分层图集、2 张单体及定稿精确裁切，共 117 个独立部件。文字、数值与交互保持原生；按钮底板/阴影/高光/图标、卡框/插画/卡背、箱体/箱盖分别绑定。原始 PNG 不做程序重绘或抠图修补。
 
-0.3.0 增加交互实验室、姿态接续、阻尼弹簧、果冻拖拽、事件与对象池保护、减弱动效和可选 TMP 适配；旧的 46 项预制体保留。完整 Skill 包可独立生成，不需先构建 Windows 展馆。
+- [96 条完整规格](docs/recipes-96.md) · [逐项验收矩阵](docs/recipes-96-acceptance.md) · [结构与接入边界](docs/recipes-96-architecture.md)
+- [美术原型与资源清单](docs/recipe-art.md) · [按钮原型](ArtSource/Recipes-v070/prototypes/controls.png) · [卡牌原型](ArtSource/Recipes-v070/prototypes/cards.png)
+- [真实 Player 默认画面](docs/previews/v070/reference-default.png) · [本机验证说明](docs/recipes-96-validation.md)
 
-- [展馆时间轴、JSON 与新美术](docs/gallery-preview.md)，[生成记录](docs/art-generation-v040.md)，[轻量 Runtime 包](docs/runtime-package.md)。
-- [快速上手](docs/quickstart.md)：Windows 展馆、Unity 工程与模板、Skill 安装。
-- [46 项图鉴](docs/catalog.md)：效果差异、参数、绑定、依赖和逐项提示词。
-- [进阶参考与原创转化](docs/design-references.md)。
-- [接入与参数](docs/integration.md)：真实项目 API、布局与生命周期规则。
-- [交互组件](docs/interaction.md)、[编排与音频](docs/orchestration.md)、[移动与性能](docs/mobile-performance.md)及 [Skill 独立打包](docs/skill-packaging.md)。
-- [提示词与验收](docs/acceptance.md)：组合请求与检查标准。
-- [实际验证记录](docs/validation.md)：以日志和实测为准。
-- [发布使用指南](docs/release-guide.md)：完整解压、资产核对和已知范围。
-- [第三方许可](ThirdPartyLicenses/README.md)：DOTween 与中文字体说明。
+## 打开与构建
 
+Unity 6000.0.26f1、UGUI 2.0.0、仓库原有 DOTween 免费版、Built-in。打开 `Assets/TweenGallery/Scenes/RecipeGallery.unity` 运行新馆。旧馆的场景、46 个基础预制体/预设、扩展配方和旧构建保留，新馆右下可进入旧馆归档。
+
+```powershell
+./scripts/recipes96.ps1 -Target Build
+./scripts/recipes96.ps1 -Target Validate
+python scripts/test_recipes96.py
+```
+
+默认 Unity 路径为 `D:\Unity\Editor\Unity.exe`，可传 `-Unity` 指定。新构建输出 `Builds/Recipes96/UIRecipeGallery.exe`，不会覆盖旧 `Builds/Windows`。验证需要可见 Player 窗口，防止隐藏窗口产生黑屏截图。
+
+新配方编号为 `01.01` 至 `12.08`，不能直接传给旧 `MotionPlayer.Play`。`RecipeStage` 提供场景示例与清晰的状态/表现边界，接入宿主时仍需替换示例数据与业务入口。[Runtime 包](docs/runtime-package.md) 不带展馆和演示美术；完整包包含图集及参考原型。
+
+## 旧馆与历史开发记录
+
+以下记录描述保留的旧馆及其历史风格，不作为新馆的主目录或新美术规范。
 ## 0.6.0 三档规则与页面配方
 
 preview2先用image gen生成两张整屏参考，再拆出8份PNG并拼装，使用独立艺术标题、空白缎带、原生动态文字和实际字体字重，统一优化旧目录与新页面的文字/底板关系。拒收中央透明的失败底板。流程已强化到Skill：[整图到美术资源](docs/art-composition-workflow.md)。完整Skill同时打包参考图、提示词和资源清单，Runtime仍不带演示美术/字体。
@@ -68,4 +76,3 @@ Unity **6000.0.26f1**、UGUI **2.0.0**、DOTween 免费版 **1.3.045**、Built-i
 打开 Gallery.unity 可在编辑器运行。需要重新生成展馆场景和模板时，在此独立工程使用菜单 **Tools → UI Motion Gallery → Prepare scene and templates**；Windows 构建使用 **Build Windows and export templates**。Prepare 会重建当前展馆场景，先保存手动改动。
 
 当前工作区为 0.4.0 预览版本，发布状态与下载资产以 GitHub Release 为准。当前验证和限制见 PROGRESS.md 与验证记录。
-

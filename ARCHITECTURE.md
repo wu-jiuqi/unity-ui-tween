@@ -2,7 +2,13 @@
 
 Unity 6000.0.26f1, UGUI, DOTween free, built-in render pipeline. Namespace `TweenGallery`.
 
-## 0.6 presentation layer
+## 0.7 recipe gallery (current entry)
+
+`RecipeGallery.unity` is the default scene. `TweenGallery.Recipes` separates the 96-entry `RecipeCatalog`, interactive `RecipeStage`, scoped `MotionChannelArbiter`, and `RecipeGalleryBootstrap` workbench. The initial card-and-drag composition follows the approved ImageGen reference; its portrait, frame, plaque, glow, slots, and shell are independently assembled sprites. Text and hit targets remain native UGUI. See [96-recipe architecture](docs/recipes-96-architecture.md), [art provenance and slicing](docs/recipe-art.md), and [validation](docs/recipes-96-validation.md).
+
+The complete 12 × 8 directory is independent of the legacy A–E catalog. Business state commits before presentation. Replay and timeline sampling do not issue rewards or repeat input; each scenario owns its tween/channel lifecycle. Reduced motion preserves outcomes and readable feedback. The current contract is documented in `docs/recipes-96*.md`. The sections below describe the preserved 0.6 gallery and its runtime compatibility API.
+
+## 0.6 presentation layer (archive)
 
 Preview2 adds reference-first composition and 7 text/logo recipes (57 browse options total). GalleryCompositionArt assembles independent generated PNG title art, blank controls, ribbons and glyph sprites. GalleryTypography uses the real Regular/Medium/Bold font files with FontStyle.Normal, preserving deliberate hierarchy. MotionVisualSequence owns scoped clocks for MotionTextSequence, MotionLogoDrop, MotionMarquee, MotionSpriteSequence and MotionConfettiSequence. MotionJellyGraphic supplies the logo's small mesh deformation. See docs/art-composition-workflow.md, text-logo-recipes.md and project-motion-audit.md. T IDs are recipe IDs, never MotionCatalog IDs.
 

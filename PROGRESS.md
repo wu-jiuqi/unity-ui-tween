@@ -1,9 +1,8 @@
-# Task2 v0.6.0-preview3
-
-The accepted task2 fixes are prepared for release from codex/button-style-skill-v050, based on 20931a5 (v0.6.0-preview2). See docs/task2-v060-review.md for code/Skill changes, acceptance validation and untested scope. Release assets carry RELEASE_INFO.json with the exact published commit and final build/test evidence. Older version records below are historical.
-
 # 当前进度
 
+- 0.7.0-dev：按用户指定的卡牌与拖放定稿重建 16:10 展馆，三张大卡牌、选中轮廓、拖放/背包和检查器均由独立素材组合。人物直接使用定稿原始 Sprite 裁切，透明内窗卡框、名称牌、稀有度、宝石和光效分层。10 张分层图集、2 张单体和原型精确裁切共 117 部件；原始 PNG 与哈希保留。
+- 完整 12×8 目录、96 条规格和可操作场景已实现。默认快捷页还原定稿，左下进入完整目录/搜索，检查器齿轮提供减弱动态、验收和 JSON 导出。旧馆和旧构建保留。
+- 本机 Windows 1600×1000、1280×720 各 96 条操作/边界/采样/减弱/清理自动检查通过；构建零错误零警告。运行截图和报告见 docs/recipes-96-validation.md。代理已检查场景布局；用户视觉验收仍待进行。Android、微信、第二台干净电脑尚未验证；未发布新的稳定 Release。
 - 0.6.0-preview2：整屏参考→资源拆分→Unity拼装，8份新PNG与真实字体字重，艺术标题/动态文字分开；修复失效透明底板的验收。扫描291脚本、复核34个UI候选，补齐T01–T07、Sprite图帧和彩纸/星屑，主目录57项；强化Skill的美术流程、文字/Logo接线和项目类型审计。
 
 - 0.6.0-preview1：按确认原型接入三档动效规则，原46项与实时按钮共用；新增 P01 整页时间轴、P02 响应式选择，主目录共50项。生成并实际接入 PNG 面板、徽章、四格奖励图集；无 SVG 占位。补充三份 Skill 接线文档，页面配置使用 schemaVersion=3。完成本轮检查后推送开发分支，未发布新的 Release。

@@ -1,0 +1,154 @@
+[
+  {
+    "atlas": "surfaces",
+    "sha256": "b359eefd6bde6107bbb9c79f12e42763bf953580c365c40bf59049c9338d944a",
+    "width": 1274,
+    "height": 1234,
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "imagegen",
+    "prototype": "surfaces"
+  },
+  {
+    "atlas": "buttons",
+    "sha256": "dc686bc608787a539aa5a236e921ab356d6b2bdc92d57876caa498b70f81c15b",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "imagegen",
+    "prototype": "controls"
+  },
+  {
+    "atlas": "inputs",
+    "sha256": "1e082a9f6c9c7a7dd21f857b1f4c983daa8b6fa26c8ba472c9ab364bcbc3ad3a",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "imagegen",
+    "prototype": "controls"
+  },
+  {
+    "atlas": "cards",
+    "sha256": "3e8e9900ee096ed93b2b935fef426ac50f9b161c57ff0e515778bae3c1489e8c",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "imagegen",
+    "prototype": "cards"
+  },
+  {
+    "atlas": "rewards",
+    "sha256": "d63fdd49cd60bbb6475903b29f927617f742c2b5ff54ab07d6b1ea81cc3459d5",
+    "width": 1263,
+    "height": 1246,
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "imagegen",
+    "prototype": "rewards"
+  },
+  {
+    "atlas": "bars",
+    "sha256": "21f1491b65b38a704c2f5d2f27cbe9d914ffb98690d682650f158fde47f70825",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "imagegen",
+    "prototype": "surfaces"
+  },
+  {
+    "atlas": "feedback",
+    "sha256": "1de32c4439f37ba84a695bd2bc2700d521d31c06b2d03c665a6e2717a12cf99a",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "imagegen",
+    "prototype": "rewards"
+  },
+  {
+    "atlas": "objects",
+    "sha256": "1d7972259555bbcd371b76c237b5083812a83df0ed7f8a55193aa88649a7c5a3",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "imagegen",
+    "prototype": "controls"
+  },
+  {
+    "atlas": "approved-cards",
+    "sha256": "2254d6452445d41b48e1bffb88e69e1302cc01e18740a18226bdd855af10288a",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "imagegen",
+    "prototype": "approved-reference"
+  },
+  {
+    "atlas": "approved-shell",
+    "sha256": "322033ff63945717c319218d18d9e831f02bf51605a610f96fe829579bb29121",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "imagegen",
+    "prototype": "approved-reference"
+  },
+  {
+    "atlas": "approved-pointer",
+    "sha256": "88327ad745625476bf8c50d5dcc12d54f8497d851f0fe31410c90e7d52bcf305",
+    "width": 1536,
+    "height": 1024,
+    "alpha": [
+      0,
+      254
+    ],
+    "source": "imagegen",
+    "prototype": "approved-reference"
+  },
+  {
+    "atlas": "approved-ghost",
+    "sha256": "233ef2587b244487ee51fa3450e7eb0c12cc7b7e8c33c45b6ff3d32caeebc27b",
+    "width": 1174,
+    "height": 1340,
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "imagegen",
+    "prototype": "approved-reference"
+  },
+  {
+    "atlas": "approved-reference",
+    "sha256": "42c35d96057d91ad1a1b7148f54570e969f2c3662ae322ecccceb3b478142fe7",
+    "width": 1586,
+    "height": 992,
+    "source": "user-approved imagegen reference",
+    "role": "authority"
+  }
+]

@@ -1,0 +1,232 @@
+{
+  "format": "Normalized production prompt specifications; full invocation wording remains in the authoring chat",
+  "tool": "built-in imagegen",
+  "style": "Quiet charcoal workbench frame with a large central demonstration stage; demo assets in saturated cobalt, cyan, orange, emerald, purple and gold. Premium chunky rounded painted 3D casual-game material, upper-left lighting, crisp silhouettes, controlled bevels, subtle short shadows. No pastel treatment. Dynamic text stays native and all independently animated parts must be separate.",
+  "authority": "approved-reference.png is the exact user-specified card-and-drag prototype. Its portrait and small tool icons use unmodified Sprite crops.",
+  "prototypes": [
+    {
+      "name": "controls",
+      "promptSpecification": "Quiet charcoal workbench frame with a large central demonstration stage; demo assets in saturated cobalt, cyan, orange, emerald, purple and gold. Premium chunky rounded painted 3D casual-game material, upper-left lighting, crisp silhouettes, controlled bevels, subtle short shadows. No pastel treatment. Dynamic text stays native and all independently animated parts must be separate. Game buttons in normal, pressed, selected and disabled states; independent icons, toggle track and knob, checkbox, radio, focus input and error, slider and 80 value bubble. Chinese context: 按钮与输入, 开始挑战, 领取奖励, 已禁用, 输入名字."
+    },
+    {
+      "name": "surfaces",
+      "promptSpecification": "Quiet charcoal workbench frame with a large central demonstration stage; demo assets in saturated cobalt, cyan, orange, emerald, purple and gold. Premium chunky rounded painted 3D casual-game material, upper-left lighting, crisp silhouettes, controlled bevels, subtle short shadows. No pastel treatment. Dynamic text stays native and all independently animated parts must be separate. Layered mission panel with header, task rows and buttons; side drawer, anchored dropdown and compact tooltip; navigation tabs and selection line; health, XP and quest progress. Chinese context: 面板与导航, 星光旅程, 探索任务, 任务详情."
+    },
+    {
+      "name": "cards",
+      "promptSpecification": "Quiet charcoal workbench frame with a large central demonstration stage; demo assets in saturated cobalt, cyan, orange, emerald, purple and gold. Premium chunky rounded painted 3D casual-game material, upper-left lighting, crisp silhouettes, controlled bevels, subtle short shadows. No pastel treatment. Dynamic text stays native and all independently animated parts must be separate. Portrait collectible fox-explorer card front with cobalt cape/orange scarf/cyan crystal; purple compass card back, independent rarity gem and gloss; inventory item and source/valid/invalid sockets. Chinese context: 卡牌与拖放, 星光旅者, 源槽, 可放置, 类型不匹配."
+    },
+    {
+      "name": "rewards",
+      "promptSpecification": "Quiet charcoal workbench frame with a large central demonstration stage; demo assets in saturated cobalt, cyan, orange, emerald, purple and gold. Premium chunky rounded painted 3D casual-game material, upper-left lighting, crisp silhouettes, controlled bevels, subtle short shadows. No pastel treatment. Dynamic text stays native and all independently animated parts must be separate. Blue-gold hinged chest, independent lid and body, coins and crystal; gold/unlit rating stars, trophy medal, level badge, ranking rows and wallet; spinner, hand, gleam and halo. Chinese context: 奖励与反馈, 旅程完成, 成就解锁, 等级提升, 继续."
+    }
+  ],
+  "atlases": [
+    {
+      "atlas": "surfaces",
+      "reference": "prototypes/surfaces.png",
+      "columns": 3,
+      "rows": 3,
+      "promptSpecification": "Use attached approved prototype as style/shape reference. Generate transparent PNG sprite atlas only; front-facing orthographic assets, no complete interface, no grid lines or cell labels. One complete independent asset per equal cell with clear alpha gutter. Preserve the prototype material/light. No text or numbers on surfaces. All central plates solid and opaque; intentional halo/outline holes and gloss remain transparent. Read parts row-major. Chest body/lid, card frame/art/back/gem/gloss and control track/knob/tick are separate; do not combine.",
+      "parts": [
+        "panel",
+        "drawer",
+        "tooltip",
+        "list-row",
+        "list-selected",
+        "toast",
+        "tab",
+        "tab-selected",
+        "header"
+      ]
+    },
+    {
+      "atlas": "buttons",
+      "reference": "prototypes/controls.png",
+      "columns": 3,
+      "rows": 3,
+      "promptSpecification": "Use attached approved prototype as style/shape reference. Generate transparent PNG sprite atlas only; front-facing orthographic assets, no complete interface, no grid lines or cell labels. One complete independent asset per equal cell with clear alpha gutter. Preserve the prototype material/light. No text or numbers on surfaces. All central plates solid and opaque; intentional halo/outline holes and gloss remain transparent. Read parts row-major. Chest body/lid, card frame/art/back/gem/gloss and control track/knob/tick are separate; do not combine.",
+      "parts": [
+        "button-blue",
+        "button-orange",
+        "button-green",
+        "button-purple",
+        "button-disabled",
+        "button-shadow",
+        "button-gloss",
+        "button-square",
+        "button-close"
+      ]
+    },
+    {
+      "atlas": "inputs",
+      "reference": "prototypes/controls.png",
+      "columns": 4,
+      "rows": 4,
+      "promptSpecification": "Use attached approved prototype as style/shape reference. Generate transparent PNG sprite atlas only; front-facing orthographic assets, no complete interface, no grid lines or cell labels. One complete independent asset per equal cell with clear alpha gutter. Preserve the prototype material/light. No text or numbers on surfaces. All central plates solid and opaque; intentional halo/outline holes and gloss remain transparent. Read parts row-major. Chest body/lid, card frame/art/back/gem/gloss and control track/knob/tick are separate; do not combine.",
+      "parts": [
+        "toggle-track",
+        "toggle-knob",
+        "checkbox-off",
+        "checkbox-on",
+        "radio-off",
+        "radio-on",
+        "input-normal",
+        "input-focus",
+        "input-error",
+        "slider-track",
+        "slider-handle",
+        "value-bubble",
+        "underline",
+        "badge",
+        "page-dot",
+        "page-dot-active"
+      ]
+    },
+    {
+      "atlas": "cards",
+      "reference": "prototypes/cards.png",
+      "columns": 3,
+      "rows": 3,
+      "promptSpecification": "Use attached approved prototype as style/shape reference. Generate transparent PNG sprite atlas only; front-facing orthographic assets, no complete interface, no grid lines or cell labels. One complete independent asset per equal cell with clear alpha gutter. Preserve the prototype material/light. No text or numbers on surfaces. All central plates solid and opaque; intentional halo/outline holes and gloss remain transparent. Read parts row-major. Chest body/lid, card frame/art/back/gem/gloss and control track/knob/tick are separate; do not combine.",
+      "parts": [
+        "card-front",
+        "card-back",
+        "card-art",
+        "card-rarity",
+        "card-gloss",
+        "slot-source",
+        "slot-valid",
+        "slot-invalid",
+        "archive-slot"
+      ]
+    },
+    {
+      "atlas": "rewards",
+      "reference": "prototypes/rewards.png",
+      "columns": 3,
+      "rows": 3,
+      "promptSpecification": "Use attached approved prototype as style/shape reference. Generate transparent PNG sprite atlas only; front-facing orthographic assets, no complete interface, no grid lines or cell labels. One complete independent asset per equal cell with clear alpha gutter. Preserve the prototype material/light. No text or numbers on surfaces. All central plates solid and opaque; intentional halo/outline holes and gloss remain transparent. Read parts row-major. Chest body/lid, card frame/art/back/gem/gloss and control track/knob/tick are separate; do not combine.",
+      "parts": [
+        "chest-body",
+        "chest-lid",
+        "star-lit",
+        "star-unlit",
+        "coin",
+        "crystal",
+        "medal",
+        "level-badge",
+        "wallet"
+      ]
+    },
+    {
+      "atlas": "bars",
+      "reference": "prototypes/surfaces.png",
+      "columns": 3,
+      "rows": 3,
+      "promptSpecification": "Use attached approved prototype as style/shape reference. Generate transparent PNG sprite atlas only; front-facing orthographic assets, no complete interface, no grid lines or cell labels. One complete independent asset per equal cell with clear alpha gutter. Preserve the prototype material/light. No text or numbers on surfaces. All central plates solid and opaque; intentional halo/outline holes and gloss remain transparent. Read parts row-major. Chest body/lid, card frame/art/back/gem/gloss and control track/knob/tick are separate; do not combine.",
+      "parts": [
+        "bar-track",
+        "bar-health",
+        "bar-damage",
+        "bar-xp",
+        "bar-gold",
+        "step-off",
+        "step-on",
+        "rank-row",
+        "rank-selected"
+      ]
+    },
+    {
+      "atlas": "feedback",
+      "reference": "prototypes/rewards.png",
+      "columns": 4,
+      "rows": 4,
+      "promptSpecification": "Use attached approved prototype as style/shape reference. Generate transparent PNG sprite atlas only; front-facing orthographic assets, no complete interface, no grid lines or cell labels. One complete independent asset per equal cell with clear alpha gutter. Preserve the prototype material/light. No text or numbers on surfaces. All central plates solid and opaque; intentional halo/outline holes and gloss remain transparent. Read parts row-major. Chest body/lid, card frame/art/back/gem/gloss and control track/knob/tick are separate; do not combine.",
+      "parts": [
+        "notice-info",
+        "notice-success",
+        "notice-error",
+        "notice-warning",
+        "check",
+        "prohibit",
+        "arrow",
+        "hand",
+        "spinner",
+        "halo",
+        "shine",
+        "focus-outline",
+        "selection-outline",
+        "ghost",
+        "avatar",
+        "unread"
+      ]
+    },
+    {
+      "atlas": "objects",
+      "reference": "prototypes/controls.png",
+      "columns": 3,
+      "rows": 3,
+      "promptSpecification": "Use attached approved prototype as style/shape reference. Generate transparent PNG sprite atlas only; front-facing orthographic assets, no complete interface, no grid lines or cell labels. One complete independent asset per equal cell with clear alpha gutter. Preserve the prototype material/light. No text or numbers on surfaces. All central plates solid and opaque; intentional halo/outline holes and gloss remain transparent. Read parts row-major. Chest body/lid, card frame/art/back/gem/gloss and control track/knob/tick are separate; do not combine.",
+      "parts": [
+        "swords",
+        "gift",
+        "home",
+        "lock",
+        "gear",
+        "heart",
+        "xp",
+        "bubble",
+        "direction-arrow"
+      ]
+    },
+    {
+      "atlas": "approved-cards",
+      "reference": "approved-reference.png",
+      "columns": 3,
+      "rows": 3,
+      "promptSpecification": "Use attached approved prototype as style/shape reference. Generate transparent PNG sprite atlas only; front-facing orthographic assets, no complete interface, no grid lines or cell labels. One complete independent asset per equal cell with clear alpha gutter. Preserve the prototype material/light. No text or numbers on surfaces. All central plates solid and opaque; intentional halo/outline holes and gloss remain transparent. Read parts row-major. Chest body/lid, card frame/art/back/gem/gloss and control track/knob/tick are separate; do not combine.",
+      "parts": [
+        "approved-frame",
+        "approved-back",
+        "approved-portrait",
+        "approved-banner",
+        "approved-rarity",
+        "approved-gem",
+        "approved-glow",
+        "approved-amber",
+        "approved-potion"
+      ]
+    },
+    {
+      "atlas": "approved-shell",
+      "reference": "approved-reference.png",
+      "columns": 3,
+      "rows": 3,
+      "promptSpecification": "Use attached approved prototype as style/shape reference. Generate transparent PNG sprite atlas only; front-facing orthographic assets, no complete interface, no grid lines or cell labels. One complete independent asset per equal cell with clear alpha gutter. Preserve the prototype material/light. No text or numbers on surfaces. All central plates solid and opaque; intentional halo/outline holes and gloss remain transparent. Read parts row-major. Chest body/lid, card frame/art/back/gem/gloss and control track/knob/tick are separate; do not combine.",
+      "parts": [
+        "wb-sidebar",
+        "wb-stage",
+        "wb-inspector",
+        "wb-gray",
+        "wb-title",
+        "wb-play",
+        "wb-inventory",
+        "wb-slider",
+        "wb-handle"
+      ]
+    }
+  ],
+  "standalone": [
+    {
+      "name": "approved-pointer",
+      "reference": "approved-reference.png",
+      "promptSpecification": "Only the exact cyan curved down-left drag arrow, actual transparent alpha, no other objects."
+    },
+    {
+      "name": "approved-ghost",
+      "reference": "approved-reference.png",
+      "promptSpecification": "Only the thin cyan dashed closed rounded-rectangle ghost slot outline, not four corner brackets; actual transparent center and background."
+    }
+  ]
+}

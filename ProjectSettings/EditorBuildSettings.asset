@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/TweenGallery/Scenes/RecipeGallery.unity
+    guid: a9fbc0b3b1aad4c4487cd6449303cebf
+  - enabled: 1
     path: Assets/TweenGallery/Scenes/Gallery.unity
     guid: 80523cd6abe98564d8e84ed998665112
   m_configObjects: {}

@@ -35,7 +35,8 @@ DOC_NAMES = ("acceptance.md", "catalog.md", "integration.md", "interaction.md",
              "mobile-performance.md", "orchestration.md", "skill-packaging.md", "runtime-package.md",
              "button-design.md", "button-recipes.md", "motion-system.md", "gallery-workflow.md",
              "motion-profiles.md", "page-recipes.md", "responsive-layout.md",
-             "art-composition-workflow.md", "text-logo-recipes.md", "project-motion-audit.md")
+             "art-composition-workflow.md", "text-logo-recipes.md", "project-motion-audit.md",
+             "recipes-96.md", "recipes-96-architecture.md", "recipe-art.md")
 
 
 def runtime_asset(relative: str) -> bool:
@@ -43,7 +44,8 @@ def runtime_asset(relative: str) -> bool:
     return (first in {"Runtime", "Optional", "Shaders", "Presets"}
             or relative in {"Runtime.meta", "Optional.meta", "Shaders.meta", "Presets.meta",
                             "Resources.meta", "Resources/motion-catalog.json",
-                            "Resources/motion-catalog.json.meta"})
+                            "Resources/motion-catalog.json.meta", "Resources/recipe-catalog.json",
+                            "Resources/recipe-catalog.json.meta"})
 
 
 def collect_files(profile: str = "full") -> dict[str, Path]:
@@ -102,6 +104,10 @@ def collect_files(profile: str = "full") -> dict[str, Path]:
         for path in sorted(reference_root.glob("*")):
             if path.is_file() and path.suffix in {".png", ".json"}:
                 out[f"unity-ui-tween/assets/Reference/Composition-v061/{path.name}"] = path
+        recipe_reference = PROJECT / "ArtSource" / "Recipes-v070"
+        for path in sorted(recipe_reference.rglob("*")):
+            if path.is_file() and path.suffix in {".png", ".json", ".md"}:
+                out[f"unity-ui-tween/assets/Reference/Recipes-v070/{path.relative_to(recipe_reference).as_posix()}"] = path
     # The docs directory is canonical; never ship stale Skill/reference copies.
     for name in DOC_NAMES:
         document = PROJECT / "docs" / name
