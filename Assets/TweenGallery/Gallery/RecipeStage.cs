@@ -21,6 +21,14 @@ namespace TweenGallery.Recipes
         public float Progress {get;private set;}
         public bool IsPlaying=>motion!=null&&motion.IsActive()&&motion.IsPlaying();
         public bool CanSeek=>render!=null;
+        public bool Looping=>playbackLoop;
+        public bool Backwards=>motion!=null&&motion.IsBackwards();
+        public bool CurveEditable {
+            get{if(ReferenceComposition)return Definition.Group!=8;int g=Definition.Group,n=Definition.Number;
+                switch(g){case 1:return true;case 2:return n!=8;case 3:return n!=5;case 4:return n!=8;case 5:return n!=5;case 6:return n==1||n==2||n==4||n==5;case 7:return n>=2&&n!=7;case 9:return n==1||n==2||n==4||n==8;case 11:return n==5||n==8;default:return false;}}
+        }
+        public bool StrengthEditable=>ReferenceComposition?(ReferencePreviewMode=="scale"||ReferencePreviewMode=="slide"||Definition.id=="03.08"&&ReferencePreviewMode==""):Definition.id=="02.08"||Definition.id=="05.05"||Definition.id=="11.06"||Definition.id=="12.01"||Definition.id=="12.02"||Definition.id=="12.04";
+        public bool ClockEditable=>Definition.Group!=8&&Definition.id!="06.08"&&Definition.id!="07.07"&&Definition.id!="09.06"&&Definition.id!="10.01"&&Definition.id!="10.08";
         public bool Paused {get;private set;}
         public int Generation {get;private set;}
         Tween motion;Action<float> render;Text stateText;RectTransform world,actionsRoot;

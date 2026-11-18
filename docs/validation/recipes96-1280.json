@@ -1,8 +1,8 @@
 {
     "unity": "6000.0.26f1",
-    "version": "0.7.0-dev",
+    "version": "0.7.1-dev",
     "platform": "WindowsPlayer",
-    "utc": "2026-11-18T04:28:03.1100721Z",
+    "utc": "2026-11-18T05:05:40.2286271Z",
     "width": 1280,
     "height": 720,
     "passed": true,
@@ -1066,6 +1066,11 @@
     ],
     "checks": [
         "Approved reference composition and inspector scale preview rendered in Player",
+        "Workbench: raycast all four curves and card shortcuts; scale/flip use actual easing; single-select/double-flip; loop/reverse before play; pause/resume; 34px slider hit area",
+        "Pointer: actual raycast pickup, preserved grab offset, drag enter and accepted drop",
+        "Inventory: actual potion pointer rejects crystal slot; spring re-grab stays continuous; cancel releases pointer",
+        "Inspector hides unsupported curve/strength/clock settings instead of exposing inert controls",
+        "Play routes to close, next page, successful input, star reveal and outside-release sequences instead of blindly invoking the first action",
         "Atomic channel ownership; 96 visible directory entries; imagegen assets present"
     ],
     "errors": []

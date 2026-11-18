@@ -20,7 +20,7 @@ namespace TweenGallery.Editor
             var cam=new GameObject("Camera").AddComponent<Camera>();cam.clearFlags=CameraClearFlags.SolidColor;cam.backgroundColor=new Color(.08f,.09f,.11f);cam.orthographic=true;
             EditorSceneManager.SaveScene(scene,Scene);
             EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene(Scene,true),new EditorBuildSettingsScene("Assets/TweenGallery/Scenes/Gallery.unity",true)};
-            PlayerSettings.bundleVersion="0.7.0-dev";PlayerSettings.productName="UI Recipe Gallery";PlayerSettings.defaultScreenWidth=1600;PlayerSettings.defaultScreenHeight=1000;PlayerSettings.fullScreenMode=FullScreenMode.Windowed;PlayerSettings.resizableWindow=true;PlayerSettings.runInBackground=true;
+            PlayerSettings.bundleVersion="0.7.1-dev";PlayerSettings.productName="UI Recipe Gallery";PlayerSettings.defaultScreenWidth=1600;PlayerSettings.defaultScreenHeight=1000;PlayerSettings.fullScreenMode=FullScreenMode.Windowed;PlayerSettings.resizableWindow=true;PlayerSettings.runInBackground=true;
             AssetDatabase.SaveAssets();Debug.Log("RECIPE_PREPARE_OK 96");
         }
         [MenuItem("Tools/UI Motion Gallery/96 recipes/Build Windows")]

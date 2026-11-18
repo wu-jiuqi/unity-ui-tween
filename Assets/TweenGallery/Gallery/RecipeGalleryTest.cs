@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace TweenGallery.Recipes
 {
@@ -24,6 +25,7 @@ namespace TweenGallery.Recipes
             yield return new WaitForEndOfFrame();ScreenCapture.CaptureScreenshot(Path.Combine(output,"reference-default.png"));yield return null;
             var beforePreview=string.Join("|",gallery.Stage.Data.OrderBy(k=>k.Key).Select(k=>k.Key+"="+k.Value));gallery.GuidedOperation();gallery.Stage.Seek(.5f);
             try{Check(gallery.Stage.ReferenceMainCard!=null,"Approved card composition missing");Check(gallery.Stage.ReferenceMainCard.localScale.x>1&&gallery.Stage.ReferenceMainCard.localScale.x<1.21f,"Scale preview did not animate");Check(beforePreview==string.Join("|",gallery.Stage.Data.OrderBy(k=>k.Key).Select(k=>k.Key+"="+k.Value)),"Preview changed business data");report.checks.Add("Approved reference composition and inspector scale preview rendered in Player");}catch(Exception e){report.errors.Add(e.ToString());}
+            yield return WorkbenchChecks();
             gallery.Select("03.08");yield return null;
             gallery.ShowAllRecipes();yield return null;
             try{CheckChannels();Check(RecipeArt.Available,"Imagegen art missing");CheckDirectory();report.checks.Add("Atomic channel ownership; 96 visible directory entries; imagegen assets present");}
@@ -56,6 +58,53 @@ namespace TweenGallery.Recipes
             gallery.Select("01.01");Finish();
         }
         static void Check(bool condition,string detail){if(!condition)throw new Exception(detail);}
+        Button NamedButton(string name)=>gallery.GetComponentsInChildren<Button>().Single(b=>b.name==name);
+        static RaycastResult Hit(Vector2 point){Canvas.ForceUpdateCanvases();var e=new PointerEventData(EventSystem.current){position=point};var results=new List<RaycastResult>();EventSystem.current.RaycastAll(e,results);Check(results.Count>0,"Nothing hit at "+point);return results[0];}
+        static void Tap(Button b){var p=RectTransformUtility.WorldToScreenPoint(null,b.transform.position);var hit=Hit(p);Check(ExecuteEvents.GetEventHandler<IPointerClickHandler>(hit.gameObject)==b.gameObject,"Button obstructed: "+b.name+" by "+hit.gameObject.name);var e=new PointerEventData(EventSystem.current){position=p,button=PointerEventData.InputButton.Left,clickCount=1};ExecuteEvents.Execute(b.gameObject,e,ExecuteEvents.pointerClickHandler);}
+        IEnumerator WorkbenchChecks(){
+            try{
+                for(int i=0;i<4;i++){Tap(NamedButton("Curve choice "+i));Check(gallery.SelectedCurveIndex==i,"Curve selection did not update");Check(gallery.Stage.Curve==new[]{DG.Tweening.Ease.OutCubic,DG.Tweening.Ease.InCubic,DG.Tweening.Ease.InOutCubic,DG.Tweening.Ease.OutElastic}[i],"Wrong evaluator");}
+                Tap(NamedButton("Curve choice 0"));gallery.Stage.Seek(.25f);float slowEnd=gallery.Stage.ReferenceSelectedCard.localScale.x;
+                Tap(NamedButton("Curve choice 1"));gallery.Stage.Seek(.25f);Check(slowEnd-gallery.Stage.ReferenceSelectedCard.localScale.x>.08f,"Curve did not affect card transform");
+                var fingerprint=gallery.Stage.BusinessFingerprint();Tap(NamedButton("Curve choice 3"));gallery.Stage.Seek(.5f);Check(fingerprint==gallery.Stage.BusinessFingerprint(),"Curve preview changed business state");
+                gallery.Stage.Strength=1.5f;gallery.Stage.PreviewReferenceScale();gallery.Stage.Seek(.13f);var peak=gallery.Stage.ReferenceMainCard;Check(peak.anchoredPosition.y+peak.rect.height*peak.localScale.y*.54f<=448.01f,"Elastic peak clipped above stage");gallery.Stage.Strength=1.2f;
+                gallery.Select("03.08");gallery.TogglePresentationLoop();Check(gallery.Stage.Looping&&gallery.Stage.IsPlaying,"Loop before first play did nothing");gallery.TogglePresentationLoop();Check(!gallery.Stage.Looping,"Loop did not turn off");gallery.Stage.Seek(.4f);Check(gallery.Stage.Paused,"Timeline did not pause");gallery.Stage.TogglePause();Check(gallery.Stage.IsPlaying,"Resume did nothing");gallery.ReversePresentation();Check(gallery.Stage.Backwards,"Reverse did nothing");
+                Tap(NamedButton("Shortcut 排列过渡"));Check(gallery.Stage.ReferenceComposition,"Arrange left the reference cards");gallery.GuidedOperation();gallery.Stage.Seek(.5f);Check(gallery.Stage.ReferenceMainCard.anchoredPosition.x>60,"Cards did not rearrange");
+            }catch(Exception e){report.errors.Add("Workbench controls: "+e);}
+            yield return null;
+            foreach(string name in new[]{"位移滑动","旋转动画","淡入淡出","选中缩放"}){
+                try{Tap(NamedButton("Shortcut "+name));Check(gallery.Stage.ReferenceComposition,"Shortcut changed fixture: "+name);gallery.GuidedOperation();Check(gallery.Stage.CanSeek,"Shortcut has no presentation: "+name);}
+                catch(Exception e){report.errors.Add("Shortcut pointer: "+e);}
+                yield return null;
+            }
+            try{
+                Tap(NamedButton("Curve choice 3"));gallery.Stage.Seek(.4f);
+                var slider=gallery.GetComponentsInChildren<Slider>().First(s=>s.minValue==.08f);var sr=(RectTransform)slider.transform;Check(sr.rect.height>=32,"Slider hit area too narrow");var point=RectTransformUtility.WorldToScreenPoint(null,sr.TransformPoint(new Vector3(sr.rect.width*.3f,10,0)));var hit=Hit(point);Check(ExecuteEvents.GetEventHandler<IPointerDownHandler>(hit.gameObject)==slider.gameObject,"Slider expanded hit area obstructed");var e=new PointerEventData(EventSystem.current){position=point,button=PointerEventData.InputButton.Left};ExecuteEvents.Execute(slider.gameObject,e,ExecuteEvents.pointerDownHandler);Check(gallery.Stage.Duration>1,"Slider click did not set duration");gallery.Stage.Duration=.3f;
+                gallery.SelectShortcut("翻转切换");var card=gallery.Stage.ReferenceMainCard;var click=new PointerEventData(EventSystem.current){button=PointerEventData.InputButton.Left,clickCount=1};ExecuteEvents.Execute(card.gameObject,click,ExecuteEvents.pointerClickHandler);Check(gallery.Stage.Get("face")==0,"Single selection unexpectedly flipped");click.clickCount=2;ExecuteEvents.Execute(card.gameObject,click,ExecuteEvents.pointerClickHandler);Check(gallery.Stage.Get("face")==1,"Double click did not flip once");gallery.ChooseCurve(0);gallery.Stage.Seek(.2f);float outWidth=card.localScale.x;gallery.ChooseCurve(1);gallery.Stage.Seek(.2f);Check(card.localScale.x-outWidth>.5f,"Flip ignored curve selection");
+                gallery.SelectShortcut("选中缩放");gallery.ChooseCurve(3);gallery.Stage.Seek(.4f);
+                report.checks.Add("Workbench: raycast all four curves and card shortcuts; scale/flip use actual easing; single-select/double-flip; loop/reverse before play; pause/resume; 34px slider hit area");
+            }catch(Exception e){report.errors.Add("Workbench slider: "+e);}
+            yield return new WaitForEndOfFrame();ScreenCapture.CaptureScreenshot(Path.Combine(output,"workbench-curves.png"));yield return null;
+            gallery.SelectShortcut("拖拽放置");yield return null;
+            var stage=gallery.Stage;var item=stage.ReferenceDragItem;GameObject dragTarget=null;PointerEventData dragEvent=null;
+            try{
+                var point=RectTransformUtility.WorldToScreenPoint(null,item.position)+new Vector2(8,6);var hit=Hit(point);dragTarget=ExecuteEvents.GetEventHandler<IPointerDownHandler>(hit.gameObject);Check(dragTarget==item.gameObject,"Drag item is obstructed");dragEvent=new PointerEventData(EventSystem.current){position=point,pointerId=-80,button=PointerEventData.InputButton.Left};ExecuteEvents.Execute(dragTarget,dragEvent,ExecuteEvents.pointerDownHandler);var start=item.anchoredPosition;ExecuteEvents.Execute(dragTarget,dragEvent,ExecuteEvents.dragHandler);Check(Vector2.Distance(start,item.anchoredPosition)<.01f,"Pickup offset jumped");dragEvent.position=RectTransformUtility.WorldToScreenPoint(null,stage.ReferenceValidSlot.position)+new Vector2(8,6);ExecuteEvents.Execute(dragTarget,dragEvent,ExecuteEvents.dragHandler);Check(stage.Get("hoverSlot")==1,"Actual drag did not enter valid slot");ExecuteEvents.Execute(dragTarget,dragEvent,ExecuteEvents.pointerUpHandler);Check(stage.Get("drops")==1&&stage.Get("held")==0,"Actual drop not accepted");
+                report.checks.Add("Pointer: actual raycast pickup, preserved grab offset, drag enter and accepted drop");
+            }catch(Exception e){report.errors.Add("Pointer drag: "+e);}
+            yield return new WaitForSecondsRealtime(.4f);yield return new WaitForEndOfFrame();ScreenCapture.CaptureScreenshot(Path.Combine(output,"drag-accepted.png"));yield return null;
+            try{
+                var potion=stage.GetComponentsInChildren<RecipePointer>().Single(p=>p.name=="Potion item");var point=RectTransformUtility.WorldToScreenPoint(null,potion.transform.position);Check(ExecuteEvents.GetEventHandler<IPointerDownHandler>(Hit(point).gameObject)==potion.gameObject,"Inventory item obstructed");var e=new PointerEventData(EventSystem.current){position=point,pointerId=-81,button=PointerEventData.InputButton.Left};ExecuteEvents.Execute(potion.gameObject,e,ExecuteEvents.pointerDownHandler);e.position=RectTransformUtility.WorldToScreenPoint(null,stage.ReferenceValidSlot.position);ExecuteEvents.Execute(potion.gameObject,e,ExecuteEvents.dragHandler);Check(stage.Get("hoverSlot")==-1,"Potion accepted as crystal");ExecuteEvents.Execute(potion.gameObject,e,ExecuteEvents.pointerUpHandler);Check(stage.Get("rejected")==1&&stage.Get("drops")==1,"Wrong inventory type committed");
+                var p=item.GetComponent<RecipePointer>();point=RectTransformUtility.WorldToScreenPoint(null,item.position);e=new PointerEventData(EventSystem.current){position=point,pointerId=-82,button=PointerEventData.InputButton.Left};p.OnPointerDown(e);var start=item.anchoredPosition;p.OnDrag(e);Check(Vector2.Distance(start,item.anchoredPosition)<.01f,"Re-grab during spring jumped");p.Cancel();Check(stage.Get("held")==0,"Cancellation left held state");
+                report.checks.Add("Inventory: actual potion pointer rejects crystal slot; spring re-grab stays continuous; cancel releases pointer");
+            }catch(Exception e){report.errors.Add("Inventory pointer: "+e);}
+            gallery.ShowAllRecipes();gallery.Select("10.01");try{Check(!gallery.Stage.CurveEditable&&!gallery.Stage.ClockEditable,"Realtime toast exposed irrelevant controls");Check(!gallery.GetComponentsInChildren<Button>().Any(b=>b.name.StartsWith("Curve choice")),"Irrelevant curve controls remain visible");report.checks.Add("Inspector hides unsupported curve/strength/clock settings instead of exposing inert controls");}catch(Exception e){report.errors.Add(e.ToString());}
+            foreach(string id in new[]{"02.02","04.06","06.07","11.02","05.06"}){
+                gallery.Select(id);gallery.GuidedOperation();yield return new WaitForSecondsRealtime(id=="05.06"?.4f:.1f);
+                try{var s=gallery.Stage;Check(id=="02.02"?s.Get("open")==0:id=="04.06"?s.Get("selected")==1:id=="06.07"?s.Get("valid")==1:id=="11.02"?s.Get("displayedRating")==2:s.Get("held")==0&&s.Get("clicks")==0,"Play did not execute the recipe-specific operation: "+id);}catch(Exception e){report.errors.Add(e.ToString());}
+            }
+            report.checks.Add("Play routes to close, next page, successful input, star reveal and outside-release sequences instead of blindly invoking the first action");
+            gallery.SelectShortcut("卡牌展示");gallery.ChooseCurve(0);gallery.Select("03.08");
+        }
         void CheckDirectory(){var directory=gallery.GetComponentsInChildren<ScrollRect>().First(s=>s.name=="Directory viewport");Check(directory.content.GetComponentsInChildren<Button>().Length==96,"Directory entry count");var button=directory.content.GetComponentsInChildren<Button>()[0];Vector3[] corners=new Vector3[4];button.GetComponent<RectTransform>().GetWorldCorners(corners);Check(corners[0].y>Screen.height*.1f&&corners[2].y<Screen.height,"Directory first row outside viewport");}
         static void CheckChannels(){var target=new GameObject("Lease fixture");try{var a=new MotionChannelArbiter();var p=new MotionBinding(target,MotionChannel.Position);var s=new MotionBinding(target,MotionChannel.Scale);object first=new object(),second=new object();int cancelled=0;a.Acquire(first,new[]{p},()=>cancelled++);a.Acquire(second,new[]{s},null);Check(a.Count==2&&cancelled==0,"Independent properties conflicted");a.Acquire(second,new[]{p,s},null);Check(cancelled==1&&a.Owns(second,p),"Conflicting owner not cancelled once");a.Release(second);Check(a.Count==0,"Leases leaked");}finally{Destroy(target);}}
         static void Click(RecipeStage s,string name)=>s.Trigger(name);

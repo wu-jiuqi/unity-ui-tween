@@ -37,11 +37,14 @@ namespace TweenGallery.Recipes
         public static CanvasGroup Group(RectTransform r){var g=r.GetComponent<CanvasGroup>();return g!=null?g:r.gameObject.AddComponent<CanvasGroup>();}
         public static void Alpha(RectTransform r,float a){var g=Group(r);g.alpha=Mathf.Clamp01(a);g.interactable=g.blocksRaycasts=a>=.999f;}
         public static Slider Slider(Transform p,float x,float y,float w,float min,float max,float value,Action<float> changed) {
-            var track=Box(p,"Track",x,y,w,8,Hex("454A55"));var slider=track.gameObject.AddComponent<Slider>();track.raycastTarget=true;
-            var fillArea=Rect(track.transform,"Fill area",0,0,w,8);
+            // A slim painted rail must still have a comfortable pointer target.
+            var hit=Rect(p,"Slider hit area",x,y,w,34);var surface=hit.gameObject.AddComponent<Image>();surface.color=new Color(1,1,1,.01f);surface.raycastTarget=true;
+            var track=Box(hit,"Track",0,0,w,8,Hex("454A55"));var slider=hit.gameObject.AddComponent<Slider>();
+            var fillArea=Rect(hit,"Fill area",0,0,w,8);
             var fill=Box(fillArea,"Fill",0,0,0,0,Blue);fill.rectTransform.anchorMin=Vector2.zero;fill.rectTransform.anchorMax=Vector2.one;fill.rectTransform.sizeDelta=Vector2.zero;
-            var handleArea=Rect(track.transform,"Handle area",0,0,w,8);
-            var handle=Box(handleArea,"Handle",0,0,18,18,Ink,"circle");handle.raycastTarget=true;
+            var handleArea=Rect(hit,"Handle area",0,0,w,0);
+            var handle=Box(handleArea,"Handle",0,0,24,24,Ink,"circle");handle.raycastTarget=true;
+            if(p.GetComponentInParent<RecipeStage>()==null&&RecipeArt.ApprovedAvailable)RecipeArt.Apply(handle,"wb-handle",false);
             slider.fillRect=fill.rectTransform;slider.handleRect=handle.rectTransform;slider.targetGraphic=handle;slider.minValue=min;slider.maxValue=max;slider.SetValueWithoutNotify(value);
             slider.onValueChanged.AddListener(v=>changed?.Invoke(v));return slider;
         }

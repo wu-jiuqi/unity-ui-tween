@@ -1,6 +1,6 @@
 # 96 条展馆验证记录
 
-当前交付为 0.7.0-dev 开发版。视觉基准是用户指定的[卡牌与拖放定稿](../ArtSource/Recipes-v070/approved-reference.png)，运行画面为[真实 Windows Player 截图](previews/v070/reference-default.png)。
+当前交付为 0.7.1-dev 开发版。视觉基准是用户指定的[卡牌与拖放定稿](../ArtSource/Recipes-v070/approved-reference.png)，运行画面为[真实 Windows Player 截图](previews/v070/reference-default.png)。
 
 ## 实际通过的检查
 
@@ -14,6 +14,16 @@
 | 旧 Skill 打包契约 | 7 项测试通过 | scripts/test_package_skill.py |
 
 每条 Player 检查分别记录 normal、boundary、sampling、reduced、cleanup，覆盖正常操作结果、边界条件、重播/采样不提交业务、减弱动态与关闭清理。另有目录完整性、对象/属性通道冲突和默认定稿构图/缩放预览检查。长按包含真实经过阈值后只触发一次的检查。全部使用实际场景操作入口，不以存在名称代替场景行为。
+
+## 工作台交互回归
+
+新增检查使用 `EventSystem.RaycastAll` 验证实际命中，再派发指针事件，而非仅调用按钮的 onClick。四条曲线、快捷菜单和滑块点击需命中对应控件；缩放和翻面在相同时间点产生不同姿态；首次播放前点击循环/反向必须有效；单击选中与双击翻面分别断言；最大缩放加弹性曲线的峰值不得越过舞台上边界。
+
+拖放检查实际拾起、保留抓取偏移、进入有效区和松开提交。另从背包拖出药水，确认水晶槽拒绝；回弹途中重新抓取不跳动，取消后不残留按住状态。实时 Toast 等不适用的曲线/时钟控件必须隐藏。两组报告的 checks 字段记录这些检查。
+
+播放入口也按配方语义回归：关闭弹窗不能再次执行打开，分页不能在第 1 页执行无效的上一页，校验成功需先填入有效示例，星级需执行展示，按钮移出松开必须完整收尾且不计点击。
+
+运行截图：[曲线与选中反馈](previews/v070/workbench-curves.png)、[实际指针接受放置](previews/v070/drag-accepted.png)。这些脚本事件检查不等于真人手感认可。
 
 ## 视觉检查
 
