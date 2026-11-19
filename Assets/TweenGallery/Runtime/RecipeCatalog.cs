@@ -7,6 +7,8 @@ namespace TweenGallery.Recipes
     [Serializable] public sealed class RecipeDefinition
     {
         public string id, name, layer, operation, observe, initialState, finalState, tags, boundary, reducedMotion;
+        public string[] objectTags, stateTags, typeTags;
+        public bool HasTag(string tag)=>Array.IndexOf(objectTags,tag)>=0||Array.IndexOf(stateTags,tag)>=0||Array.IndexOf(typeTags,tag)>=0;
         public float duration = .3f;
         public bool interactive, loop;
         public int Group => int.Parse(id.Substring(0, 2));
@@ -25,7 +27,7 @@ namespace TweenGallery.Recipes
                 if (items == null || items.Length != 96) throw new InvalidOperationException("Expected exactly 96 recipes");
                 var ids = new HashSet<string>();
                 foreach (var r in items) {
-                    if (!ids.Add(r.id) || string.IsNullOrWhiteSpace(r.operation) || string.IsNullOrWhiteSpace(r.boundary))
+                    if (!ids.Add(r.id) || string.IsNullOrWhiteSpace(r.operation) || string.IsNullOrWhiteSpace(r.boundary)||r.objectTags==null||r.objectTags.Length==0||r.stateTags==null||r.stateTags.Length==0||r.typeTags==null||r.typeTags.Length==0)
                         throw new InvalidOperationException("Invalid recipe " + r.id);
                 }
                 for (int g=1;g<=12;g++) for(int n=1;n<=8;n++)

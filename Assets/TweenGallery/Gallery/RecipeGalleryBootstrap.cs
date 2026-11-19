@@ -1,78 +1,77 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace TweenGallery.Recipes
 {
-    /// <summary>96 scenario recipes, not a rename of the original primitive gallery.</summary>
     public sealed partial class RecipeGalleryBootstrap : MonoBehaviour
     {
         public RecipeStage Stage {get;private set;}
-        public string SelectedId {get;private set;}="01.01";
+        public string SelectedId {get;private set;}="05.03";
         public bool Reduced {get;private set;}
         public bool Ready {get;private set;}
+        public string PreviewMode=>SelectedId=="03.08"?"flip":"";
         RectTransform root,listContent,stageHost,parameters,popup;
         ScrollRect directory;Text heading,operation,observe,layerLabel,stateFilterLabel,reduceLabel,playLabel,timelineLabel,countLabel;
         Slider timeline;InputField search;
-        int layerFilter,stateFilter;bool syncing,slow;string query="";
+        bool syncing,slow;string query="",stateQuery="",objectQuery="",typeQuery="";
         readonly Dictionary<string,Image> rows=new Dictionary<string,Image>();
-        static readonly string[] Filters={"全部状态","进入 / 退出","按压 / 焦点","值 / 选择","拖动 / 滚动","循环 / 闲置"};
-        [Serializable] sealed class Export {public int schemaVersion=4;public string driver="RecipeStage",recipeId,operation,initialState,finalState,previewMode;public float duration,strength,springFrequency,springDamping;public string curve;public bool reducedMotion;}
-        void Start(){BuildReference();Select("03.08");Ready=true;}
-        void OpenMenu(bool layers) {
-            if(popup!=null){Destroy(popup.gameObject);popup=null;return;}
-            int count=layers?13:Filters.Length;popup=RecipeUI.Box(root,"Filter choices",referenceShell?(layers?-130:20):(layers?200:402),365-count*17,260,count*34+12,RecipeUI.Surface).rectTransform;
-            for(int i=0;i<count;i++){int index=i;RecipeUI.Button(popup,layers?(i==0?"全部层级":i.ToString("00")+" "+RecipeCatalog.Layers[i-1]):Filters[i],0,(count-1)*17-i*34,245,()=>{if(layers){layerFilter=index;layerLabel.text=index==0?"全部层级 ▾":index.ToString("00")+" "+RecipeCatalog.Layers[index-1]+" ▾";}else{stateFilter=index;stateFilterLabel.text=Filters[index]+" ▾";}Destroy(popup.gameObject);popup=null;RefreshDirectory();},RecipeUI.Dark,30);}
+        readonly HashSet<int> collapsed=new HashSet<int>();
+        public int VisibleRecipeCount=>RecipeCatalog.All.Count(Matches);
+        public string[] VisibleRecipeIds=>RecipeCatalog.All.Where(Matches).Select(d=>d.id).ToArray();
+        [Serializable] sealed class Export {public int schemaVersion=5;public string recipeId,operation,initialState,finalState,curve;public string[] objectTags,stateTags,typeTags;public float duration,strength,springFrequency,springDamping;public bool reducedMotion;}
+        void Start(){BuildReference();Select(SelectedId);Ready=true;}
+        bool Matches(RecipeDefinition d){
+            if(stateQuery.Length>0&&!d.stateTags.Contains(stateQuery))return false;
+            if(objectQuery.Length>0&&!d.objectTags.Contains(objectQuery))return false;
+            if(typeQuery.Length>0&&!d.typeTags.Contains(typeQuery))return false;
+            var haystack=d.id+" "+d.name+" "+d.operation+" "+d.initialState+" "+d.finalState+" "+d.tags+" "+string.Join(" ",d.objectTags.Concat(d.stateTags).Concat(d.typeTags));
+            return query.Length==0||haystack.IndexOf(query,StringComparison.OrdinalIgnoreCase)>=0;
         }
-        bool Matches(RecipeDefinition d) {
-            if(layerFilter!=0&&d.Group!=layerFilter)return false;
-            if(query.Length>0&&!(d.id+" "+d.name+" "+d.initialState+" "+d.finalState+" "+d.tags+" "+d.operation).ToLowerInvariant().Contains(query.ToLowerInvariant()))return false;
-            switch(stateFilter){case 1:return d.Group<=3;case 2:return d.Group==5||d.Group==6||d.id=="04.02";case 3:return d.Group==4||d.Group==6||d.Group==9||d.Group==11;case 4:return d.Group==7||d.Group==8||d.id=="03.04";case 5:return d.Group==12||d.id=="04.08"||d.id=="09.07";default:return true;}
+        public void ApplyFilters(string state="",string obj="",string type="",string text=""){
+            stateQuery=state;objectQuery=obj;typeQuery=type;query=text;search.SetTextWithoutNotify(text);collapsed.Clear();RefreshDirectory();
+            stateFilterLabel.text=state.Length==0?"状态：全部 ▾":state+" ▾";layerLabel.text=obj.Length==0?"对象：全部 ▾":obj+" ▾";
         }
-        void RefreshDirectory() {
-            foreach(Transform child in listContent){child.gameObject.SetActive(false);Destroy(child.gameObject);}rows.Clear();float y=-20;int group=0,count=0;
-            if(referenceShell&&shortcuts&&query.Length==0&&layerFilter==0&&stateFilter==0){BuildShortcuts();return;}
-            foreach(var d in RecipeCatalog.All){if(!Matches(d))continue;if(d.Group!=group){group=d.Group;RecipeUI.Label(listContent,group.ToString("00")+"  "+d.layer,0,y,238,32,16,RecipeUI.Muted,TextAnchor.MiddleLeft);y-=38;}
-                string id=d.id;var button=RecipeUI.Button(listContent,d.id+"  "+d.name,0,y,240,()=>Select(id),id==SelectedId?RecipeUI.Hex("3B465D"):RecipeUI.Hex("272B32"),33);button.GetComponentInChildren<Text>().alignment=TextAnchor.MiddleLeft;button.GetComponentInChildren<Text>().fontSize=15;rows[id]=button.GetComponent<Image>();y-=38;count++;
-                if(referenceShell){RecipeArt.Apply(button.GetComponent<Image>(),"wb-play");button.GetComponent<Image>().pixelsPerUnitMultiplier=1;button.GetComponent<Image>().color=id==SelectedId?Color.white:new Color(1,1,1,.025f);}
+        public void ShowAllRecipes(){ApplyFilters();}
+        void OpenMenu(bool objects){
+            if(popup!=null){CloseMenu();return;}
+            var tags=RecipeCatalog.All.SelectMany(d=>objects?d.objectTags:d.stateTags).Distinct().ToArray();
+            popup=RecipeUI.Box(root,"Tag filter choices",-652,36,274,510,RecipeUI.Surface).rectTransform;
+            var view=RecipeUI.Rect(popup,"Tag choices viewport",0,0,264,496);view.gameObject.AddComponent<RectMask2D>();var hit=view.gameObject.AddComponent<Image>();hit.color=new Color(1,1,1,.01f);
+            var scroll=view.gameObject.AddComponent<ScrollRect>();scroll.viewport=view;scroll.horizontal=false;scroll.scrollSensitivity=35;
+            var content=RecipeUI.Rect(view,"Tag choices",0,0,254,(tags.Length+1)*38);content.anchorMin=content.anchorMax=new Vector2(.5f,1);content.pivot=new Vector2(.5f,1);content.anchoredPosition=Vector2.zero;scroll.content=content;
+            for(int i=0;i<=tags.Length;i++){string value=i==0?"":tags[i-1];var b=Tool(content,i==0?"全部":value,0,-20-i*38,250,()=>{if(objects)objectQuery=value;else stateQuery=value;CloseMenu();ApplyFilters(stateQuery,objectQuery,typeQuery,query);},false,36);AnchorDirectory((RectTransform)b.transform,-20-i*38);}
+            popupFrame=Time.frameCount;
+        }
+        void CloseMenu(){if(popup!=null){popup.gameObject.SetActive(false);Destroy(popup.gameObject);popup=null;}}
+        static void AnchorDirectory(RectTransform r,float y){r.anchorMin=r.anchorMax=new Vector2(.5f,1);r.anchoredPosition=new Vector2(0,y);}
+        void RefreshDirectory(){
+            float offset=listContent.anchoredPosition.y;
+            foreach(Transform child in listContent){child.gameObject.SetActive(false);Destroy(child.gameObject);}rows.Clear();float y=-22;
+            for(int group=1;group<=12;group++){
+                int g=group;var items=RecipeCatalog.All.Where(d=>d.Group==g&&Matches(d)).ToArray();
+                var header=Tool(listContent,(collapsed.Contains(g)?"▸ ":"▾ ")+g.ToString("00")+" "+RecipeCatalog.Layers[g-1],0,y,252,()=>{if(!collapsed.Add(g))collapsed.Remove(g);RefreshDirectory();},false,38);header.name="Category "+g;header.GetComponentInChildren<Text>().fontSize=16;header.GetComponentInChildren<Text>().alignment=TextAnchor.MiddleLeft;header.GetComponentInChildren<Text>().rectTransform.sizeDelta=new Vector2(208,34);header.GetComponentInChildren<Text>().rectTransform.anchoredPosition=new Vector2(-18,0);RecipeUI.Label(header.transform,items.Length+"/8",108,0,42,34,14,RecipeUI.Muted);AnchorDirectory((RectTransform)header.transform,y);y-=42;
+                if(!collapsed.Contains(g))foreach(var d in items){string id=d.id;var b=Tool(listContent,d.id+"  "+d.name,0,y,249,()=>Select(id),id==SelectedId,38);b.name="Recipe entry "+id;b.GetComponentInChildren<Text>().fontSize=17;b.GetComponentInChildren<Text>().alignment=TextAnchor.MiddleLeft;AnchorDirectory((RectTransform)b.transform,y);rows[id]=b.GetComponent<Image>();y-=41;}
+                y-=9;
             }
-            if(count==0)RecipeUI.Label(listContent,"没有匹配的配方",0,-50,235,50,17,RecipeUI.Muted);
-            foreach(RectTransform child in listContent)child.anchorMin=child.anchorMax=new Vector2(.5f,1);
-            if(referenceShell)foreach(RectTransform child in listContent){child.sizeDelta=new Vector2(212,child.sizeDelta.y);var label=child.GetComponentInChildren<Text>();if(label!=null)label.rectTransform.sizeDelta=new Vector2(200,label.rectTransform.sizeDelta.y);}
-            listContent.sizeDelta=new Vector2(referenceShell?223:250,Mathf.Max(referenceShell?790:680,-y+20));directory.verticalNormalizedPosition=1;countLabel.text=count+" / 96 条配方";
+            listContent.sizeDelta=new Vector2(254,Mathf.Max(directory.viewport.rect.height,-y+20));listContent.anchoredPosition=new Vector2(0,Mathf.Clamp(offset,0,Mathf.Max(0,listContent.rect.height-directory.viewport.rect.height)));directory.StopMovement();
+            countLabel.text=VisibleRecipeCount==96?"12 类 · 96 条配方，全部可操作":"筛选结果 "+VisibleRecipeCount+" / 96 条";
         }
-        public void Select(string id) {
-            if(popup!=null){popup.gameObject.SetActive(false);Destroy(popup.gameObject);popup=null;}
-            if(guidance!=null){StopCoroutine(guidance);guidance=null;}previewDue=-1;
-            if(!shortcuts){SelectedShortcut="";PreviewMode=id=="03.08"?"flip":"";referenceScaleMode=false;}
+        public void Select(string id){
+            CloseMenu();StopGuidance();previewDue=-1;
             if(Stage!=null){Stage.Shutdown();Stage.gameObject.SetActive(false);Destroy(Stage.gameObject);}
-            SelectedId=id;var definition=RecipeCatalog.Find(id);var stage=RecipeUI.Rect(stageHost,"Recipe "+id,0,0,880,490);Stage=stage.gameObject.AddComponent<RecipeStage>();Stage.ReferencePreviewMode=shortcuts?PreviewMode:"";Stage.Build(definition,Reduced);Stage.Curve=CurveOptions[SelectedCurveIndex];Stage.SetSpeed(slow?.25f:1);
-            heading.text=id+"  "+definition.name;operation.text="怎么操作  "+definition.operation;observe.text="看什么  "+definition.observe;
-            heading.gameObject.SetActive(!Stage.ReferenceComposition);operation.gameObject.SetActive(!Stage.ReferenceComposition);observe.gameObject.SetActive(!Stage.ReferenceComposition);
-            foreach(var kv in rows)kv.Value.color=referenceShell?(kv.Key==(shortcuts?SelectedShortcut:id)?Color.white:new Color(1,1,1,.025f)):(kv.Key==id?RecipeUI.Hex("3B465D"):RecipeUI.Hex("272B32"));BuildReferenceInspector();
-            if(rows.TryGetValue(id,out var selected)){
-                float top=-selected.rectTransform.anchoredPosition.y-18;
-                float current=listContent.anchoredPosition.y;
-                if(top<current||top+36>current+directory.viewport.rect.height){float next=Mathf.Clamp(top-30,0,Mathf.Max(0,listContent.rect.height-directory.viewport.rect.height));listContent.anchoredPosition=new Vector2(0,next);directory.StopMovement();}
-            }
+            SelectedId=id;SelectedCurveIndex=0;var d=RecipeCatalog.Find(id);var stage=RecipeUI.Rect(stageHost,"Recipe "+id,0,67,960,570);Stage=stage.gameObject.AddComponent<RecipeStage>();Stage.Build(d,Reduced);Stage.Curve=CurveOptions[SelectedCurveIndex];Stage.SetSpeed(slow&&Stage.ClockEditable?.25f:1);
+            heading.text=d.id+"  "+d.name;operation.text="操作  "+d.operation;observe.text="观察  "+d.observe;
+            foreach(var kv in rows)kv.Value.color=kv.Key==id?RecipeUI.Blue:RecipeUI.Surface;
+            BuildReferenceInspector();
+            if(rows.TryGetValue(id,out var selected)){float top=-selected.rectTransform.anchoredPosition.y-20,current=listContent.anchoredPosition.y;var category=listContent.Find("Category "+d.Group) as RectTransform;float categoryTop=category==null?top:-category.anchoredPosition.y-20;if(categoryTop<current||top+40>current+directory.viewport.rect.height){listContent.anchoredPosition=new Vector2(0,Mathf.Clamp(categoryTop,0,Mathf.Max(0,listContent.rect.height-directory.viewport.rect.height)));directory.StopMovement();}}
         }
-        public void SetReduced(bool value){Reduced=value;reduceLabel.text=value?"减弱动态 开":"减弱动态 关";Stage.SetReduced(value);}
-        void CopyParameters() {
-            var d=Stage.Definition;GUIUtility.systemCopyBuffer=JsonUtility.ToJson(new Export{recipeId=d.id,operation=d.operation,initialState=d.initialState,finalState=d.finalState,previewMode=d.Group==8?"DragSpring":d.id=="03.08"?(referenceScaleMode?"Scale":"Flip"):"Recipe",duration=Stage.Duration,strength=Stage.Strength,springFrequency=Stage.SpringFrequency,springDamping=Stage.SpringDamping,curve=Stage.Curve.ToString(),reducedMotion=Reduced},true);
-        }
-        public void GuidedOperation() {
-            // One clearly named operation at a time. This invokes real scenario controls, not a second animation implementation.
-            if(guidance!=null){StopCoroutine(guidance);guidance=null;Stage.CancelInteractions();}
-            if(Stage.Definition.Group==8){guidance=StartCoroutine(GuideDrag(Stage,false));return;}
-            if(Stage.ReferenceComposition&&PreviewMode!="flip"){Stage.PreviewReferenceEffect(string.IsNullOrEmpty(PreviewMode)?"scale":PreviewMode);return;}
-            if(Stage.Actions.Count==0)return;Stage.Record("引导操作");guidance=StartCoroutine(GuideRecipe(Stage));
-        }
-        void Update(){if(!Ready||Stage==null)return;syncing=true;timeline.SetValueWithoutNotify(Stage.Progress);syncing=false;timeline.interactable=Stage.CanSeek;timelineLabel.text=Stage.CanSeek?Mathf.RoundToInt(Stage.Progress*100)+"%":"直接操作";playLabel.text=Stage.Paused?"继续":"暂停";playLabel.GetComponentInParent<Button>().interactable=Stage.CanSeek;SyncReferenceState();if(referenceDurationValue!=null)referenceDurationValue.text=Stage.Definition.Group==8?Stage.SpringFrequency.ToString("0.0")+" Hz":Stage.Duration.ToString("0.00")+" s";UpdateWorkbench();}
-        void OnDestroy(){if(Stage!=null)Stage.Shutdown();}
+        public void SetReduced(bool value){Reduced=value;if(reduceLabel!=null)reduceLabel.text=value?"减弱动态：开":"减弱动态：关";Stage.SetReduced(value);}
+        void CopyParameters(){var d=Stage.Definition;GUIUtility.systemCopyBuffer=JsonUtility.ToJson(new Export{recipeId=d.id,operation=d.operation,initialState=d.initialState,finalState=d.finalState,objectTags=d.objectTags,stateTags=d.stateTags,typeTags=d.typeTags,duration=Stage.Duration,strength=Stage.Strength,springFrequency=Stage.SpringFrequency,springDamping=Stage.SpringDamping,curve=Stage.Curve.ToString(),reducedMotion=Reduced},true);feedbackUntil=Time.unscaledTime+2;}
+        void Update(){if(!Ready||Stage==null)return;syncing=true;timeline.SetValueWithoutNotify(Stage.Progress);syncing=false;timeline.interactable=Stage.CanSeek;timelineLabel.text=Stage.CanSeek?Mathf.RoundToInt(Stage.Progress*100)+"%":Stage.ClockEditable?"待播放":"实时";UpdateWorkbench();SyncReferenceState();}
+        void OnDestroy(){StopGuidance();if(Stage!=null)Stage.Shutdown();}
     }
 }

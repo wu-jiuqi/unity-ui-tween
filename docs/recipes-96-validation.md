@@ -1,40 +1,55 @@
-# 96 条展馆验证记录
+# 0.8 按案例聚焦的验证记录
 
-当前交付为 0.7.1-dev 开发版。视觉基准是用户指定的[卡牌与拖放定稿](../ArtSource/Recipes-v070/approved-reference.png)，运行画面为[真实 Windows Player 截图](previews/v070/reference-default.png)。
+当前版本 **0.8.0-dev**。本轮先检查六个代表案例，再对完整 96 条执行回归；没有缩减范围。所有新截图来自当前 Windows Player，旧 v070 画面保留作历史参考。
 
-## 实际通过的检查
+## 六个代表案例
 
-| 检查 | 结果 | 证据 |
+| 案例 | 实际检查 | 当前运行截图 |
 |---|---|---|
-| Unity 6000.0.26f1 Windows x64 构建 | 成功，零错误、零警告 | [构建报告](validation/recipes96-build.json) |
-| 1600×1000 可见 Player | 96/96 配方通过 | [报告](validation/recipes96-1600.json) |
-| 1280×720 可见 Player | 96/96 配方通过 | [报告](validation/recipes96-1280.json) |
-| 96 个唯一编号与规格必填项 | 通过 | scripts/test_recipes96.py |
-| 13 个原始 PNG 的哈希、透明度与 117 个裁切矩形 | 通过 | [美术来源](../ArtSource/Recipes-v070/atlas-provenance.json) |
-| 旧 Skill 打包契约 | 7 项测试通过 | scripts/test_package_skill.py |
+| 05.03 按钮按压 | 原生命中、按下状态、固定命中区与视觉缩放分离 | [截图](previews/v080/representatives/05.03.png) |
+| 03.08 卡牌翻面 | 一张主卡、点击翻面、曲线差异、重复采样不漂移 | [截图](previews/v080/representatives/03.08.png) |
+| 08.05 拖放成功 | 无无关卡牌、大插槽、抓取偏移、接受/类型拒绝/取消 | [截图](previews/v080/representatives/08.05.png) |
+| 07.04 列表重排 | 背包图标、同一行 ID 与实例身份保持 | [截图](previews/v080/representatives/07.04.png) |
+| 09.03 血条变化 | 真实生命先扣减、主条即时变化、拖尾延后 | [截图](previews/v080/representatives/09.03.png) |
+| 11.04 奖励飞行 | 奖励来源、飞行金币、实际钱包 HUD，重播不重复发奖 | [截图](previews/v080/representatives/11.04.png) |
 
-每条 Player 检查分别记录 normal、boundary、sampling、reduced、cleanup，覆盖正常操作结果、边界条件、重播/采样不提交业务、减弱动态与关闭清理。另有目录完整性、对象/属性通道冲突和默认定稿构图/缩放预览检查。长按包含真实经过阈值后只触发一次的检查。全部使用实际场景操作入口，不以存在名称代替场景行为。
+[六例舞台总览](previews/v080/representatives.jpg)。这些是运行截图，不是新绘制的原型或整页贴图。
 
-## 工作台交互回归
+## 自动检查与范围
 
-新增检查使用 `EventSystem.RaycastAll` 验证实际命中，再派发指针事件，而非仅调用按钮的 onClick。四条曲线、快捷菜单和滑块点击需命中对应控件；缩放和翻面在相同时间点产生不同姿态；首次播放前点击循环/反向必须有效；单击选中与双击翻面分别断言；最大缩放加弹性曲线的峰值不得越过舞台上边界。
+| 检查 | 结果 / 证据 |
+|---|---|
+| Unity 6000.0.26f1 Windows x64 构建 | 零错误、零警告；[报告](validation/recipes96-build.json) |
+| 1600×1000 可见 Player | 96/96；[报告](validation/recipes96-1600.json) |
+| 1280×720 可见 Player | 96/96；[报告](validation/recipes96-1280.json) |
+| 目录和标签 | 默认 12 类/96 条；禁用、校验失败、对象、类型和交集筛选精确断言 |
+| 工作台 | 只有一个播放区；继续/循环/反向；首次和重复时间轴采样稳定 |
+| 语义状态 | 默认/按下/禁用、编辑与校验、拖放接受/拒绝/取消分别判断 |
+| 显示回归 | 主数字文本高度、排序 ID 随对象、循环无人物遮挡、卡牌无无关对象 |
+| 原始美术与规格 | 13 PNG 哈希、透明度、117 裁切矩形、96 唯一编号与三维标签 |
+| 兼容打包 | 原 Skill 的 7 项打包契约测试 |
 
-拖放检查实际拾起、保留抓取偏移、进入有效区和松开提交。另从背包拖出药水，确认水晶槽拒绝；回弹途中重新抓取不跳动，取消后不残留按住状态。实时 Toast 等不适用的曲线/时钟控件必须隐藏。两组报告的 checks 字段记录这些检查。
+每条配方保留 normal、boundary、sampling、reduced、cleanup 五项检查。部分边界是中断/关闭，不代表所有连击、触摸、滚动手感均已穷尽。代表案例用 EventSystem 射线确认目标，再派发指针事件；未把所有案例都当作按钮调用。
 
-播放入口也按配方语义回归：关闭弹窗不能再次执行打开，分页不能在第 1 页执行无效的上一页，校验成功需先填入有效示例，星级需执行展示，按钮移出松开必须完整收尾且不计点击。
+代理检查 12 张分类联系表及重点完整画面的文字、遮挡、裁切、主体占比。修正了任务容器收起裁切、分隔条/强调框定位、共享元素按钮遮脸、焦点框、主数字截断、物品 ID 标签与通知反馈主体大小等问题。截图检查仍可能漏掉节奏和手感问题。
 
-运行截图：[曲线与选中反馈](previews/v070/workbench-curves.png)、[实际指针接受放置](previews/v070/drag-accepted.png)。这些脚本事件检查不等于真人手感认可。
+## 截图、报告与附件的一致性
 
-## 视觉检查
+打包后运行 `scripts/verify_recipe_delivery.py`：逐文件比较 ZIP 与被测 Player 目录，记录 EXE、UnityPlayer、业务程序集、场景数据、两份报告及六张代表截图的 SHA-256。[本轮交付清单](validation/recipes96-delivery.json)包含 ZIP 哈希与验证文件数。
 
-每条配方保存一张 [Player 运行截图](previews/v070/cases/01.01.png)，完整索引在 [96 条规格](recipes-96.md)。截图是本次运行实际绘制的 UI，不是原型贴图。定稿图只提供独立图层与局部 Sprite 裁切；示例支持真实点击、输入、滚动、拖放、参数变化和时间控制。
+截图来自本轮 Player，打包后未另行替换演示美术或业务程序集。这证明交付文件与被测目录一致，不把哈希记录当作真人体验认可。
 
-代理对全部场景截图检查了舞台占用、文字/图形重叠、裁切、分层和定稿比例，并在实际 Player 中修复了目录锚点、滑块尺寸、卡面占比、原型人像位置、卡牌稀有度、共享元素标题遮挡、容器强调框、成就层级和钱包文字区等问题。用户是否认可视觉与手感，仍在[验收矩阵](recipes-96-acceptance.md)独立保留为待验收，未用自动测试代替。
+## 未通过自动测试代替的验收
 
-## 尚未验证
-
-未执行 Android、微信、移动触摸、移动 Profiler、第二台干净 Windows 电脑或完整真人可用性验收。本机桌面通过不代表这些平台通过。原 46 项预制体、旧场景和旧构建保留，本轮未重建或覆盖旧发行包。
+用户视觉、动画节奏、连击中断、拖放容错、真人三秒理解目标仍待实际体验；没有标记为人工通过。Android、微信、触屏、第二台干净 Windows 电脑与移动 Profiler 未验证。目标平台列中的“本机 Windows 通过”仅指本次环境。
 
 ## 复现
 
-在仓库根运行 `scripts/recipes96.ps1 -Target Build`，再运行 `-Target Validate`。Player 必须可见：隐藏/最小化窗口可能返回黑屏截图。报告保留实际运行的 UTC、分辨率、Unity 与平台字段；历史版本记录不计入本轮结果。
+1. `scripts/recipes96.ps1 -Target Build`
+2. `scripts/recipes96.ps1 -Target Validate`（窗口须可见，隐藏窗口可能黑屏）
+3. `python scripts/collect_recipe_evidence.py`
+4. `python scripts/document_recipes96.py`
+5. `python scripts/test_recipes96.py`
+6. 用 `scripts/portable_zip.py` 打包 `Builds/Recipes96` 后，运行 `scripts/verify_recipe_delivery.py`。
+
+报告保留真实 UTC、版本、平台与分辨率。完整索引见 [96 条规格](recipes-96.md)，人工状态见 [验收矩阵](recipes-96-acceptance.md)。

@@ -13,6 +13,19 @@ class RecipeContracts(unittest.TestCase):
         for r in rows:
             for field in ('operation','observe','initialState','finalState','boundary','reducedMotion','tags'):
                 self.assertTrue(r[field].strip(),(r['id'],field))
+    def test_explicit_tag_dimensions(self):
+        document=json.loads((ROOT/'Assets/TweenGallery/Resources/recipe-catalog.json').read_text(encoding='utf-8'))
+        self.assertEqual(document['schemaVersion'],2)
+        for row in document['recipes']:
+            for key in ('objectTags','stateTags','typeTags'):
+                self.assertIsInstance(row[key],list)
+                self.assertGreater(len(row[key]),0,(row['id'],key))
+                self.assertEqual(len(row[key]),len(set(row[key])))
+        rows=document['recipes']
+        self.assertEqual([r['id'] for r in rows if '禁用' in r['stateTags']],['05.07'])
+        self.assertEqual([r['id'] for r in rows if '校验失败' in r['stateTags']],['06.06'])
+        self.assertTrue(all('卡牌' not in r['objectTags'] for r in rows if r['id'].startswith('08.') or r['id'].startswith('12.')))
+
     def test_generated_pngs_unchanged_and_alpha_present(self):
         sources=json.loads((ROOT/'ArtSource/Recipes-v070/atlas-provenance.json').read_text(encoding='utf-8'))
         self.assertEqual(len(sources),13)

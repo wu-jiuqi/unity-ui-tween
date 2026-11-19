@@ -17,6 +17,7 @@ def main():
     for row in rows:
         text.extend([f"## {row['id']} {row['name']}",'',
             f"- 层级与素材：{row['layer']}；{row['tags']}。",
+            f"- 标签：对象 {', '.join(row['objectTags'])}；状态 {', '.join(row['stateTags'])}；类型 {', '.join(row['typeTags'])}。",
             f"- 初始状态：{row['initialState']}。",
             f"- 明确操作：{row['operation']}。",
             f"- 观察内容：{row['observe']}。",
@@ -25,7 +26,7 @@ def main():
             f"- 正常验收：执行上述操作，状态与实际数据一致，能观察到描述的变化。",
             f"- 边界验收：{row['boundary']}。",
             f"- 减弱动态：{row['reducedMotion']}。",
-            f"- [运行画面](previews/v070/cases/{row['id']}.png)。",''])
+            f"- [运行画面](previews/v080/cases/{row['id']}.png)。",''])
     (ROOT/'docs/recipes-96.md').write_text('\n'.join(text),encoding='utf-8')
     table=['# 96 条配方验收矩阵','',
         '五个阶段分别记录。自动测试覆盖操作结果、至少一个边界、采样不提交业务、减弱动态和关闭清理；不能代替真人交互体验。',

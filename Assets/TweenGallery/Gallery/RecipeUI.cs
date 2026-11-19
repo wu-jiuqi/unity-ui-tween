@@ -68,6 +68,7 @@ namespace TweenGallery.Recipes
         public Action<PointerEventData> down,up,enter,exit,drag,end;
         public Action cancel;public int Pointer {get;private set;}=int.MinValue;
         public bool Held=>Pointer!=int.MinValue;
+        public void ReleaseCapture(){Pointer=int.MinValue;}
         public void OnPointerDown(PointerEventData e){if(Held||e.button!=PointerEventData.InputButton.Left)return;Pointer=e.pointerId;down?.Invoke(e);}
         public void OnPointerUp(PointerEventData e){if(Pointer!=e.pointerId)return;up?.Invoke(e);Pointer=int.MinValue;}
         public void OnPointerEnter(PointerEventData e){enter?.Invoke(e);}

@@ -1,0 +1,76 @@
+{
+  "version": "0.8.0-dev",
+  "windowsZip": {
+    "path": "dist/UIRecipeGallery-0.8.0-dev-Windows.zip",
+    "sha256": "e42861361cbb6ca9fb1b74d8841af7cfafc21499488bda3f690ee539dde8134e",
+    "bytes": 110162539
+  },
+  "verifiedZipFiles": 142,
+  "testedPlayer": [
+    {
+      "path": "Builds/Recipes96/UIRecipeGallery.exe",
+      "sha256": "0ca33352ba3f994ce52eff1be97a4c6caf023b64b917168a05ec09dbd3b28b41",
+      "bytes": 672256
+    },
+    {
+      "path": "Builds/Recipes96/UnityPlayer.dll",
+      "sha256": "0e9ff0d1706a0791bd6a98e811806ad9037f765f88eb5fdb56deb8055682d1bd",
+      "bytes": 33601720
+    },
+    {
+      "path": "Builds/Recipes96/UIRecipeGallery_Data/Managed/Assembly-CSharp.dll",
+      "sha256": "507d0ae9012adfc9453a2600e4e76c7dbb212bc3e6b9ff9a8cc7801c499bb7d8",
+      "bytes": 472064
+    },
+    {
+      "path": "Builds/Recipes96/UIRecipeGallery_Data/globalgamemanagers",
+      "sha256": "68087966cfcbbcf0e998bcf741354ce27eae0771cdc6c6399fadc1b82e045450",
+      "bytes": 32308
+    }
+  ],
+  "reports": [
+    {
+      "path": "docs/validation/recipes96-1600.json",
+      "sha256": "02494a9c336a2a3f8475f5105b56589c1791c14e83eb8ca2e8936d755c1d98b6",
+      "bytes": 29202
+    },
+    {
+      "path": "docs/validation/recipes96-1280.json",
+      "sha256": "9e1dc8eed4f61e00301b913fe8d577042f6f947e4225c0121cf727e3db55d56f",
+      "bytes": 29201
+    }
+  ],
+  "representativeScreenshots": [
+    {
+      "path": "docs/previews/v080/representatives/05.03.png",
+      "sha256": "a1af66f6761190d525bf7b287b3851181b42c718faff5a03fd87a0346b7a5db3",
+      "bytes": 291465
+    },
+    {
+      "path": "docs/previews/v080/representatives/03.08.png",
+      "sha256": "840c8ba1be45151df36fd96aa123e5eb85b122b08ce46ffd18ef33d851dbdb5e",
+      "bytes": 456659
+    },
+    {
+      "path": "docs/previews/v080/representatives/08.05.png",
+      "sha256": "3c188b5f8f38d0bd00b671840e096e1f049f1b8729ba9fdadc2e86006a77ec06",
+      "bytes": 468078
+    },
+    {
+      "path": "docs/previews/v080/representatives/07.04.png",
+      "sha256": "8e3facb4f1a65e507770f58f46c33ce0f97a3a661d797a230ef5e0724743671f",
+      "bytes": 465019
+    },
+    {
+      "path": "docs/previews/v080/representatives/09.03.png",
+      "sha256": "c6c3acb5476793fe68b219397405822aefd6de99e6e5fd62885bacf59059c3b1",
+      "bytes": 319950
+    },
+    {
+      "path": "docs/previews/v080/representatives/11.04.png",
+      "sha256": "14483b5dda63197558ae43296aa50b8c400b1469a3ad93dd8c443146015aa0ca",
+      "bytes": 348373
+    }
+  ],
+  "scope": "Scripted Windows Player checks and screenshot provenance; not human visual, rhythm, rapid-input or three-second-comprehension approval"
+}

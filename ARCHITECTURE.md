@@ -2,9 +2,9 @@
 
 Unity 6000.0.26f1, UGUI, DOTween free, built-in render pipeline. Namespace `TweenGallery`.
 
-## 0.7 recipe gallery (current entry)
+## 0.8 recipe gallery (current entry)
 
-`RecipeGallery.unity` is the default scene. `TweenGallery.Recipes` separates the 96-entry `RecipeCatalog`, interactive `RecipeStage`, scoped `MotionChannelArbiter`, and `RecipeGalleryBootstrap` workbench. The initial card-and-drag composition follows the approved ImageGen reference; its portrait, frame, plaque, glow, slots, and shell are independently assembled sprites. Text and hit targets remain native UGUI. See [96-recipe architecture](docs/recipes-96-architecture.md), [art provenance and slicing](docs/recipe-art.md), and [validation](docs/recipes-96-validation.md).
+`RecipeGallery.unity` is the default scene. `TweenGallery.Recipes` separates the 96-entry `RecipeCatalog`, interactive `RecipeStage`, scoped `MotionChannelArbiter`, and `RecipeGalleryBootstrap` workbench. The current workbench exposes all 96 recipes, uses one playback area and a focused scenario per category. Drag fixtures omit unrelated cards; loops use standalone objects. ImageGen art remains independently assembled, while explicit object/state/type tags and actual scenario status drive discovery and inspection. Text and hit targets remain native UGUI. See [96-recipe architecture](docs/recipes-96-architecture.md), [art provenance and slicing](docs/recipe-art.md), and [validation](docs/recipes-96-validation.md).
 
 The complete 12 × 8 directory is independent of the legacy A–E catalog. Business state commits before presentation. Replay and timeline sampling do not issue rewards or repeat input; each scenario owns its tween/channel lifecycle. Reduced motion preserves outcomes and readable feedback. The current contract is documented in `docs/recipes-96*.md`. The sections below describe the preserved 0.6 gallery and its runtime compatibility API.
 

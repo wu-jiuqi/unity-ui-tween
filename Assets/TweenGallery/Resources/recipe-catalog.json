@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "recipes": [
     {
       "id": "01.01",
@@ -10,6 +10,17 @@
       "initialState": "隐藏",
       "finalState": "可交互",
       "tags": "界面与场景 UI 页面",
+      "objectTags": [
+        "页面"
+      ],
+      "stateTags": [
+        "进入",
+        "就绪"
+      ],
+      "typeTags": [
+        "透明度",
+        "位移"
+      ],
       "boundary": "入场中退出不留下透明遮挡",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -25,6 +36,17 @@
       "initialState": "可交互",
       "finalState": "隐藏",
       "tags": "界面与场景 UI 页面",
+      "objectTags": [
+        "页面"
+      ],
+      "stateTags": [
+        "退出",
+        "隐藏"
+      ],
+      "typeTags": [
+        "透明度",
+        "位移"
+      ],
       "boundary": "重复退出只关闭一次",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -40,6 +62,15 @@
       "initialState": "栏目一",
       "finalState": "栏目二",
       "tags": "界面与场景 UI 页面",
+      "objectTags": [
+        "页面"
+      ],
+      "stateTags": [
+        "替换"
+      ],
+      "typeTags": [
+        "交叉淡化"
+      ],
       "boundary": "连续切换以最后目标为准",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -55,6 +86,18 @@
       "initialState": "父页",
       "finalState": "详情",
       "tags": "界面与场景 UI 详情页",
+      "objectTags": [
+        "页面",
+        "详情"
+      ],
+      "stateTags": [
+        "前进",
+        "返回"
+      ],
+      "typeTags": [
+        "位移",
+        "导航"
+      ],
       "boundary": "返回保留父页信息",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -70,6 +113,18 @@
       "initialState": "卡片",
       "finalState": "详情",
       "tags": "界面与场景 UI 卡牌 插画",
+      "objectTags": [
+        "卡牌",
+        "插画"
+      ],
+      "stateTags": [
+        "展开",
+        "返回"
+      ],
+      "typeTags": [
+        "位移",
+        "缩放"
+      ],
       "boundary": "中断时代理清理且原对象可见",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -85,6 +140,16 @@
       "initialState": "HUD显示",
       "finalState": "HUD隐藏",
       "tags": "界面与场景 UI HUD",
+      "objectTags": [
+        "HUD"
+      ],
+      "stateTags": [
+        "显示",
+        "隐藏"
+      ],
+      "typeTags": [
+        "透明度"
+      ],
       "boundary": "隐藏HUD不拦截场景输入",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -100,6 +165,18 @@
       "initialState": "未进入",
       "finalState": "就绪",
       "tags": "界面与场景 UI 页面 分组",
+      "objectTags": [
+        "页面",
+        "分组"
+      ],
+      "stateTags": [
+        "进入",
+        "就绪"
+      ],
+      "typeTags": [
+        "错峰",
+        "透明度"
+      ],
       "boundary": "取消后不补播延迟项",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -115,6 +192,17 @@
       "initialState": "宽布局",
       "finalState": "窄布局",
       "tags": "界面与场景 UI 布局 卡牌",
+      "objectTags": [
+        "页面",
+        "布局"
+      ],
+      "stateTags": [
+        "布局变化"
+      ],
+      "typeTags": [
+        "位移",
+        "尺寸"
+      ],
       "boundary": "往返切换不累计位置偏移",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -130,6 +218,17 @@
       "initialState": "关闭",
       "finalState": "打开",
       "tags": "弹窗与浮层 弹窗",
+      "objectTags": [
+        "弹窗"
+      ],
+      "stateTags": [
+        "打开",
+        "进入"
+      ],
+      "typeTags": [
+        "缩放",
+        "透明度"
+      ],
       "boundary": "入场中关闭也能正确退出",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -145,6 +244,17 @@
       "initialState": "打开",
       "finalState": "关闭",
       "tags": "弹窗与浮层 弹窗",
+      "objectTags": [
+        "弹窗"
+      ],
+      "stateTags": [
+        "关闭",
+        "退出"
+      ],
+      "typeTags": [
+        "缩放",
+        "透明度"
+      ],
       "boundary": "重复关闭不穿透到底层",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -160,6 +270,16 @@
       "initialState": "收起",
       "finalState": "展开",
       "tags": "弹窗与浮层 侧边抽屉",
+      "objectTags": [
+        "抽屉"
+      ],
+      "stateTags": [
+        "展开",
+        "收起"
+      ],
+      "typeTags": [
+        "位移"
+      ],
       "boundary": "中途反向从当前姿态接续",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -175,6 +295,16 @@
       "initialState": "收起",
       "finalState": "展开",
       "tags": "弹窗与浮层 底部面板",
+      "objectTags": [
+        "底部面板"
+      ],
+      "stateTags": [
+        "展开",
+        "收起"
+      ],
+      "typeTags": [
+        "位移"
+      ],
       "boundary": "快速重复操作以最新请求为准",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -190,6 +320,16 @@
       "initialState": "收起",
       "finalState": "展开",
       "tags": "弹窗与浮层 下拉菜单",
+      "objectTags": [
+        "菜单"
+      ],
+      "stateTags": [
+        "展开",
+        "选择"
+      ],
+      "typeTags": [
+        "透明度"
+      ],
       "boundary": "选择后收起且记录选择",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -205,6 +345,17 @@
       "initialState": "等待",
       "finalState": "提示",
       "tags": "弹窗与浮层 提示气泡",
+      "objectTags": [
+        "提示气泡"
+      ],
+      "stateTags": [
+        "悬停",
+        "显示"
+      ],
+      "typeTags": [
+        "透明度",
+        "延迟"
+      ],
       "boundary": "离开早于延迟不显示",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -220,6 +371,15 @@
       "initialState": "步骤一",
       "finalState": "步骤二",
       "tags": "弹窗与浮层 弹窗 步骤",
+      "objectTags": [
+        "弹窗"
+      ],
+      "stateTags": [
+        "替换"
+      ],
+      "typeTags": [
+        "交叉淡化"
+      ],
       "boundary": "连续下一步不恢复旧内容",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -235,6 +395,17 @@
       "initialState": "未确认",
       "finalState": "拒绝",
       "tags": "弹窗与浮层 弹窗 确认",
+      "objectTags": [
+        "弹窗",
+        "确认框"
+      ],
+      "stateTags": [
+        "拒绝",
+        "确认"
+      ],
+      "typeTags": [
+        "震动"
+      ],
       "boundary": "拒绝不清空填写状态",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -250,6 +421,16 @@
       "initialState": "折叠",
       "finalState": "展开",
       "tags": "容器与布局 折叠容器",
+      "objectTags": [
+        "任务面板"
+      ],
+      "stateTags": [
+        "展开"
+      ],
+      "typeTags": [
+        "尺寸",
+        "布局"
+      ],
       "boundary": "中途收起不留下空白",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -265,6 +446,16 @@
       "initialState": "展开",
       "finalState": "折叠",
       "tags": "容器与布局 折叠容器",
+      "objectTags": [
+        "任务面板"
+      ],
+      "stateTags": [
+        "收起"
+      ],
+      "typeTags": [
+        "尺寸",
+        "布局"
+      ],
       "boundary": "收起后内容不可点击",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -280,6 +471,17 @@
       "initialState": "短内容",
       "finalState": "长内容",
       "tags": "容器与布局 文本容器",
+      "objectTags": [
+        "任务面板",
+        "文本"
+      ],
+      "stateTags": [
+        "内容变化"
+      ],
+      "typeTags": [
+        "尺寸",
+        "文本"
+      ],
       "boundary": "反复切换文字不溢出",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -295,6 +497,18 @@
       "initialState": "自由位置",
       "finalState": "吸附",
       "tags": "容器与布局 分隔条",
+      "objectTags": [
+        "任务面板",
+        "分隔条"
+      ],
+      "stateTags": [
+        "拖动",
+        "吸附"
+      ],
+      "typeTags": [
+        "位移",
+        "吸附"
+      ],
       "boundary": "吸附中重抓不跳动",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -310,6 +524,17 @@
       "initialState": "未更新",
       "finalState": "已更新",
       "tags": "容器与布局 任务容器",
+      "objectTags": [
+        "任务面板"
+      ],
+      "stateTags": [
+        "更新",
+        "强调"
+      ],
+      "typeTags": [
+        "透明度",
+        "强调"
+      ],
       "boundary": "连续更新不叠加常亮",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -325,6 +550,15 @@
       "initialState": "内容甲",
       "finalState": "内容乙",
       "tags": "容器与布局 容器内容",
+      "objectTags": [
+        "任务面板"
+      ],
+      "stateTags": [
+        "替换"
+      ],
+      "typeTags": [
+        "交叉淡化"
+      ],
       "boundary": "末态只保留新内容",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -340,6 +574,17 @@
       "initialState": "空列表",
       "finalState": "有内容",
       "tags": "容器与布局 任务列表",
+      "objectTags": [
+        "任务列表"
+      ],
+      "stateTags": [
+        "空态",
+        "加载"
+      ],
+      "typeTags": [
+        "透明度",
+        "内容"
+      ],
       "boundary": "清空后可再次加载",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -355,6 +600,16 @@
       "initialState": "正面",
       "finalState": "背面",
       "tags": "容器与布局 卡牌 正面 背面",
+      "objectTags": [
+        "卡牌"
+      ],
+      "stateTags": [
+        "翻面"
+      ],
+      "typeTags": [
+        "翻转",
+        "缩放"
+      ],
       "boundary": "中途反向落到明确一面",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.3,
@@ -370,6 +625,15 @@
       "initialState": "页签一",
       "finalState": "页签二",
       "tags": "导航与选中 页签 指示条",
+      "objectTags": [
+        "页签"
+      ],
+      "stateTags": [
+        "选中"
+      ],
+      "typeTags": [
+        "位移"
+      ],
       "boundary": "快速换页最终指向最后一项",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -385,6 +649,15 @@
       "initialState": "焦点一",
       "finalState": "焦点二",
       "tags": "导航与选中 键盘 焦点框",
+      "objectTags": [
+        "焦点框"
+      ],
+      "stateTags": [
+        "聚焦"
+      ],
+      "typeTags": [
+        "位移"
+      ],
       "boundary": "失效控件不保留焦点",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -400,6 +673,18 @@
       "initialState": "页签一内容",
       "finalState": "页签二内容",
       "tags": "导航与选中 页签 内容",
+      "objectTags": [
+        "页签",
+        "内容"
+      ],
+      "stateTags": [
+        "选中",
+        "替换"
+      ],
+      "typeTags": [
+        "位移",
+        "透明度"
+      ],
       "boundary": "旧内容失去交互资格",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -415,6 +700,15 @@
       "initialState": "步骤一",
       "finalState": "步骤二",
       "tags": "导航与选中 步骤条",
+      "objectTags": [
+        "步骤条"
+      ],
+      "stateTags": [
+        "完成"
+      ],
+      "typeTags": [
+        "填充"
+      ],
       "boundary": "不能越过未完成步骤",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -430,6 +724,16 @@
       "initialState": "一级",
       "finalState": "二级",
       "tags": "导航与选中 面包屑",
+      "objectTags": [
+        "面包屑"
+      ],
+      "stateTags": [
+        "前进",
+        "返回"
+      ],
+      "typeTags": [
+        "透明度"
+      ],
       "boundary": "返回删除旧路径且可再次进入",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -445,6 +749,16 @@
       "initialState": "第一页",
       "finalState": "第二页",
       "tags": "导航与选中 分页 列表",
+      "objectTags": [
+        "分页",
+        "列表"
+      ],
+      "stateTags": [
+        "翻页"
+      ],
+      "typeTags": [
+        "位移"
+      ],
       "boundary": "第一页不能继续向前",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -460,6 +774,16 @@
       "initialState": "全部",
       "finalState": "稀有",
       "tags": "导航与选中 筛选 标签",
+      "objectTags": [
+        "筛选标签"
+      ],
+      "stateTags": [
+        "筛选",
+        "选中"
+      ],
+      "typeTags": [
+        "透明度"
+      ],
       "boundary": "快速切换不出现过期结果",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -475,6 +799,18 @@
       "initialState": "未选中",
       "finalState": "选中",
       "tags": "导航与选中 选中 光环",
+      "objectTags": [
+        "光环",
+        "物品"
+      ],
+      "stateTags": [
+        "选中",
+        "循环"
+      ],
+      "typeTags": [
+        "透明度",
+        "循环"
+      ],
       "boundary": "失去选择立即停止循环",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 1.8,
@@ -490,6 +826,16 @@
       "initialState": "默认",
       "finalState": "悬停",
       "tags": "按钮 按钮 指针",
+      "objectTags": [
+        "按钮"
+      ],
+      "stateTags": [
+        "悬停",
+        "进入"
+      ],
+      "typeTags": [
+        "缩放"
+      ],
       "boundary": "边缘移动不反复闪烁",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -505,6 +851,16 @@
       "initialState": "悬停",
       "finalState": "默认",
       "tags": "按钮 按钮 指针",
+      "objectTags": [
+        "按钮"
+      ],
+      "stateTags": [
+        "悬停",
+        "退出"
+      ],
+      "typeTags": [
+        "缩放"
+      ],
       "boundary": "移动中再次移入从当前姿态接续",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -520,6 +876,15 @@
       "initialState": "默认",
       "finalState": "按下",
       "tags": "按钮 按钮 按压",
+      "objectTags": [
+        "按钮"
+      ],
+      "stateTags": [
+        "按下"
+      ],
+      "typeTags": [
+        "缩放"
+      ],
       "boundary": "禁用时立即取消按压",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -535,6 +900,16 @@
       "initialState": "按下",
       "finalState": "释放",
       "tags": "按钮 按钮 释放",
+      "objectTags": [
+        "按钮"
+      ],
+      "stateTags": [
+        "按下",
+        "松开"
+      ],
+      "typeTags": [
+        "缩放"
+      ],
       "boundary": "快速连点不累计缩放",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -550,6 +925,16 @@
       "initialState": "可用",
       "finalState": "已点击",
       "tags": "按钮 按钮 脉冲",
+      "objectTags": [
+        "按钮"
+      ],
+      "stateTags": [
+        "点击"
+      ],
+      "typeTags": [
+        "缩放",
+        "脉冲"
+      ],
       "boundary": "按下但未完成点击不产生脉冲",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -565,6 +950,17 @@
       "initialState": "按下",
       "finalState": "取消",
       "tags": "按钮 按钮 取消",
+      "objectTags": [
+        "按钮"
+      ],
+      "stateTags": [
+        "按下",
+        "取消"
+      ],
+      "typeTags": [
+        "缩放",
+        "取消"
+      ],
       "boundary": "外部松开不能误触发",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -580,6 +976,16 @@
       "initialState": "启用",
       "finalState": "禁用",
       "tags": "按钮 按钮 禁用",
+      "objectTags": [
+        "按钮"
+      ],
+      "stateTags": [
+        "禁用",
+        "启用"
+      ],
+      "typeTags": [
+        "状态切换"
+      ],
       "boundary": "按住期间禁用不留下Pressed",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -595,6 +1001,18 @@
       "initialState": "等待",
       "finalState": "蓄满",
       "tags": "按钮 按钮 长按",
+      "objectTags": [
+        "按钮",
+        "进度条"
+      ],
+      "stateTags": [
+        "长按",
+        "蓄满"
+      ],
+      "typeTags": [
+        "填充",
+        "输入驱动"
+      ],
       "boundary": "提前移出或松开取消",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -610,6 +1028,16 @@
       "initialState": "关闭",
       "finalState": "开启",
       "tags": "输入与选项 开关 滑块",
+      "objectTags": [
+        "开关"
+      ],
+      "stateTags": [
+        "开启",
+        "关闭"
+      ],
+      "typeTags": [
+        "位移"
+      ],
       "boundary": "连续点击以最终状态为准",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -625,6 +1053,16 @@
       "initialState": "未勾选",
       "finalState": "勾选",
       "tags": "输入与选项 复选框 勾选",
+      "objectTags": [
+        "复选框"
+      ],
+      "stateTags": [
+        "勾选",
+        "取消"
+      ],
+      "typeTags": [
+        "缩放"
+      ],
       "boundary": "再次点击正确取消",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -640,6 +1078,15 @@
       "initialState": "选项一",
       "finalState": "选项二",
       "tags": "输入与选项 单选 选项",
+      "objectTags": [
+        "单选框"
+      ],
+      "stateTags": [
+        "选中"
+      ],
+      "typeTags": [
+        "状态切换"
+      ],
       "boundary": "任意时刻只有一项选中",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -655,6 +1102,16 @@
       "initialState": "未聚焦",
       "finalState": "聚焦",
       "tags": "输入与选项 输入框 焦点",
+      "objectTags": [
+        "输入框"
+      ],
+      "stateTags": [
+        "聚焦",
+        "编辑中"
+      ],
+      "typeTags": [
+        "透明度"
+      ],
       "boundary": "点外部能正常失焦",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -670,6 +1127,15 @@
       "initialState": "聚焦",
       "finalState": "未聚焦",
       "tags": "输入与选项 输入框 失焦",
+      "objectTags": [
+        "输入框"
+      ],
+      "stateTags": [
+        "失焦"
+      ],
+      "typeTags": [
+        "透明度"
+      ],
       "boundary": "失焦不清除已输入文字",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -685,6 +1151,16 @@
       "initialState": "待校验",
       "finalState": "失败",
       "tags": "输入与选项 输入框 错误",
+      "objectTags": [
+        "输入框"
+      ],
+      "stateTags": [
+        "校验失败",
+        "编辑中"
+      ],
+      "typeTags": [
+        "震动"
+      ],
       "boundary": "失败后可以修正并重试",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -700,6 +1176,16 @@
       "initialState": "待校验",
       "finalState": "成功",
       "tags": "输入与选项 输入框 成功",
+      "objectTags": [
+        "输入框"
+      ],
+      "stateTags": [
+        "校验成功",
+        "编辑中"
+      ],
+      "typeTags": [
+        "状态切换"
+      ],
       "boundary": "无效内容不能提前成功",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -715,6 +1201,16 @@
       "initialState": "静止",
       "finalState": "拖动",
       "tags": "输入与选项 滑块 气泡",
+      "objectTags": [
+        "滑块",
+        "提示气泡"
+      ],
+      "stateTags": [
+        "拖动"
+      ],
+      "typeTags": [
+        "输入驱动"
+      ],
       "boundary": "松开隐藏气泡但保存数值",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -730,6 +1226,17 @@
       "initialState": "未显示",
       "finalState": "首屏可见",
       "tags": "列表与滚动 任务列表",
+      "objectTags": [
+        "背包",
+        "列表"
+      ],
+      "stateTags": [
+        "进入"
+      ],
+      "typeTags": [
+        "透明度",
+        "错峰"
+      ],
       "boundary": "隐藏后不再出现延迟条目",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -745,6 +1252,17 @@
       "initialState": "四条",
       "finalState": "五条",
       "tags": "列表与滚动 任务列表 插入",
+      "objectTags": [
+        "背包",
+        "列表"
+      ],
+      "stateTags": [
+        "插入"
+      ],
+      "typeTags": [
+        "位移",
+        "布局"
+      ],
       "boundary": "多次插入保留原行身份",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -760,6 +1278,17 @@
       "initialState": "四条",
       "finalState": "三条",
       "tags": "列表与滚动 任务列表 删除",
+      "objectTags": [
+        "背包",
+        "列表"
+      ],
+      "stateTags": [
+        "删除"
+      ],
+      "typeTags": [
+        "透明度",
+        "位移"
+      ],
       "boundary": "删除末行后显示空态",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -775,6 +1304,16 @@
       "initialState": "原顺序",
       "finalState": "反序",
       "tags": "列表与滚动 任务列表 重排",
+      "objectTags": [
+        "背包",
+        "列表"
+      ],
+      "stateTags": [
+        "重排"
+      ],
+      "typeTags": [
+        "位移"
+      ],
       "boundary": "点击仍对应原任务ID",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -790,6 +1329,17 @@
       "initialState": "全部",
       "finalState": "未完成",
       "tags": "列表与滚动 任务列表 筛选",
+      "objectTags": [
+        "背包",
+        "列表"
+      ],
+      "stateTags": [
+        "筛选"
+      ],
+      "typeTags": [
+        "位移",
+        "布局"
+      ],
       "boundary": "恢复全部不重复创建ID",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -805,6 +1355,18 @@
       "initialState": "任意偏移",
       "finalState": "行边界",
       "tags": "列表与滚动 滚动 吸附",
+      "objectTags": [
+        "背包",
+        "列表"
+      ],
+      "stateTags": [
+        "滚动",
+        "吸附"
+      ],
+      "typeTags": [
+        "位移",
+        "吸附"
+      ],
       "boundary": "拖动中不与吸附争写位置",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -820,6 +1382,18 @@
       "initialState": "越界",
       "finalState": "有效范围",
       "tags": "列表与滚动 滚动 回弹",
+      "objectTags": [
+        "背包",
+        "列表"
+      ],
+      "stateTags": [
+        "滚动",
+        "回弹"
+      ],
+      "typeTags": [
+        "弹簧",
+        "输入驱动"
+      ],
       "boundary": "不叠加第二套惯性驱动",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -835,6 +1409,17 @@
       "initialState": "当前位置",
       "finalState": "目标可见",
       "tags": "列表与滚动 滚动 定位",
+      "objectTags": [
+        "背包",
+        "列表"
+      ],
+      "stateTags": [
+        "滚动",
+        "定位"
+      ],
+      "typeTags": [
+        "位移"
+      ],
       "boundary": "跳转中手动拖动立即接管",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -850,6 +1435,17 @@
       "initialState": "源槽",
       "finalState": "拾起",
       "tags": "拖拽与放置 物品 插槽",
+      "objectTags": [
+        "物品",
+        "插槽"
+      ],
+      "stateTags": [
+        "拾起"
+      ],
+      "typeTags": [
+        "缩放",
+        "输入驱动"
+      ],
       "boundary": "只接受活动指针，失焦取消",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -865,6 +1461,16 @@
       "initialState": "拾起",
       "finalState": "拖动",
       "tags": "拖拽与放置 物品 跟手",
+      "objectTags": [
+        "物品",
+        "插槽"
+      ],
+      "stateTags": [
+        "拖动"
+      ],
+      "typeTags": [
+        "输入驱动"
+      ],
       "boundary": "重抓回弹中的物品不跳动",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -880,6 +1486,17 @@
       "initialState": "拖动",
       "finalState": "有效区域",
       "tags": "拖拽与放置 有效 插槽",
+      "objectTags": [
+        "物品",
+        "插槽"
+      ],
+      "stateTags": [
+        "拖动",
+        "有效"
+      ],
+      "typeTags": [
+        "状态切换"
+      ],
       "boundary": "离开区域撤销有效提示",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -895,6 +1512,17 @@
       "initialState": "拖动",
       "finalState": "无效区域",
       "tags": "拖拽与放置 无效 插槽",
+      "objectTags": [
+        "物品",
+        "插槽"
+      ],
+      "stateTags": [
+        "拖动",
+        "无效"
+      ],
+      "typeTags": [
+        "状态切换"
+      ],
       "boundary": "颜色外另有禁止图标",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -910,6 +1538,18 @@
       "initialState": "源槽",
       "finalState": "目标槽",
       "tags": "拖拽与放置 物品 吸附",
+      "objectTags": [
+        "物品",
+        "插槽"
+      ],
+      "stateTags": [
+        "放置",
+        "成功"
+      ],
+      "typeTags": [
+        "弹簧",
+        "吸附"
+      ],
       "boundary": "再次拖动以新槽为起点",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -925,6 +1565,18 @@
       "initialState": "拖动",
       "finalState": "拒绝回源",
       "tags": "拖拽与放置 物品 回弹",
+      "objectTags": [
+        "物品",
+        "插槽"
+      ],
+      "stateTags": [
+        "拒绝",
+        "回弹"
+      ],
+      "typeTags": [
+        "弹簧",
+        "回弹"
+      ],
       "boundary": "回弹中重抓从当前位置开始",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -940,6 +1592,18 @@
       "initialState": "ABC",
       "finalState": "BCA",
       "tags": "拖拽与放置 物品 排序",
+      "objectTags": [
+        "物品",
+        "背包"
+      ],
+      "stateTags": [
+        "拖动",
+        "重排"
+      ],
+      "typeTags": [
+        "位移",
+        "排序"
+      ],
       "boundary": "使用稳定ID绑定点击与排序",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -955,6 +1619,18 @@
       "initialState": "拖动",
       "finalState": "取消",
       "tags": "拖拽与放置 物品 取消",
+      "objectTags": [
+        "物品",
+        "插槽"
+      ],
+      "stateTags": [
+        "取消",
+        "恢复"
+      ],
+      "typeTags": [
+        "弹簧",
+        "取消"
+      ],
       "boundary": "取消与拒绝分别记录结果",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -970,6 +1646,15 @@
       "initialState": "100",
       "finalState": "最新目标",
       "tags": "数值与进度 数值",
+      "objectTags": [
+        "数值"
+      ],
+      "stateTags": [
+        "更新"
+      ],
+      "typeTags": [
+        "数值"
+      ],
       "boundary": "旧补间不能覆盖新目标",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -985,6 +1670,16 @@
       "initialState": "100",
       "finalState": "增加或扣减",
       "tags": "数值与进度 货币",
+      "objectTags": [
+        "货币"
+      ],
+      "stateTags": [
+        "收入",
+        "支出"
+      ],
+      "typeTags": [
+        "数值"
+      ],
       "boundary": "余额不足拒绝支出",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1000,6 +1695,16 @@
       "initialState": "满血",
       "finalState": "受伤",
       "tags": "数值与进度 生命条 拖尾",
+      "objectTags": [
+        "血条"
+      ],
+      "stateTags": [
+        "受伤"
+      ],
+      "typeTags": [
+        "填充",
+        "拖尾"
+      ],
       "boundary": "连续伤害最终追到真实生命",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1015,6 +1720,15 @@
       "initialState": "低生命",
       "finalState": "恢复",
       "tags": "数值与进度 生命条 治疗",
+      "objectTags": [
+        "血条"
+      ],
+      "stateTags": [
+        "治疗"
+      ],
+      "typeTags": [
+        "填充"
+      ],
       "boundary": "不超过最大生命",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1030,6 +1744,16 @@
       "initialState": "等级1经验70",
       "finalState": "等级3经验20",
       "tags": "数值与进度 经验条 等级",
+      "objectTags": [
+        "经验条"
+      ],
+      "stateTags": [
+        "升级"
+      ],
+      "typeTags": [
+        "填充",
+        "数值"
+      ],
       "boundary": "跨级不丢失余量",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1045,6 +1769,16 @@
       "initialState": "10秒",
       "finalState": "0秒",
       "tags": "数值与进度 倒计时",
+      "objectTags": [
+        "倒计时"
+      ],
+      "stateTags": [
+        "倒计时",
+        "临界"
+      ],
+      "typeTags": [
+        "实时计时"
+      ],
       "boundary": "暂停表现不暂停真实倒计时",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1060,6 +1794,16 @@
       "initialState": "空闲",
       "finalState": "加载→结果",
       "tags": "数值与进度 加载环",
+      "objectTags": [
+        "加载环"
+      ],
+      "stateTags": [
+        "加载"
+      ],
+      "typeTags": [
+        "旋转",
+        "循环"
+      ],
       "boundary": "不显示伪造百分比",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 1.2,
@@ -1075,6 +1819,16 @@
       "initialState": "0/4",
       "finalState": "4/4",
       "tags": "数值与进度 进度条",
+      "objectTags": [
+        "进度条"
+      ],
+      "stateTags": [
+        "进度",
+        "完成"
+      ],
+      "typeTags": [
+        "填充"
+      ],
       "boundary": "显示到100不能反推任务完成",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1090,6 +1844,17 @@
       "initialState": "无消息",
       "finalState": "显示→隐藏",
       "tags": "通知与反馈 Toast 消息",
+      "objectTags": [
+        "通知"
+      ],
+      "stateTags": [
+        "显示",
+        "隐藏"
+      ],
+      "typeTags": [
+        "透明度",
+        "队列"
+      ],
       "boundary": "重复消息合并且队列有上限",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1105,6 +1870,15 @@
       "initialState": "待操作",
       "finalState": "成功",
       "tags": "通知与反馈 成功 图标",
+      "objectTags": [
+        "成功图标"
+      ],
+      "stateTags": [
+        "成功"
+      ],
+      "typeTags": [
+        "缩放"
+      ],
       "boundary": "重复采样不重复提交",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1120,6 +1894,15 @@
       "initialState": "待操作",
       "finalState": "错误",
       "tags": "通知与反馈 错误 图标",
+      "objectTags": [
+        "错误图标"
+      ],
+      "stateTags": [
+        "错误"
+      ],
+      "typeTags": [
+        "震动"
+      ],
       "boundary": "不锁住修正入口",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1135,6 +1918,15 @@
       "initialState": "未检查",
       "finalState": "警告",
       "tags": "通知与反馈 警告 图标",
+      "objectTags": [
+        "警告图标"
+      ],
+      "stateTags": [
+        "警告"
+      ],
+      "typeTags": [
+        "缩放"
+      ],
       "boundary": "减弱模式保留文字",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1150,6 +1942,16 @@
       "initialState": "0",
       "finalState": "未读",
       "tags": "通知与反馈 角标 未读",
+      "objectTags": [
+        "角标"
+      ],
+      "stateTags": [
+        "更新"
+      ],
+      "typeTags": [
+        "缩放",
+        "数值"
+      ],
       "boundary": "动画完成不能清空未读数据",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1165,6 +1967,19 @@
       "initialState": "空闲",
       "finalState": "加载→失败→重试",
       "tags": "通知与反馈 加载 重试",
+      "objectTags": [
+        "加载环",
+        "重试"
+      ],
+      "stateTags": [
+        "加载",
+        "失败",
+        "重试"
+      ],
+      "typeTags": [
+        "旋转",
+        "状态切换"
+      ],
       "boundary": "旧请求完成不能覆盖新请求",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 1.2,
@@ -1180,6 +1995,18 @@
       "initialState": "未开始",
       "finalState": "引导→完成",
       "tags": "通知与反馈 教学 箭头",
+      "objectTags": [
+        "教学箭头",
+        "按钮"
+      ],
+      "stateTags": [
+        "引导",
+        "完成"
+      ],
+      "typeTags": [
+        "位移",
+        "循环"
+      ],
       "boundary": "跳过彻底清理遮挡",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1195,6 +2022,17 @@
       "initialState": "目标可见",
       "finalState": "跟随",
       "tags": "通知与反馈 锚定 气泡",
+      "objectTags": [
+        "提示气泡",
+        "目标"
+      ],
+      "stateTags": [
+        "跟随",
+        "隐藏"
+      ],
+      "typeTags": [
+        "输入驱动"
+      ],
       "boundary": "目标隐藏不留下悬空气泡",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.28,
@@ -1210,6 +2048,17 @@
       "initialState": "未揭示",
       "finalState": "可见",
       "tags": "奖励与结算 奖励 卡牌",
+      "objectTags": [
+        "奖励卡牌"
+      ],
+      "stateTags": [
+        "揭示",
+        "领取"
+      ],
+      "typeTags": [
+        "透明度",
+        "错峰"
+      ],
       "boundary": "跳过直接展示确定奖励",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.65,
@@ -1225,6 +2074,17 @@
       "initialState": "未展示",
       "finalState": "实际星数",
       "tags": "奖励与结算 星级",
+      "objectTags": [
+        "星星"
+      ],
+      "stateTags": [
+        "评分",
+        "展示"
+      ],
+      "typeTags": [
+        "缩放",
+        "错峰"
+      ],
       "boundary": "重复播放不累加评分",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.65,
@@ -1240,6 +2100,17 @@
       "initialState": "关闭",
       "finalState": "开启",
       "tags": "奖励与结算 宝箱",
+      "objectTags": [
+        "宝箱"
+      ],
+      "stateTags": [
+        "开启",
+        "揭示"
+      ],
+      "typeTags": [
+        "旋转",
+        "位移"
+      ],
       "boundary": "重复开启不重复发放",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.65,
@@ -1255,6 +2126,18 @@
       "initialState": "未领取",
       "finalState": "已到账",
       "tags": "奖励与结算 货币 图标 HUD",
+      "objectTags": [
+        "货币",
+        "HUD"
+      ],
+      "stateTags": [
+        "领取",
+        "到账"
+      ],
+      "typeTags": [
+        "位移",
+        "数值"
+      ],
       "boundary": "取消表现仍保持到账",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.65,
@@ -1270,6 +2153,17 @@
       "initialState": "未解锁",
       "finalState": "已归档",
       "tags": "奖励与结算 成就 徽章",
+      "objectTags": [
+        "成就徽章"
+      ],
+      "stateTags": [
+        "解锁",
+        "归位"
+      ],
+      "typeTags": [
+        "位移",
+        "缩放"
+      ],
       "boundary": "中途关闭不丢失解锁",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.65,
@@ -1285,6 +2179,15 @@
       "initialState": "等级1",
       "finalState": "等级2",
       "tags": "奖励与结算 等级 徽章",
+      "objectTags": [
+        "等级徽章"
+      ],
+      "stateTags": [
+        "升级"
+      ],
+      "typeTags": [
+        "缩放"
+      ],
       "boundary": "连续升级不丢数据",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.65,
@@ -1300,6 +2203,16 @@
       "initialState": "玩家第4",
       "finalState": "第1",
       "tags": "奖励与结算 排名 行",
+      "objectTags": [
+        "排行榜"
+      ],
+      "stateTags": [
+        "重排"
+      ],
+      "typeTags": [
+        "位移",
+        "排序"
+      ],
       "boundary": "排名变化不改绑用户身份",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.65,
@@ -1315,6 +2228,18 @@
       "initialState": "演出中",
       "finalState": "完成",
       "tags": "奖励与结算 结算 卡牌",
+      "objectTags": [
+        "结算",
+        "奖励卡牌"
+      ],
+      "stateTags": [
+        "跳过",
+        "完成"
+      ],
+      "typeTags": [
+        "透明度",
+        "状态切换"
+      ],
       "boundary": "反复跳过不重复发奖",
       "reducedMotion": "立即显示正确状态，保留文字、图标和必要进度，不改变操作结果",
       "duration": 0.65,
@@ -1329,7 +2254,18 @@
       "observe": "围绕稳定比例低幅缩放",
       "initialState": "静止",
       "finalState": "呼吸",
-      "tags": "闲置与装饰循环 卡牌 呼吸",
+      "tags": "闲置与装饰循环 晶石 呼吸",
+      "objectTags": [
+        "晶石"
+      ],
+      "stateTags": [
+        "循环",
+        "呼吸"
+      ],
+      "typeTags": [
+        "缩放",
+        "循环"
+      ],
       "boundary": "停止后回到固定基线",
       "reducedMotion": "关闭空间运动与循环，以静态轮廓和状态文字表达",
       "duration": 1.8,
@@ -1344,7 +2280,18 @@
       "observe": "围绕固定原位上下运动",
       "initialState": "静止",
       "finalState": "悬浮",
-      "tags": "闲置与装饰循环 卡牌 悬浮",
+      "tags": "闲置与装饰循环 药水 悬浮",
+      "objectTags": [
+        "药水"
+      ],
+      "stateTags": [
+        "循环",
+        "悬浮"
+      ],
+      "typeTags": [
+        "位移",
+        "循环"
+      ],
       "boundary": "长时间不累计位移",
       "reducedMotion": "关闭空间运动与循环，以静态轮廓和状态文字表达",
       "duration": 1.8,
@@ -1359,7 +2306,18 @@
       "observe": "带方向的图标恒速旋转",
       "initialState": "静止",
       "finalState": "旋转",
-      "tags": "闲置与装饰循环 晶石 旋转",
+      "tags": "闲置与装饰循环 装备 旋转",
+      "objectTags": [
+        "装备图标"
+      ],
+      "stateTags": [
+        "循环",
+        "旋转"
+      ],
+      "typeTags": [
+        "旋转",
+        "循环"
+      ],
       "boundary": "隐藏停止，重复开启不叠加",
       "reducedMotion": "关闭空间运动与循环，以静态轮廓和状态文字表达",
       "duration": 1.8,
@@ -1374,7 +2332,18 @@
       "observe": "吊牌绕顶部固定枢轴摆动",
       "initialState": "静止",
       "finalState": "摆动",
-      "tags": "闲置与装饰循环 卡牌 摆动",
+      "tags": "闲置与装饰循环 吊牌 摆动",
+      "objectTags": [
+        "吊牌"
+      ],
+      "stateTags": [
+        "循环",
+        "摆动"
+      ],
+      "typeTags": [
+        "旋转",
+        "循环"
+      ],
       "boundary": "停止恢复原始角度",
       "reducedMotion": "关闭空间运动与循环，以静态轮廓和状态文字表达",
       "duration": 1.8,
@@ -1390,6 +2359,18 @@
       "initialState": "静止",
       "finalState": "光环",
       "tags": "闲置与装饰循环 光环",
+      "objectTags": [
+        "光环",
+        "晶石"
+      ],
+      "stateTags": [
+        "循环",
+        "呼吸"
+      ],
+      "typeTags": [
+        "透明度",
+        "循环"
+      ],
       "boundary": "减弱模式改静态轮廓",
       "reducedMotion": "关闭空间运动与循环，以静态轮廓和状态文字表达",
       "duration": 1.8,
@@ -1404,7 +2385,19 @@
       "observe": "高光掠过后有明确静默间隔",
       "initialState": "静止",
       "finalState": "扫光",
-      "tags": "闲置与装饰循环 卡牌 扫光",
+      "tags": "闲置与装饰循环 按钮 扫光",
+      "objectTags": [
+        "按钮",
+        "高光"
+      ],
+      "stateTags": [
+        "循环",
+        "扫光"
+      ],
+      "typeTags": [
+        "位移",
+        "循环"
+      ],
       "boundary": "高光限制在卡牌裁剪内",
       "reducedMotion": "关闭空间运动与循环，以静态轮廓和状态文字表达",
       "duration": 1.8,
@@ -1419,7 +2412,19 @@
       "observe": "物体沿闭合轨迹连续移动",
       "initialState": "静止",
       "finalState": "巡游",
-      "tags": "闲置与装饰循环 晶石 路径",
+      "tags": "闲置与装饰循环 金币 路径",
+      "objectTags": [
+        "金币",
+        "路径"
+      ],
+      "stateTags": [
+        "循环",
+        "巡游"
+      ],
+      "typeTags": [
+        "路径",
+        "循环"
+      ],
       "boundary": "周期接缝位置与速度连续",
       "reducedMotion": "关闭空间运动与循环，以静态轮廓和状态文字表达",
       "duration": 1.8,
@@ -1434,7 +2439,18 @@
       "observe": "前后层有限反向偏移",
       "initialState": "居中",
       "finalState": "视差",
-      "tags": "闲置与装饰循环 卡牌 视差",
+      "tags": "闲置与装饰循环 晶石 视差",
+      "objectTags": [
+        "晶石",
+        "底板"
+      ],
+      "stateTags": [
+        "跟随",
+        "复位"
+      ],
+      "typeTags": [
+        "输入驱动"
+      ],
       "boundary": "离开舞台或失焦回中",
       "reducedMotion": "关闭空间运动与循环，以静态轮廓和状态文字表达",
       "duration": 1.8,
